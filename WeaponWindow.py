@@ -1,5 +1,8 @@
 from tkinter import *
-from variables import *
+from variables import WEAPON_NAMES, WEAPON_ADDRESSES, WEAPON_TYPE, inv_WEAPON_TYPE
+from variables import WEAPON_ANIMATIONS, inv_WEAPON_ANIMATIONS, EQUIPMENT_STAT, inv_EQUIPMENT_STAT
+from variables import SKILL_ATTRIBUTE, inv_SKILL_ATTRIBUTE, EQUIPMENT_SPELLS_MAGIC, inv_EQUIPMENT_SPELLS_MAGIC
+from variables import RESIST, inv_RESIST, RESIST_AMOUNTS, inv_RESIST_AMOUNTS
 
 
 class WeaponEdit:
