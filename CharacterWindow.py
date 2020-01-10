@@ -1,6 +1,7 @@
 from tkinter import *
 # from tkinter import filedialog
-from variables import *
+from variables import WEAPONS, inv_WEAPONS, ARMORS, inv_ARMORS, SHIELDS, inv_SHIELDS
+from variables import SPELLS, inv_SPELLS, ATTRIBUTES, SKILLS
 
 
 class CharacterEdit:
@@ -22,7 +23,7 @@ class CharacterEdit:
 
                 # seek address for everything else
                 f.seek(address)
-                character_data = f.read(148)
+                character_data = f.read(74)
                 cd = character_data.hex()
 
                 # set aspect default
@@ -90,7 +91,7 @@ class CharacterEdit:
                 f.write(new_name.encode('utf-8'))
 
                 f.seek(address)
-                character_data = f.read(148)
+                character_data = f.read(74)
                 cd = character_data.hex()
                 towrite = [aspect.get(), int((cd[3] + cd[4]).encode('utf-8'), 16),
                            int((cd[5] + cd[6]).encode('utf-8'), 16)]
@@ -124,15 +125,8 @@ class CharacterEdit:
                 for i in spell_levels:
                     towrite.append(i.get())
 
-                towrite.append(int((cd[118] + cd[119]).encode('utf-8'), 16))
-                towrite.append(int((cd[120] + cd[121]).encode('utf-8'), 16))
-                towrite.append(int((cd[122] + cd[123]).encode('utf-8'), 16))
-                towrite.append(int((cd[124] + cd[125]).encode('utf-8'), 16))
-                towrite.append(int((cd[126] + cd[127]).encode('utf-8'), 16))
-                towrite.append(int((cd[128] + cd[129]).encode('utf-8'), 16))
-                towrite.append(int((cd[130] + cd[131]).encode('utf-8'), 16))
-                towrite.append(int((cd[132] + cd[133]).encode('utf-8'), 16))
-                towrite.append(int((cd[134] + cd[135]).encode('utf-8'), 16))
+                for i in range(118, 135, 2):
+                    towrite.append(int((cd[i] + cd[i+1]).encode('utf-8'), 16))
 
                 towrite.append(int((ARMORS[armor.get()])[:2], 16))
                 towrite.append(int((ARMORS[armor.get()])[2:], 16))
@@ -143,7 +137,7 @@ class CharacterEdit:
                 shi = shield_skill.get()
                 if shi == '':
                     shi = 255
-                towrite.append(shi)
+                towrite.append(int(shi))
 
                 f.seek(address)
                 for item in towrite:
@@ -163,7 +157,7 @@ class CharacterEdit:
             default_name_menu.grid(column=0, row=0)
             default_name_menu.config(width=18)
 
-            new_name_entry = Entry(new_name_frame, textvariable=name, width=15)
+            new_name_entry = Entry(new_name_frame, textvariable=name)
             new_name_entry.grid(column=0, row=1)
             new_name_entry.config(width=18)
 

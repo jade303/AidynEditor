@@ -1,8 +1,9 @@
 from tkinter import *
 from tkinter import filedialog
-from variables import *
+from variables import PARTY, PARTY_ADDRESSES, ENEMIES, ENEMY_ADDRESSES
 import CharacterWindow
 import SpellWindow
+import WeaponWindow
 
 
 def file_dialog():
@@ -32,6 +33,9 @@ def file_dialog():
         spell_button = Button(root, text="Spell Edit",
                               command=lambda: SpellWindow.SpellEdit(filename))
         spell_button.grid(column=2, row=1)
+        weapon_button = Button(root, text="Weapon Edit",
+                               command=lambda: WeaponWindow.WeaponEdit(filename))
+        weapon_button.grid(column=3, row=1)
 
 
 root = Tk()
