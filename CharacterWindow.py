@@ -1,7 +1,7 @@
-from tkinter import *
+from tkinter import Toplevel, Frame, LabelFrame, OptionMenu, Entry, Button, Radiobutton, Label, StringVar, IntVar
 # from tkinter import filedialog
-from variables import WEAPONS, inv_WEAPONS, ARMORS, inv_ARMORS, SHIELDS, inv_SHIELDS
-from variables import SPELLS, inv_SPELLS, ATTRIBUTES, SKILLS
+from variables import WEAPONS, inv_WEAPONS, ARMORS, inv_ARMORS, SHIELDS, inv_SHIELDS, \
+    SPELLS, inv_SPELLS, ATTRIBUTES, SKILLS
 
 
 class CharacterEdit:
@@ -126,7 +126,7 @@ class CharacterEdit:
                     towrite.append(i.get())
 
                 for i in range(118, 135, 2):
-                    towrite.append(int((cd[i] + cd[i+1]).encode('utf-8'), 16))
+                    towrite.append(int((cd[i] + cd[i + 1]).encode('utf-8'), 16))
 
                 towrite.append(int((ARMORS[armor.get()])[:2], 16))
                 towrite.append(int((ARMORS[armor.get()])[2:], 16))
@@ -258,7 +258,7 @@ class CharacterEdit:
                 spell_level.config(width=4)
 
         def input_val(inp):
-            if inp.isnumeric() and int(inp) in range(1, 256):
+            if inp.isnumeric() and int(inp) in range(0, 256):
                 return True
             elif inp == "":
                 return True

@@ -1,6 +1,6 @@
-from tkinter import *
-from variables import SPELL_ADDRESSES, SPELL_INGREDIENTS, SPELL_NAMES, inv_SPELL_INGREDIENTS
-from variables import TARGET_NUM, TARGET_TYPE, inv_TARGET_NUM, inv_TARGET_TYPE
+from tkinter import Toplevel, Frame, LabelFrame, Entry, OptionMenu, Radiobutton, Label, Button, StringVar, IntVar
+from variables import SPELL_ADDRESSES, SPELL_INGREDIENTS, SPELL_NAMES, inv_SPELL_INGREDIENTS, \
+    TARGET_NUM, TARGET_TYPE, inv_TARGET_NUM, inv_TARGET_TYPE
 
 
 class SpellEdit:
@@ -163,7 +163,7 @@ class SpellEdit:
             target_type_menu.config(width=23)
 
         def input_val(inp):
-            if inp.isnumeric() and int(inp) in range(1, 256):
+            if inp.isnumeric() and int(inp) in range(0, 256):
                 return True
             elif inp == "":
                 return True

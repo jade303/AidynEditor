@@ -1,8 +1,8 @@
-from tkinter import *
-from variables import WEAPON_NAMES, WEAPON_ADDRESSES, WEAPON_TYPE, inv_WEAPON_TYPE
-from variables import WEAPON_ANIMATIONS, inv_WEAPON_ANIMATIONS, EQUIPMENT_STAT, inv_EQUIPMENT_STAT
-from variables import SKILL_ATTRIBUTE, inv_SKILL_ATTRIBUTE, EQUIPMENT_SPELLS_MAGIC, inv_EQUIPMENT_SPELLS_MAGIC
-from variables import RESIST, inv_RESIST, RESIST_AMOUNTS, inv_RESIST_AMOUNTS
+from tkinter import Toplevel, Frame, LabelFrame, Entry, OptionMenu, Label, Button, Radiobutton, StringVar, IntVar
+from variables import WEAPON_NAMES, WEAPON_ADDRESSES, WEAPON_TYPE, inv_WEAPON_TYPE, \
+    WEAPON_ANIMATIONS, inv_WEAPON_ANIMATIONS, EQUIPMENT_STAT, inv_EQUIPMENT_STAT, \
+    SKILL_ATTRIBUTE, inv_SKILL_ATTRIBUTE, SPELLS, inv_SPELLS, \
+    RESIST, inv_RESIST, RESIST_AMOUNTS, inv_RESIST_AMOUNTS
 
 
 class WeaponEdit:
@@ -36,10 +36,10 @@ class WeaponEdit:
                 skill_attribute.set(inv_SKILL_ATTRIBUTE[(d[28] + d[29]).upper()])
                 skill_attribute_amount.set(int(d[30] + d[31], 16))
 
-                spell.set(inv_EQUIPMENT_SPELLS_MAGIC[(d[32:36]).upper()])
+                spell.set(inv_SPELLS[(d[32:36]).upper()])
                 spell_level.set(int(d[36] + d[37], 16))
 
-                magic.set(inv_EQUIPMENT_SPELLS_MAGIC[(d[40:44]).upper()])
+                magic.set(inv_SPELLS[(d[40:44]).upper()])
                 magic_level.set(int(d[44] + d[45], 16))
 
                 resist.set(inv_RESIST[(d[46] + d[47]).upper()])
@@ -74,10 +74,10 @@ class WeaponEdit:
                     int(d[18] + d[19], 16), int(d[20] + d[21], 16), aspect.get(),
                     int(EQUIPMENT_STAT[stat.get()], 16), int(stat_amount.get()),
                     int(SKILL_ATTRIBUTE[skill_attribute.get()], 16), skill_attribute_amount.get(),
-                    int((EQUIPMENT_SPELLS_MAGIC[spell.get()])[:2], 16),
-                    int((EQUIPMENT_SPELLS_MAGIC[spell.get()])[2:], 16),
-                    spell_level.get(), int(d[38] + d[39], 16), int((EQUIPMENT_SPELLS_MAGIC[magic.get()])[:2], 16),
-                    int((EQUIPMENT_SPELLS_MAGIC[magic.get()])[2:], 16), magic_level.get(),
+                    int((SPELLS[spell.get()])[:2], 16),
+                    int((SPELLS[spell.get()])[2:], 16),
+                    spell_level.get(), int(d[38] + d[39], 16), int((SPELLS[magic.get()])[:2], 16),
+                    int((SPELLS[magic.get()])[2:], 16), magic_level.get(),
                     int(RESIST[resist.get()], 16), int(RESIST_AMOUNTS[resist_amount.get()], 16)
                 ]
 
@@ -87,7 +87,6 @@ class WeaponEdit:
 
         def build():
             reg = weapwin.register(input_val)
-            egg = weapwin.register(value_input_val)
             lawfulgood_frame = Frame(weapwin)
             lawfulgood_frame.grid(column=0, row=0)
             default_weapon_menu = OptionMenu(lawfulgood_frame, weapon, *WEAPON_NAMES)
@@ -140,7 +139,6 @@ class WeaponEdit:
             value_entry = Entry(lawfulneutral_frame, textvariable=value)
             value_entry.grid(column=1, row=4, sticky='e')
             value_entry.config(width=6)
-            value_entry.configure(validate='key', vcmd=(egg, "%P"))
             value_label2 = Label(lawfulneutral_frame, text='Max base value: 65535')
             value_label2.grid(row=5, columnspan=2)
             value_label2.config(font=(None, 8))
@@ -192,7 +190,7 @@ class WeaponEdit:
 
             spell_frame = LabelFrame(trueneutral_frame, text='Spell')
             spell_frame.grid(column=0, row=2)
-            spell_menu = OptionMenu(spell_frame, spell, *EQUIPMENT_SPELLS_MAGIC)
+            spell_menu = OptionMenu(spell_frame, spell, *SPELLS)
             spell_menu.grid(column=0, row=0)
             spell_menu.config(width=16)
             spell_entry = Entry(spell_frame, textvariable=spell_level)
@@ -202,7 +200,7 @@ class WeaponEdit:
 
             magic_frame = LabelFrame(trueneutral_frame, text='Magic')
             magic_frame.grid(column=0, row=3)
-            magic_menu = OptionMenu(magic_frame, magic, *EQUIPMENT_SPELLS_MAGIC)
+            magic_menu = OptionMenu(magic_frame, magic, *SPELLS)
             magic_menu.grid(column=0, row=0)
             magic_menu.config(width=16)
             magic_entry = Entry(magic_frame, textvariable=magic_level)
@@ -220,20 +218,22 @@ class WeaponEdit:
             resist_amount_menu.config(width=4)
 
         def input_val(inp):
-            if inp.isnumeric() and int(inp) in range(1, 256):
+            if inp.isnumeric() and int(inp) in range(0, 256):
                 return True
             elif inp == "":
                 return True
             else:
                 return False
 
-        def value_input_val(inp):
-            if inp.isnumeric() and int(inp) in range(1, 65536):
-                return True
-            elif inp == "":
-                return True
+        def value_check(*args):
+            val = value.get()
+            if val.isnumeric():
+                if int(val) > 65535:
+                    value.set(65535)
+                else:
+                    value.set(val)
             else:
-                return False
+                value.set('')
 
         def limit_name_size(*args):
             n = name.get()
@@ -249,7 +249,8 @@ class WeaponEdit:
         strength = IntVar()
         hit = IntVar()
         damage = IntVar()
-        value = IntVar()
+        value = StringVar()
+        value.trace('w', value_check)
         weapon_range = IntVar()
         animation = StringVar()
         aspect = IntVar()
