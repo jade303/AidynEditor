@@ -257,18 +257,22 @@ class CharacterEdit:
                 spell_level.grid(column=1, row=x)
                 spell_level.config(width=4)
 
-        def input_val(inp):
-            if inp.isnumeric() and int(inp) in range(0, 256):
-                return True
-            elif inp == "":
-                return True
-            else:
-                return False
-
+        # limits the same size
         def limit_name_size(*args):
             n = name.get()
             if len(n) > name_length:
                 name.set(n[:name_length])
+
+        def input_val(inp):
+            if inp.isnumeric() and int(inp) in range(0, 256):
+                if int(inp) > 255:
+                    return 255
+                else:
+                    return True
+            elif inp == "":
+                return True
+            else:
+                return False
 
         # initial declaration of variables
         character = StringVar()

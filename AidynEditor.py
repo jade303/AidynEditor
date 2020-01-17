@@ -39,29 +39,29 @@ def file_dialog():
         enemy_button.grid(column=0, row=2)
         enemy_button.config(width=12)
 
-        #accessory_button = Button(root, text="Accessory Edit",
-        #                          command=lambda: AccessoryWindow.AccessoryEdit(filename))
-        #accessory_button.grid(column=0, row=3)
-        #accessory_button.config(width=12)
+        accessory_button = Button(root, text="Accessory Edit",
+                                  command=lambda: AccessoryWindow.AccessoryEdit(filename))
+        accessory_button.grid(column=0, row=3)
+        accessory_button.config(width=12)
 
-        #armor_button = Button(root, text="Armor Edit",
-        #                      command=lambda: ArmorShieldWindow.ArmorShieldEdit(filename,
-        #                                                                        ARMOR_NAMES,
-        #                                                                        ARMOR_ADDRESSES))
-        #armor_button.grid(column=0, row=4)
-        #armor_button.config(width=12)
+        armor_button = Button(root, text="Armor Edit",
+                              command=lambda: ArmorShieldWindow.ArmorShieldEdit(filename,
+                                                                                ARMOR_NAMES,
+                                                                                ARMOR_ADDRESSES))
+        armor_button.grid(column=0, row=4)
+        armor_button.config(width=12)
 
         #item_button = Button(root, text='Item Edit',
         #                     command=lambda: ItemWindow.ItemEdit(filename))
         #item_button.grid(column=0, row=5)
         #item_button.config(width=12)
 
-        #shield_button = Button(root, text="Shield Edit",
-        #                       command=lambda: ArmorShieldWindow.ArmorShieldEdit(filename,
-        #                                                                         SHIELD_NAMES,
-        #                                                                         SHIELD_ADDRESSES))
-        #shield_button.grid(column=0, row=6)
-        #shield_button.config(width=12)
+        shield_button = Button(root, text="Shield Edit",
+                               command=lambda: ArmorShieldWindow.ArmorShieldEdit(filename,
+                                                                                 SHIELD_NAMES,
+                                                                                 SHIELD_ADDRESSES))
+        shield_button.grid(column=0, row=6)
+        shield_button.config(width=12)
 
         spell_button = Button(root, text="Spell Edit",
                               command=lambda: SpellWindow.SpellEdit(filename))

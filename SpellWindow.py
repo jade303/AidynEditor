@@ -23,16 +23,16 @@ class SpellEdit:
                 sd = spell_data.hex()
 
                 school.set(sd[1])
-                damage.set(int(sd[2] + sd[3], 16))
-                stamina.set(int(sd[4] + sd[5], 16))
+                pos_stats[0].set(int(sd[2] + sd[3], 16))
+                pos_stats[1].set(int(sd[4] + sd[5], 16))
                 target_num.set(inv_TARGET_NUM[sd[7]])
                 target_type.set(inv_TARGET_TYPE[sd[9]])
                 # target_area.set(int(sd[10] + sd[11], 16))
-                wizard.set(int(sd[12] + sd[13], 16))
+                pos_stats[2].set(int(sd[12] + sd[13], 16))
                 aspect.set(sd[14])
-                spell_range.set(int(sd[17], 16))
+                pos_stats[3].set(int(sd[16] + sd[17], 16))
                 ingredient.set(inv_SPELL_INGREDIENTS[sd[19]])
-                exp.set(int(sd[20] + sd[21], 16))
+                pos_stats[4].set(int(sd[20] + sd[21], 16))
 
         def write_values():
             with open(filename, 'rb+') as f:
@@ -52,10 +52,10 @@ class SpellEdit:
                 sd = spell_data.hex()
 
                 towrite = [
-                    school.get(), damage.get(), stamina.get(), int(TARGET_NUM[target_num.get()], 16),
-                    int(TARGET_TYPE[target_type.get()], 16), int(sd[10] + sd[11]),
-                    wizard.get(), aspect.get(), spell_range.get(), int(SPELL_INGREDIENTS[ingredient.get()], 16),
-                    exp.get()
+                    school.get(), int(pos_stats[0].get()), int(pos_stats[1].get()),
+                    int(TARGET_NUM[target_num.get()]), int(TARGET_TYPE[target_type.get()]),
+                    int(sd[10] + sd[11], 16), int(pos_stats[2].get()), aspect.get(), int(pos_stats[3].get()),
+                    int(SPELL_INGREDIENTS[ingredient.get()]), int(pos_stats[4].get())
                 ]
 
                 f.seek(address + 25)
@@ -63,7 +63,6 @@ class SpellEdit:
                     f.write(item.to_bytes(1, byteorder='big'))
 
         def build_window():
-            reg = spellwin.register(input_val)
             lawfulgood_frame = Frame(spellwin)
             lawfulgood_frame.grid(column=0, row=0)
             default_spell_menu = OptionMenu(lawfulgood_frame, spell, *SPELL_NAMES)
@@ -93,38 +92,33 @@ class SpellEdit:
             stuff_frame.grid()
             damage_label = Label(stuff_frame, text='Damage:')
             damage_label.grid(column=0, row=0, sticky='e')
-            damage_entry = Entry(stuff_frame, textvariable=damage)
+            damage_entry = Entry(stuff_frame, textvariable=pos_stats[0])
             damage_entry.grid(column=1, row=0, sticky='e')
             damage_entry.config(width=4)
-            damage_entry.configure(validate='key', vcmd=(reg, "%P"))
 
             stamina_label = Label(stuff_frame, text='Stamina Cost:')
             stamina_label.grid(column=0, row=1, sticky='e')
-            stamina_entry = Entry(stuff_frame, textvariable=stamina)
+            stamina_entry = Entry(stuff_frame, textvariable=pos_stats[1])
             stamina_entry.grid(column=1, row=1, sticky='e')
             stamina_entry.config(width=4)
-            stamina_entry.configure(validate='key', vcmd=(reg, "%P"))
 
             wizard_label = Label(stuff_frame, text='Wizard Required:')
             wizard_label.grid(column=0, row=2, sticky='e')
-            wizard_entry = Entry(stuff_frame, textvariable=wizard)
+            wizard_entry = Entry(stuff_frame, textvariable=pos_stats[2])
             wizard_entry.grid(column=1, row=2, sticky='e')
             wizard_entry.config(width=4)
-            wizard_entry.configure(validate='key', vcmd=(reg, "%P"))
 
             range_label = Label(stuff_frame, text='Range:')
             range_label.grid(column=0, row=3, sticky='e')
-            range_entry = Entry(stuff_frame, textvariable=spell_range)
+            range_entry = Entry(stuff_frame, textvariable=pos_stats[3])
             range_entry.grid(column=1, row=3, sticky='e')
             range_entry.config(width=4)
-            range_entry.configure(validate='key', vcmd=(reg, "%P"))
 
             exp_label = Label(stuff_frame, text='EXP to Rank:')
             exp_label.grid(column=0, row=4, sticky='e')
-            exp_entry = Entry(stuff_frame, textvariable=exp)
+            exp_entry = Entry(stuff_frame, textvariable=pos_stats[4])
             exp_entry.grid(column=1, row=4, sticky='e')
             exp_entry.config(width=4)
-            exp_entry.configure(validate='key', vcmd=(reg, "%P"))
             exp_label2 = Label(stuff_frame, text='(there is some unknown \nformula involved with EXP)')
             exp_label2.grid(row=5, columnspan=2, rowspan=2, sticky='ew')
             exp_label2.config(font=(None, 8))
@@ -162,34 +156,45 @@ class SpellEdit:
             target_type_menu.grid()
             target_type_menu.config(width=23)
 
-        def input_val(inp):
-            if inp.isnumeric() and int(inp) in range(0, 256):
-                return True
-            elif inp == "":
-                return True
-            else:
-                return False
-
+        # limits the same size
         def limit_name_size(*args):
             n = name.get()
             if len(n) > 22:
                 name.set(n[:22])
 
+        # check for positive 255
+        def pos_check(*args):
+            for i in pos_stats:
+                val = i.get()
+                if not val.isnumeric():
+                    val = ''.join(filter(str.isnumeric, val))
+                    i.set(val)
+                elif val.isnumeric():
+                    if int(val) > 255:
+                        i.set(255)
+                    else:
+                        i.set(val)
+
         spell = StringVar()
         spell.trace('w', read_defaults)
         name = StringVar()
         name.trace('w', limit_name_size)
+
+        # group of stats:
+        # damage, stamina, wizard, spell range, exp
+        # grouped to make it easier to run a 255 check
+        pos_stats = []
+        for i in range(5):
+            i = StringVar()
+            i.trace('w', pos_check)
+            pos_stats.append(i)
+
         school = IntVar()
-        damage = IntVar()
-        stamina = IntVar()
         target_num = StringVar()
         target_type = StringVar()
         # target_area = IntVar()
-        wizard = IntVar()
         aspect = IntVar()
-        spell_range = IntVar()
         ingredient = StringVar()
-        exp = IntVar()
 
         spell.set(SPELL_NAMES[0])
         build_window()

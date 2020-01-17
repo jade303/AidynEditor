@@ -165,44 +165,13 @@ class ArmorShieldEdit:
             resist_amount_menu.grid(column=1, row=0)
             resist_amount_menu.config(width=4)
 
+        # limits the same size
         def limit_name_size(*args):
             n = name.get()
             if len(n) > 21:
                 name.set(n[:22])
 
-        def pos_check(*args):
-            for i in pos_stats:
-                val = i.get()
-                if val.isnumeric():
-                    if int(val) > 255:
-                        i.set(255)
-                    else:
-                        i.set(val)
-                else:
-                    i.set('')
-
-        def neg_check(*args):
-            for i in neg_stats:
-                val = i.get()
-                if val[0] == '-':
-                    sign = -1
-                    if val[1:].isnumeric():
-                        if int(val[1:]) > 127:
-                            i.set(-127)
-                        else:
-                            i.set(val)
-                    else:
-                        i.set('')
-                else:
-                    sign = 1
-                if val.isnumeric():
-                    if int(val) > 127:
-                        i.set(127)
-                    else:
-                        i.set(val)
-                else:
-                    i.set('')
-
+        # check for max value of item
         def value_check(*args):
             val = value.get()
             if val.isnumeric():
@@ -211,14 +180,57 @@ class ArmorShieldEdit:
                 else:
                     value.set(val)
             else:
-                value.set('')
+                val = ''.join(filter(str.isnumeric, val))
+                value.set(val)
+
+        # check for positive 255
+        def pos_check(*args):
+            for i in pos_stats:
+                val = i.get()
+                if not val.isnumeric():
+                    val = ''.join(filter(str.isnumeric, val))
+                    i.set(val)
+                elif val.isnumeric():
+                    if int(val) > 255:
+                        i.set(255)
+                    else:
+                        i.set(val)
+
+        # check for neg/pos 127
+        def neg_check(*args):
+            for i in neg_stats:
+                val = i.get()
+                if len(val) > 0 and val[0] == '-':
+                    if val == '-':
+                        break
+                    else:
+                        val = val[1:]
+                    if not val.isnumeric():
+                        val = ''.join(filter(str.isnumeric, val))
+                        i.set(int(val) * -1)
+                    elif val.isnumeric():
+                        if int(val) > 127:
+                            i.set('-127')
+                        else:
+                            i.set(int(val) * -1)
+                else:
+                    if not val.isnumeric():
+                        val = ''.join(filter(str.isnumeric, val))
+                        i.set(val)
+                    elif val.isnumeric():
+                        if int(val) > 127:
+                            i.set(127)
+                        else:
+                            i.set(val)
 
         item = StringVar()
         item.trace('w', set_defaults)
         name = StringVar()
         name.trace('w', limit_name_size)
 
+        # group of stats:
         # defense, protection, stat_amount, skill_attribute_amount, spell_level, magic_level
+        # grouped to make it easier to run a 255 check
         pos_stats = []
         for i in range(6):
             i = StringVar()
@@ -226,6 +238,7 @@ class ArmorShieldEdit:
             pos_stats.append(i)
 
         # dexterity, stealth
+        # grouped to make it easier to run a neg/pos 127 check
         neg_stats = []
         for i in range(2):
             i = StringVar()
