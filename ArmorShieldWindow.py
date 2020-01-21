@@ -1,4 +1,4 @@
-from tkinter import Toplevel, StringVar, IntVar, OptionMenu, LabelFrame, Frame, Entry, Label, Button, Radiobutton
+from tkinter import Toplevel, StringVar, IntVar, LabelFrame, Frame, Entry, Label, Button, Radiobutton
 from tkinter.ttk import Combobox
 
 from variables import inv_EQUIPMENT_STAT, inv_SKILL_ATTRIBUTE, inv_SPELLS, inv_RESIST, inv_RESIST_AMOUNTS, \
@@ -83,28 +83,29 @@ class ArmorShieldEdit:
                         j = j + 256
                     new_onetwentyseven_stats.append(j)
 
-                towrite = [int(twofivefive_stats[0].get()),
-                           int(twofivefive_stats[1].get()),
-                           int(new_onetwentyseven_stats[0]),
-                           int(d[6] + d[7], 16),
-                           int(new_onetwentyseven_stats[1]),
-                           int(v1), int(v2),
-                           int(d[14] + d[15], 16),
-                           aspect.get(),
-                           int(EQUIPMENT_STAT[stat.get()], 16),
-                           int(new_onetwentyseven_stats[2]),
-                           int(SKILL_ATTRIBUTE[skill_attribute.get()], 16),
-                           int(new_onetwentyseven_stats[3]),
-                           int((SPELLS[spell.get()])[:2], 16),
-                           int((SPELLS[spell.get()])[2:], 16),
-                           int(twofivefive_stats[2].get()),
-                           int(d[32] + d[33], 16),
-                           int((SPELLS[magic.get()])[:2], 16),
-                           int((SPELLS[magic.get()])[2:], 16),
-                           int(twofivefive_stats[3].get()),
-                           int(RESIST[resist.get()], 16),
-                           int(RESIST_AMOUNTS[resist_amount.get()], 16)
-                           ]
+                towrite = [
+                    int(twofivefive_stats[0].get()),
+                    int(twofivefive_stats[1].get()),
+                    int(new_onetwentyseven_stats[0]),
+                    int(d[6] + d[7], 16),
+                    int(new_onetwentyseven_stats[1]),
+                    int(v1), int(v2),
+                    int(d[14] + d[15], 16),
+                    aspect.get(),
+                    int(EQUIPMENT_STAT[stat.get()], 16),
+                    int(new_onetwentyseven_stats[2]),
+                    int(SKILL_ATTRIBUTE[skill_attribute.get()], 16),
+                    int(new_onetwentyseven_stats[3]),
+                    int((SPELLS[spell.get()])[:2], 16),
+                    int((SPELLS[spell.get()])[2:], 16),
+                    int(twofivefive_stats[2].get()),
+                    int(d[32] + d[33], 16),
+                    int((SPELLS[magic.get()])[:2], 16),
+                    int((SPELLS[magic.get()])[2:], 16),
+                    int(twofivefive_stats[3].get()),
+                    int(RESIST[resist.get()], 16),
+                    int(RESIST_AMOUNTS[resist_amount.get()], 16)
+                ]
 
                 f.seek(address + 26)
                 for i in towrite:
@@ -180,7 +181,7 @@ class ArmorShieldEdit:
 
             stat_frame = LabelFrame(trueneutral_frame, text='Stat')
             stat_frame.grid(column=0, row=0)
-            stat_menu = OptionMenu(stat_frame, stat, *EQUIPMENT_STAT)
+            stat_menu = Combobox(stat_frame, textvariable=stat, values=list(EQUIPMENT_STAT.keys()))
             stat_menu.grid(column=0, row=0)
             stat_menu.config(width=16)
             stat_entry = Entry(stat_frame, textvariable=onetwentyseven_stats[2])
@@ -189,7 +190,7 @@ class ArmorShieldEdit:
 
             ski_att_frame = LabelFrame(trueneutral_frame, text='Skill/Attribute')
             ski_att_frame.grid(column=0, row=1)
-            ski_att_menu = OptionMenu(ski_att_frame, skill_attribute, *SKILL_ATTRIBUTE)
+            ski_att_menu = Combobox(ski_att_frame, textvariable=skill_attribute, values=list(SKILL_ATTRIBUTE.keys()))
             ski_att_menu.grid(column=0, row=0)
             ski_att_menu.config(width=16)
             ski_att_amo_entry = Entry(ski_att_frame, textvariable=onetwentyseven_stats[3])
@@ -198,7 +199,7 @@ class ArmorShieldEdit:
 
             spell_frame = LabelFrame(trueneutral_frame, text='Spell')
             spell_frame.grid(column=0, row=2)
-            spell_menu = OptionMenu(spell_frame, spell, *SPELLS)
+            spell_menu = Combobox(spell_frame, textvariable=spell, values=list(SPELLS.keys()))
             spell_menu.grid(column=0, row=0)
             spell_menu.config(width=16)
             spell_entry = Entry(spell_frame, textvariable=twofivefive_stats[2])
@@ -207,7 +208,7 @@ class ArmorShieldEdit:
 
             magic_frame = LabelFrame(trueneutral_frame, text='Magic')
             magic_frame.grid(column=0, row=3)
-            magic_menu = OptionMenu(magic_frame, magic, *SPELLS)
+            magic_menu = Combobox(magic_frame, textvariable=magic, values=list(SPELLS.keys()))
             magic_menu.grid(column=0, row=0)
             magic_menu.config(width=16)
             magic_entry = Entry(magic_frame, textvariable=twofivefive_stats[3])
@@ -216,10 +217,10 @@ class ArmorShieldEdit:
 
             resist_frame = LabelFrame(shiwin, text='Resist')
             resist_frame.grid(column=1, row=2)
-            resist_menu = OptionMenu(resist_frame, resist, *RESIST)
+            resist_menu = Combobox(resist_frame, textvariable=resist, values=list(RESIST.keys()))
             resist_menu.grid(column=0, row=0)
             resist_menu.config(width=16)
-            resist_amount_menu = OptionMenu(resist_frame, resist_amount, *RESIST_AMOUNTS)
+            resist_amount_menu = Combobox(resist_frame, textvariable=resist_amount, values=list(RESIST_AMOUNTS.keys()))
             resist_amount_menu.grid(column=1, row=0)
             resist_amount_menu.config(width=4)
 

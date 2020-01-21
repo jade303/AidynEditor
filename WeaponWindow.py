@@ -1,4 +1,6 @@
-from tkinter import Toplevel, Frame, LabelFrame, Entry, OptionMenu, Label, Button, Radiobutton, StringVar, IntVar
+from tkinter import Toplevel, Frame, LabelFrame, Entry, Label, Button, Radiobutton, StringVar, IntVar
+from tkinter.ttk import Combobox
+
 from variables import WEAPON_NAMES, WEAPON_ADDRESSES, WEAPON_TYPE, inv_WEAPON_TYPE, \
     WEAPON_ANIMATIONS, inv_WEAPON_ANIMATIONS, EQUIPMENT_STAT, inv_EQUIPMENT_STAT, \
     SKILL_ATTRIBUTE, inv_SKILL_ATTRIBUTE, SPELLS, inv_SPELLS, \
@@ -111,7 +113,7 @@ class WeaponEdit:
         def build():
             lawfulgood_frame = Frame(weapwin)
             lawfulgood_frame.grid(column=0, row=0)
-            default_weapon_menu = OptionMenu(lawfulgood_frame, weapon, *WEAPON_NAMES)
+            default_weapon_menu = Combobox(lawfulgood_frame, textvariable=weapon, values=WEAPON_NAMES)
             default_weapon_menu.grid(column=0, row=0)
             default_weapon_menu.config(width=21)
 
@@ -121,7 +123,7 @@ class WeaponEdit:
             new_name_entry.grid()
             new_name_entry.config(width=21)
 
-            weapon_type_menu = OptionMenu(lawfulgood_frame, weapon_type, *WEAPON_TYPE)
+            weapon_type_menu = Combobox(lawfulgood_frame, textvariable=weapon_type, values=list(WEAPON_TYPE.keys()))
             weapon_type_menu.grid(column=0, row=3)
             weapon_type_menu.config(width=9)
 
@@ -163,7 +165,7 @@ class WeaponEdit:
 
             animation_frame = LabelFrame(weapwin, text='Animation')
             animation_frame.grid(column=0, row=2)
-            animation_menu = OptionMenu(animation_frame, animation, *WEAPON_ANIMATIONS)
+            animation_menu = Combobox(animation_frame, textvariable=animation, values=list(WEAPON_ANIMATIONS.keys()))
             animation_menu.grid(column=0, row=0)
             animation_menu.config(width=12)
 
@@ -188,7 +190,7 @@ class WeaponEdit:
 
             stat_frame = LabelFrame(trueneutral_frame, text='Stat')
             stat_frame.grid(column=0, row=0)
-            stat_menu = OptionMenu(stat_frame, stat, *EQUIPMENT_STAT)
+            stat_menu = Combobox(stat_frame, textvariable=stat, values=list(EQUIPMENT_STAT.keys()))
             stat_menu.grid(column=0, row=0)
             stat_menu.config(width=16)
             stat_entry = Entry(stat_frame, textvariable=onetwentyseven_stats[0])
@@ -197,7 +199,7 @@ class WeaponEdit:
 
             ski_att_frame = LabelFrame(trueneutral_frame, text='Skill/Attribute')
             ski_att_frame.grid(column=0, row=1)
-            ski_att_menu = OptionMenu(ski_att_frame, skill_attribute, *SKILL_ATTRIBUTE)
+            ski_att_menu = Combobox(ski_att_frame, textvariable=skill_attribute, values=list(SKILL_ATTRIBUTE.keys()))
             ski_att_menu.grid(column=0, row=0)
             ski_att_menu.config(width=16)
             ski_att_amo_entry = Entry(ski_att_frame, textvariable=onetwentyseven_stats[1])
@@ -206,7 +208,7 @@ class WeaponEdit:
 
             spell_frame = LabelFrame(trueneutral_frame, text='Spell')
             spell_frame.grid(column=0, row=2)
-            spell_menu = OptionMenu(spell_frame, spell, *SPELLS)
+            spell_menu = Combobox(spell_frame, textvariable=spell, values=list(SPELLS.keys()))
             spell_menu.grid(column=0, row=0)
             spell_menu.config(width=16)
             spell_entry = Entry(spell_frame, textvariable=twofivefive_stats[4])
@@ -215,7 +217,7 @@ class WeaponEdit:
 
             magic_frame = LabelFrame(trueneutral_frame, text='Magic')
             magic_frame.grid(column=0, row=3)
-            magic_menu = OptionMenu(magic_frame, magic, *SPELLS)
+            magic_menu = Combobox(magic_frame, textvariable=magic, values=list(SPELLS.keys()))
             magic_menu.grid(column=0, row=0)
             magic_menu.config(width=16)
             magic_entry = Entry(magic_frame, textvariable=twofivefive_stats[5])
@@ -224,10 +226,10 @@ class WeaponEdit:
 
             resist_frame = LabelFrame(weapwin, text='Resist')
             resist_frame.grid(column=1, row=2)
-            resist_menu = OptionMenu(resist_frame, resist, *RESIST)
+            resist_menu = Combobox(resist_frame, textvariable=resist, values=list(RESIST.keys()))
             resist_menu.grid(column=0, row=0)
             resist_menu.config(width=16)
-            resist_amount_menu = OptionMenu(resist_frame, resist_amount, *RESIST_AMOUNTS)
+            resist_amount_menu = Combobox(resist_frame, textvariable=resist_amount, values=list(RESIST_AMOUNTS.keys()))
             resist_amount_menu.grid(column=1, row=0)
             resist_amount_menu.config(width=4)
 
@@ -309,5 +311,5 @@ class WeaponEdit:
         resist = StringVar()
         resist_amount = StringVar()
 
-        weapon.set(WEAPON_NAMES[28])
+        weapon.set(WEAPON_NAMES[0])
         build()

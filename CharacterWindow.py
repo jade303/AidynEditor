@@ -1,5 +1,5 @@
-from tkinter import Toplevel, Frame, LabelFrame, OptionMenu, Entry, Button, Radiobutton, Label, StringVar, IntVar
-# from tkinter import filedialog
+from tkinter import Toplevel, Frame, LabelFrame, Entry, Button, Radiobutton, Label, StringVar, IntVar
+from tkinter.ttk import Combobox
 from variables import WEAPONS, inv_WEAPONS, ARMORS, inv_ARMORS, SHIELDS, inv_SHIELDS, \
     SPELLS, inv_SPELLS, ATTRIBUTES, SKILLS
 
@@ -24,20 +24,20 @@ class CharacterEdit:
                 # seek address for everything else
                 f.seek(address)
                 character_data = f.read(74)
-                cd = character_data.hex()
+                d = character_data.hex()
 
                 # set aspect default
-                aspect.set(cd[1])
+                aspect.set(d[1])
 
                 # set skill defaults
                 for s in skills:
                     sa = skills.index(s) * 2
-                    sn = int(cd[sa + 6] + cd[sa + 7], 16)
+                    sn = int(d[sa + 6] + d[sa + 7], 16)
                     if sn == 255:
                         sn = ''
                     s.set(sn)
 
-                shi = int(cd[146] + cd[147], 16)
+                shi = int(d[146] + d[147], 16)
                 if shi == 255:
                     shi = ''
                 shield_skill.set(shi)
@@ -45,35 +45,35 @@ class CharacterEdit:
                 # set attribute defaults
                 for a in atts:
                     aa = atts.index(a) * 2
-                    an = int(cd[aa + 52] + cd[aa + 53], 16)
+                    an = int(d[aa + 52] + d[aa + 53], 16)
                     if an == 255:
                         an = ''
                     a.set(an)
 
                 # set level default
-                level.set(int(cd[66] + cd[67], 16))
+                level.set(int(d[66] + d[67], 16))
 
                 # set equipment defaults
                 for w in weapons:
                     x = (weapons.index(w) * 4) + 70
                     y = x + 4
-                    w.set(inv_WEAPONS[cd[x:y].upper()])
-                armor.set(inv_ARMORS[cd[136:140].upper()])
-                shield.set(inv_SHIELDS[cd[142:146].upper()])
+                    w.set(inv_WEAPONS[d[x:y].upper()])
+                armor.set(inv_ARMORS[d[136:140].upper()])
+                shield.set(inv_SHIELDS[d[142:146].upper()])
 
                 # set school
-                school.set(cd[107])
+                school.set(d[107])
 
                 # 5 initial spells
                 for s in spells:
                     x = (spells.index(s) * 4) + 86
                     y = x + 4
-                    s.set(inv_SPELLS[cd[x:y].upper()])
+                    s.set(inv_SPELLS[d[x:y].upper()])
 
                 # spell levels
                 for s in spell_levels:
                     x = (spell_levels.index(s) * 2) + 108
-                    s.set(int(cd[x] + cd[x + 1], 16))
+                    s.set(int(d[x] + d[x + 1], 16))
 
         def write_to_file():
             with open(filename, 'rb+') as f:
@@ -85,12 +85,13 @@ class CharacterEdit:
                         new_name.append(0x00)
                 f.seek(address - 44)
                 f.write(new_name)
-# todo 7f = 127, 80 = -128
+
                 f.seek(address)
                 character_data = f.read(74)
-                cd = character_data.hex()
-                towrite = [aspect.get(), int((cd[3] + cd[4]).encode('utf-8'), 16),
-                           int((cd[5] + cd[6]).encode('utf-8'), 16)]
+                d = character_data.hex()
+
+                towrite = [aspect.get(), int((d[3] + d[4]).encode('utf-8'), 16),
+                           int((d[5] + d[6]).encode('utf-8'), 16)]
                 for i in skills:
                     j = i.get()
                     if j == '':
@@ -101,16 +102,16 @@ class CharacterEdit:
                     j = i.get()
                     towrite.append(int(j))
 
-                towrite.append(int((cd[64] + cd[65]).encode('utf-8'), 16))
+                towrite.append(int((d[64] + d[65]).encode('utf-8'), 16))
                 towrite.append(level.get())
-                towrite.append(int((cd[68] + cd[69]).encode('utf-8'), 16))
+                towrite.append(int((d[68] + d[69]).encode('utf-8'), 16))
 
                 for i in weapons:
                     towrite.append(int((WEAPONS[i.get()])[:2], 16))
                     towrite.append(int((WEAPONS[i.get()])[2:], 16))
 
-                towrite.append(int((cd[82] + cd[83]).encode('utf-8'), 16))
-                towrite.append(int((cd[84] + cd[85]).encode('utf-8'), 16))
+                towrite.append(int((d[82] + d[83]).encode('utf-8'), 16))
+                towrite.append(int((d[84] + d[85]).encode('utf-8'), 16))
 
                 for i in spells:
                     towrite.append(int((SPELLS[i.get()])[:2], 16))
@@ -122,11 +123,11 @@ class CharacterEdit:
                     towrite.append(i.get())
 
                 for i in range(118, 135, 2):
-                    towrite.append(int((cd[i] + cd[i + 1]).encode('utf-8'), 16))
+                    towrite.append(int((d[i] + d[i + 1]).encode('utf-8'), 16))
 
                 towrite.append(int((ARMORS[armor.get()])[:2], 16))
                 towrite.append(int((ARMORS[armor.get()])[2:], 16))
-                towrite.append(int((cd[140] + cd[141]).encode('utf-8'), 16))
+                towrite.append(int((d[140] + d[141]).encode('utf-8'), 16))
                 towrite.append(int((SHIELDS[shield.get()])[:2], 16))
                 towrite.append(int((SHIELDS[shield.get()])[2:], 16))
 
@@ -138,10 +139,8 @@ class CharacterEdit:
                 f.seek(address)
                 for item in towrite:
                     f.write(item.to_bytes(1, byteorder='big'))
-            # messagebox.showinfo('Finished','Write Complete')
 
         def build_window():
-            reg = charwin.register(input_val)
             # column 0, row 0
             lawfulgood_frame = Frame(charwin)
             lawfulgood_frame.grid(column=0, row=0)
@@ -149,7 +148,7 @@ class CharacterEdit:
             new_name_frame.grid(column=0, row=1)
             new_name_frame.config(width=18)
 
-            default_name_menu = OptionMenu(lawfulgood_frame, character, *characters)
+            default_name_menu = Combobox(lawfulgood_frame, textvariable=character, values=characters)
             default_name_menu.grid(column=0, row=0)
             default_name_menu.config(width=18)
 
@@ -178,7 +177,6 @@ class CharacterEdit:
             lunar_radio.grid(column=1, row=0, sticky='w')
 
             level_entry = Entry(level_frame, textvariable=level, width=4)
-            level_entry.configure(validate='key', vcmd=(reg, "%P"))
             level_entry.grid(column=1, row=1)
 
             school0 = Radiobutton(school_frame, text='Chaos', variable=school, value='0')
@@ -199,7 +197,6 @@ class CharacterEdit:
                 att_label = Label(att_frame, text=att, anchor='e', width=9)
                 att_label.grid(column=0, row=x)
                 att_num = Entry(att_frame, textvariable=atts[x], width=4)
-                att_num.configure(validate='key', vcmd=(reg, "%P"))
                 att_num.grid(column=1, row=x)
 
             # column 0, row 2
@@ -213,13 +210,13 @@ class CharacterEdit:
             shield_frame.grid(column=1, row=1)
 
             for w in weapons:
-                weapon_menu = OptionMenu(weapon_frame, w, *WEAPONS)
+                weapon_menu = Combobox(weapon_frame, textvariable=w, values=list(WEAPONS.keys()))
                 weapon_menu.grid()
                 weapon_menu.config(width=16)
-            armor_menu = OptionMenu(armor_frame, armor, *ARMORS)
+            armor_menu = Combobox(armor_frame, textvariable=armor, values=list(ARMORS.keys()))
             armor_menu.grid(column=1)
             armor_menu.config(width=16)
-            shield_menu = OptionMenu(shield_frame, shield, *SHIELDS)
+            shield_menu = Combobox(shield_frame, textvariable=shield, values=list(SHIELDS.keys()))
             shield_menu.grid()
             shield_menu.config(width=16)
 
@@ -227,17 +224,16 @@ class CharacterEdit:
             neutralgood_frame = LabelFrame(charwin, text='Skills')
             neutralgood_frame.grid(column=1, row=0, rowspan=23)
 
+            # todo: add note about blank being can't learn
             for skill in SKILLS:
                 x = SKILLS.index(skill)
                 skill_label = Label(neutralgood_frame, text=skill, anchor='e', width=9)
                 skill_label.grid(column=0, row=x)
                 skill_num = Entry(neutralgood_frame, textvariable=skills[x], width=4)
-                skill_num.configure(validate='key', vcmd=(reg, "%P"))
                 skill_num.grid(column=1, row=x)
             shield_label = Label(neutralgood_frame, text='Shield', anchor='e', width=9)
             shield_label.grid(column=0, row=23)
             shield_num = Entry(neutralgood_frame, textvariable=shield_skill, width=4)
-            shield_num.configure(validate='key', vcmd=(reg, "%P"))
             shield_num.grid(column=1, row=23)
 
             # column 0, row 4, column 2, row all
@@ -245,11 +241,10 @@ class CharacterEdit:
             chaoticgood_frame.grid(column=0, row=3)
             for s in spells:
                 x = spells.index(s)
-                spell = OptionMenu(chaoticgood_frame, s, *SPELLS)
+                spell = Combobox(chaoticgood_frame, textvariable=s, values=list(SPELLS.keys()))
                 spell.grid(column=0, row=x)
                 spell.config(width=16)
                 spell_level = Entry(chaoticgood_frame, textvariable=spell_levels[spells.index(s)])
-                spell_level.configure(validate='key', vcmd=(reg, "%P"))
                 spell_level.grid(column=1, row=x)
                 spell_level.config(width=4)
 
@@ -259,19 +254,58 @@ class CharacterEdit:
             if len(n) > name_length:
                 name.set(n[:name_length])
 
-        # int, wil, dex, str
-        def limit_30(*args):
-            pass
+        # limits stats and level to appropriate numbers
+        # higher numbers than limits causes the game to crash
+        # or the numbers don't work right
+        def limit_atts(*args):
+            # int, wil, dex, str
+            limit_30_stats = [atts[0], atts[1], atts[2], atts[4]]
+            for i in limit_30_stats:
+                val = i.get()
+                if not val.isnumeric():
+                    val = ''.join(filter(str.isnumeric, val))
+                    i.set(val)
+                elif val.isnumeric():
+                    if int(val) > 30:
+                        i.set(30)
+                    else:
+                        i.set(val)
 
-        # lvl and end
-        def limit_40(*args):
-            pass
+            # end and level
+            limit_40_stats = [atts[3], level]
+            for i in limit_40_stats:
+                val = i.get()
+                if not val.isnumeric():
+                    val = ''.join(filter(str.isnumeric, val))
+                    i.set(val)
+                elif val.isnumeric():
+                    if int(val) > 40:
+                        i.set(40)
+                    else:
+                        i.set(val)
 
-        def limit_90(*args):
-            pass
+            # stamina
+            stamina = atts[5].get()
+            if not stamina.isnumeric():
+                stamina = ''.join(filter(str.isnumeric, stamina))
+                atts[5].set(stamina)
+            elif stamina.isnumeric():
+                if int(stamina) > 120:
+                    atts[5].set(120)
+                else:
+                    atts[5].set(stamina)
 
-        def limit_255(*args):
-            pass
+        def twofivefive(*args):
+            for i in spell_levels:
+                val = i.get()
+                if not val.isnumeric():
+                    val = ''.join(filter(str.isnumeric, val))
+                    i.set(val)
+                elif val.isnumeric():
+                    if int(val) > 255:
+                        i.set(255)
+                    else:
+                        i.set(val)
 
         def limit1_10(*args):
             pass
@@ -313,13 +347,19 @@ class CharacterEdit:
         shield_skill = StringVar()
         atts = []
         for _ in ATTRIBUTES:
-            i = IntVar()
+            i = StringVar()
+            i.trace('w', limit_atts)
             atts.append(i)
-        level = IntVar()
+        level = StringVar()
+        level.trace('w', limit_atts)
         weapons = [StringVar(), StringVar(), StringVar()]
         spells = [StringVar(), StringVar(), StringVar(), StringVar(), StringVar()]
         school = IntVar()
-        spell_levels = [IntVar(), IntVar(), IntVar(), IntVar(), IntVar()]
+        spell_levels = []
+        for i in range(5):
+            i = StringVar()
+            i.trace('w', twofivefive)
+            spell_levels.append(i)
         armor = StringVar()
         shield = StringVar()
 

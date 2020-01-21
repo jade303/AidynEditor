@@ -1,4 +1,6 @@
-from tkinter import Toplevel, Frame, LabelFrame, Entry, OptionMenu, Radiobutton, Label, Button, StringVar, IntVar
+from tkinter import Toplevel, Frame, LabelFrame, Entry, Radiobutton, Label, Button, StringVar, IntVar
+from tkinter.ttk import Combobox
+
 from variables import SPELL_ADDRESSES, SPELL_INGREDIENTS, SPELL_NAMES, inv_SPELL_INGREDIENTS, \
     TARGET_NUM, TARGET_TYPE, inv_TARGET_NUM, inv_TARGET_TYPE
 
@@ -20,42 +22,46 @@ class SpellEdit:
                 # get everything else
                 f.seek(address + 25)
                 spell_data = f.read(11)
-                sd = spell_data.hex()
+                d = spell_data.hex()
 
-                school.set(sd[1])
-                pos_stats[0].set(int(sd[2] + sd[3], 16))
-                pos_stats[1].set(int(sd[4] + sd[5], 16))
-                target_num.set(inv_TARGET_NUM[sd[7]])
-                target_type.set(inv_TARGET_TYPE[sd[9]])
+                school.set(d[1])
+                pos_stats[0].set(int(d[2] + d[3], 16))
+                pos_stats[1].set(int(d[4] + d[5], 16))
+                target_num.set(inv_TARGET_NUM[d[7]])
+                target_type.set(inv_TARGET_TYPE[d[9]])
                 # target_area.set(int(sd[10] + sd[11], 16))
-                pos_stats[2].set(int(sd[12] + sd[13], 16))
-                aspect.set(sd[14])
-                pos_stats[3].set(int(sd[16] + sd[17], 16))
-                ingredient.set(inv_SPELL_INGREDIENTS[sd[19]])
-                pos_stats[4].set(int(sd[20] + sd[21], 16))
+                pos_stats[2].set(int(d[12] + d[13], 16))
+                aspect.set(d[14])
+                pos_stats[3].set(int(d[16] + d[17], 16))
+                ingredient.set(inv_SPELL_INGREDIENTS[d[19]])
+                pos_stats[4].set(int(d[20] + d[21], 16))
 
         def write_values():
             with open(filename, 'rb+') as f:
                 address = SPELL_ADDRESSES[SPELL_NAMES.index(spell.get())]
-                new_name = name.get()
+                new_name = bytearray(name.get(), 'utf-8')
                 if len(new_name) < 22:
-                    new_name = bytearray(new_name, 'utf-8')
                     while len(new_name) < 22:
                         new_name.append(0x00)
-                else:
-                    new_name = bytes(new_name, 'utf-8')
                 f.seek(address)
                 f.write(new_name)
 
                 f.seek(address + 25)
                 spell_data = f.read(11)
-                sd = spell_data.hex()
+                d = spell_data.hex()
 
                 towrite = [
-                    school.get(), int(pos_stats[0].get()), int(pos_stats[1].get()),
-                    int(TARGET_NUM[target_num.get()]), int(TARGET_TYPE[target_type.get()]),
-                    int(sd[10] + sd[11], 16), int(pos_stats[2].get()), aspect.get(), int(pos_stats[3].get()),
-                    int(SPELL_INGREDIENTS[ingredient.get()]), int(pos_stats[4].get())
+                    school.get(),
+                    int(pos_stats[0].get()),
+                    int(pos_stats[1].get()),
+                    int(TARGET_NUM[target_num.get()]),
+                    int(TARGET_TYPE[target_type.get()]),
+                    int(d[10] + d[11], 16),
+                    int(pos_stats[2].get()),
+                    aspect.get(),
+                    int(pos_stats[3].get()),
+                    int(SPELL_INGREDIENTS[ingredient.get()]),
+                    int(pos_stats[4].get())
                 ]
 
                 f.seek(address + 25)
@@ -65,7 +71,7 @@ class SpellEdit:
         def build_window():
             lawfulgood_frame = Frame(spellwin)
             lawfulgood_frame.grid(column=0, row=0)
-            default_spell_menu = OptionMenu(lawfulgood_frame, spell, *SPELL_NAMES)
+            default_spell_menu = Combobox(lawfulgood_frame, textvariable=spell, values=SPELL_NAMES)
             default_spell_menu.grid()
             default_spell_menu.config(width=22)
 
@@ -129,7 +135,7 @@ class SpellEdit:
             write_button.grid(column=1, row=0)
             ingredient_frame = LabelFrame(another_frame, text='Ingredient')
             ingredient_frame.grid(column=0, row=0)
-            ingredient_menu = OptionMenu(ingredient_frame, ingredient, *SPELL_INGREDIENTS)
+            ingredient_menu = Combobox(ingredient_frame, textvariable=ingredient, values=list(SPELL_INGREDIENTS.keys()))
             ingredient_menu.grid(column=0, row=0)
             ingredient_menu.config(width=10)
 
@@ -146,13 +152,13 @@ class SpellEdit:
             target_frame.grid(column=1, row=2)
             target_num_frame = LabelFrame(target_frame, text='Number of targets:')
             target_num_frame.grid(column=0, row=0)
-            target_num_menu = OptionMenu(target_num_frame, target_num, *TARGET_NUM)
+            target_num_menu = Combobox(target_num_frame, textvariable=target_num, values=list(TARGET_NUM.keys()))
             target_num_menu.grid()
             target_num_menu.config(width=23)
 
             target_type_frame = LabelFrame(target_frame, text='Who is targeted:')
             target_type_frame.grid(column=0, row=1)
-            target_type_menu = OptionMenu(target_type_frame, target_type, *TARGET_TYPE)
+            target_type_menu = Combobox(target_type_frame, textvariable=target_type, values=list(TARGET_TYPE.keys()))
             target_type_menu.grid()
             target_type_menu.config(width=23)
 
