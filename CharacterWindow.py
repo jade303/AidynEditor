@@ -78,18 +78,14 @@ class CharacterEdit:
         def write_to_file():
             with open(filename, 'rb+') as f:
                 address = (character_addresses[characters.index(character.get())])
-
                 # write new name to file
-                new_name = name.get()
-                if len(new_name) > name_length:
-                    new_name = bytes(new_name[:name_length], 'utf-8')
+                new_name = bytearray(name.get(), 'utf-8')
                 if len(new_name) < name_length:
-                    new_name = bytearray(new_name, 'utf-8')
                     while len(new_name) < name_length:
                         new_name.append(0x00)
                 f.seek(address - 44)
-                f.write(new_name.encode('utf-8'))
-
+                f.write(new_name)
+# todo 7f = 127, 80 = -128
                 f.seek(address)
                 character_data = f.read(74)
                 cd = character_data.hex()
@@ -263,6 +259,32 @@ class CharacterEdit:
             if len(n) > name_length:
                 name.set(n[:name_length])
 
+        # int, wil, dex, str
+        def limit_30(*args):
+            pass
+
+        # lvl and end
+        def limit_40(*args):
+            pass
+
+        def limit_90(*args):
+            pass
+
+        def limit_255(*args):
+            pass
+
+        def limit1_10(*args):
+            pass
+
+        def limit2_10(*args):
+            pass
+
+        def limit3_10(*args):
+            pass
+
+        def limit4_10(*args):
+            pass
+
         def input_val(inp):
             if inp.isnumeric() and int(inp) in range(0, 256):
                 if int(inp) > 255:
@@ -274,6 +296,9 @@ class CharacterEdit:
             else:
                 return False
 
+        # todo max skill is 10
+        # todo max attribute is what defaults are
+        # todo level 40 is max
         # initial declaration of variables
         character = StringVar()
         character.trace('w', read_default_values)

@@ -38,14 +38,14 @@ class SpellEdit:
             with open(filename, 'rb+') as f:
                 address = SPELL_ADDRESSES[SPELL_NAMES.index(spell.get())]
                 new_name = name.get()
-                if len(new_name) > 22:
-                    new_name = bytes(new_name[:22], 'utf-8')
                 if len(new_name) < 22:
                     new_name = bytearray(new_name, 'utf-8')
                     while len(new_name) < 22:
                         new_name.append(0x00)
+                else:
+                    new_name = bytes(new_name, 'utf-8')
                 f.seek(address)
-                f.write(new_name.encode('utf-8'))
+                f.write(new_name)
 
                 f.seek(address + 25)
                 spell_data = f.read(11)

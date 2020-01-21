@@ -22,25 +22,31 @@ class WeaponEdit:
                 d = data.hex()
 
                 weapon_type.set(inv_WEAPON_TYPE[d[1].upper()])
-                pos_stats1[0].set(int(d[2] + d[3], 16))
-                pos_stats1[1].set(int(d[4] + d[5], 16))
-                pos_stats1[2].set(int(d[6] + d[7], 16))
+                twofivefive_stats[0].set(int(d[2] + d[3], 16))
+                twofivefive_stats[1].set(int(d[4] + d[5], 16))
+                twofivefive_stats[2].set(int(d[6] + d[7], 16))
                 value.set((int(d[10] + d[11], 16) * 256) + int(d[8] + d[9], 16))
-                pos_stats1[3].set(int(d[14] + d[15], 16))
+                twofivefive_stats[3].set(int(d[14] + d[15], 16))
                 animation.set(inv_WEAPON_ANIMATIONS[d[16] + d[17].upper()])
                 aspect.set(d[23])
 
                 stat.set(inv_EQUIPMENT_STAT[(d[24] + d[25]).upper()])
-                pos_stats2[0].set(int(d[26] + d[27], 16))
+                stat_amount = int(d[26] + d[27], 16)
+                if stat_amount > 127:
+                    stat_amount = stat_amount - 256
+                onetwentyseven_stats[0].set(stat_amount)
 
                 skill_attribute.set(inv_SKILL_ATTRIBUTE[(d[28] + d[29]).upper()])
-                pos_stats2[1].set(int(d[30] + d[31], 16))
+                att_amount = int(d[30] + d[31], 16)
+                if att_amount > 127:
+                    att_amount = att_amount - 256
+                onetwentyseven_stats[1].set(att_amount)
 
                 spell.set(inv_SPELLS[(d[32:36]).upper()])
-                pos_stats2[2].set(int(d[36] + d[37], 16))
+                twofivefive_stats[4].set(int(d[36] + d[37], 16))
 
                 magic.set(inv_SPELLS[(d[40:44]).upper()])
-                pos_stats2[3].set(int(d[44] + d[45], 16))
+                twofivefive_stats[5].set(int(d[44] + d[45], 16))
 
                 resist.set(inv_RESIST[(d[46] + d[47]).upper()])
                 resist_amount.set(inv_RESIST_AMOUNTS[(d[48] + d[49]).upper()])
@@ -48,15 +54,12 @@ class WeaponEdit:
         def write():
             with open(filename, 'rb+') as f:
                 address = WEAPON_ADDRESSES[WEAPON_NAMES.index(weapon.get())]
-                new_name = name.get()
-                if len(new_name) > 21:
-                    new_name = bytes(new_name[:22], 'utf-8')
+                new_name = bytearray(name.get(), 'utf-8')
                 if len(new_name) < 21:
-                    new_name = bytearray(new_name, 'utf-8')
                     while len(new_name) < 21:
                         new_name.append(0x00)
                 f.seek(address)
-                f.write(new_name.encode('utf-8'))
+                f.write(new_name)
 
                 f.seek(address + 23)
                 data = f.read(25)
@@ -68,23 +71,42 @@ class WeaponEdit:
                     v2 = 255
                     v1 = 255
 
+                new_onetwentyseven_stats = []
+                for i in onetwentyseven_stats:
+                    j = int(i.get())
+                    if j < 0:
+                        j = j + 256
+                    new_onetwentyseven_stats.append(j)
+
                 towrite = [
-                    int(WEAPON_TYPE[weapon_type.get()], 16), int(pos_stats1[0].get()), int(pos_stats1[1].get()),
-                    int(pos_stats1[2].get()), int(v1), int(v2),
-                    int(d[12] + d[13], 16), int(pos_stats1[3].get()), int(WEAPON_ANIMATIONS[animation.get()], 16),
-                    int(d[18] + d[19], 16), int(d[20] + d[21], 16), aspect.get(),
-                    int(EQUIPMENT_STAT[stat.get()], 16), int(pos_stats2[0].get()),
-                    int(SKILL_ATTRIBUTE[skill_attribute.get()], 16), int(pos_stats2[1].get()),
-                    int((SPELLS[spell.get()])[:2]),
-                    int((SPELLS[spell.get()])[2:]),
-                    int(pos_stats2[2].get()), int(d[38] + d[39], 16), int((SPELLS[magic.get()])[:2], 16),
-                    int((SPELLS[magic.get()])[2:], 16), int(pos_stats2[3].get()),
-                    int(RESIST[resist.get()], 16), int(RESIST_AMOUNTS[resist_amount.get()], 16)
+                    int(WEAPON_TYPE[weapon_type.get()], 16),
+                    int(twofivefive_stats[0].get()),
+                    int(twofivefive_stats[1].get()),
+                    int(twofivefive_stats[2].get()),
+                    int(v1), int(v2),
+                    int(d[12] + d[13], 16),
+                    int(twofivefive_stats[3].get()),
+                    int(WEAPON_ANIMATIONS[animation.get()], 16),
+                    int(d[18] + d[19], 16), int(d[20] + d[21], 16),
+                    aspect.get(),
+                    int(EQUIPMENT_STAT[stat.get()], 16),
+                    int(new_onetwentyseven_stats[0]),
+                    int(SKILL_ATTRIBUTE[skill_attribute.get()], 16),
+                    int(new_onetwentyseven_stats[1]),
+                    int((SPELLS[spell.get()])[:2], 16),
+                    int((SPELLS[spell.get()])[2:], 16),
+                    int(twofivefive_stats[4].get()),
+                    int(d[38] + d[39], 16),
+                    int((SPELLS[magic.get()])[:2], 16),
+                    int((SPELLS[magic.get()])[2:], 16),
+                    int(twofivefive_stats[5].get()),
+                    int(RESIST[resist.get()], 16),
+                    int(RESIST_AMOUNTS[resist_amount.get()], 16)
                 ]
 
                 f.seek(address + 23)
-                for item in towrite:
-                    f.write(item.to_bytes(1, byteorder='big'))
+                for i in towrite:
+                    f.write(i.to_bytes(1, byteorder='big'))
 
         def build():
             lawfulgood_frame = Frame(weapwin)
@@ -108,25 +130,25 @@ class WeaponEdit:
 
             strength_label = Label(lawfulneutral_frame, text='Str Required:')
             strength_label.grid(column=0, row=0, sticky='e')
-            strength_entry = Entry(lawfulneutral_frame, textvariable=pos_stats1[0])
+            strength_entry = Entry(lawfulneutral_frame, textvariable=twofivefive_stats[0])
             strength_entry.grid(column=1, row=0, stick='e')
             strength_entry.config(width=4)
 
             hit_label = Label(lawfulneutral_frame, text='Hit:')
             hit_label.grid(column=0, row=1, sticky='e')
-            hit_entry = Entry(lawfulneutral_frame, textvariable=pos_stats1[1])
+            hit_entry = Entry(lawfulneutral_frame, textvariable=twofivefive_stats[1])
             hit_entry.grid(column=1, row=1, sticky='e')
             hit_entry.config(width=4)
 
             damage_label = Label(lawfulneutral_frame, text='Damage:')
             damage_label.grid(column=0, row=2, sticky='e')
-            damage_entry = Entry(lawfulneutral_frame, textvariable=pos_stats1[2])
+            damage_entry = Entry(lawfulneutral_frame, textvariable=twofivefive_stats[2])
             damage_entry.grid(column=1, row=2, sticky='e')
             damage_entry.config(width=4)
 
             range_label = Label(lawfulneutral_frame, text='Range:')
             range_label.grid(column=0, row=3, sticky='e')
-            range_entry = Entry(lawfulneutral_frame, textvariable=pos_stats1[3])
+            range_entry = Entry(lawfulneutral_frame, textvariable=twofivefive_stats[3])
             range_entry.grid(column=1, row=3, sticky='e')
             range_entry.config(width=4)
 
@@ -169,7 +191,7 @@ class WeaponEdit:
             stat_menu = OptionMenu(stat_frame, stat, *EQUIPMENT_STAT)
             stat_menu.grid(column=0, row=0)
             stat_menu.config(width=16)
-            stat_entry = Entry(stat_frame, textvariable=pos_stats2[0])
+            stat_entry = Entry(stat_frame, textvariable=onetwentyseven_stats[0])
             stat_entry.grid(column=1, row=0, sticky='e')
             stat_entry.config(width=4)
 
@@ -178,7 +200,7 @@ class WeaponEdit:
             ski_att_menu = OptionMenu(ski_att_frame, skill_attribute, *SKILL_ATTRIBUTE)
             ski_att_menu.grid(column=0, row=0)
             ski_att_menu.config(width=16)
-            ski_att_amo_entry = Entry(ski_att_frame, textvariable=pos_stats2[1])
+            ski_att_amo_entry = Entry(ski_att_frame, textvariable=onetwentyseven_stats[1])
             ski_att_amo_entry.grid(column=1, row=0)
             ski_att_amo_entry.config(width=4)
 
@@ -187,7 +209,7 @@ class WeaponEdit:
             spell_menu = OptionMenu(spell_frame, spell, *SPELLS)
             spell_menu.grid(column=0, row=0)
             spell_menu.config(width=16)
-            spell_entry = Entry(spell_frame, textvariable=pos_stats2[2])
+            spell_entry = Entry(spell_frame, textvariable=twofivefive_stats[4])
             spell_entry.grid(column=1, row=0)
             spell_entry.config(width=4)
 
@@ -196,7 +218,7 @@ class WeaponEdit:
             magic_menu = OptionMenu(magic_frame, magic, *SPELLS)
             magic_menu.grid(column=0, row=0)
             magic_menu.config(width=16)
-            magic_entry = Entry(magic_frame, textvariable=pos_stats2[3])
+            magic_entry = Entry(magic_frame, textvariable=twofivefive_stats[5])
             magic_entry.grid(column=1, row=0)
             magic_entry.config(width=4)
 
@@ -228,8 +250,8 @@ class WeaponEdit:
                 value.set(val)
 
         # check for positive 255
-        def pos_check1(*args):
-            for i in pos_stats1:
+        def twofivefive(*args):
+            for i in twofivefive_stats:
                 val = i.get()
                 if not val.isnumeric():
                     val = ''.join(filter(str.isnumeric, val))
@@ -240,11 +262,9 @@ class WeaponEdit:
                     else:
                         i.set(val)
 
-        # second check for positive 255
-        # introduced to help speed up program
-        # because I had it doing a for loop over 8 different stats which lagged things
-        def pos_check2(*args):
-            for i in pos_stats2:
+        # check for 127
+        def onetwentyseven(*args):
+            for i in onetwentyseven_stats:
                 val = i.get()
                 if not val.isnumeric():
                     val = ''.join(filter(str.isnumeric, val))
@@ -261,23 +281,21 @@ class WeaponEdit:
         name.trace('w', limit_name_size)
 
         # group of stats:
-        # strength, hit, damage, weapon range
+        # strength, hit, damage, weapon range, spell level, magic level
         # grouped to make it easier to run a 255 check
-        pos_stats1 = []
-        for i in range(4):
+        twofivefive_stats = []
+        for i in range(6):
             i = StringVar()
-            i.trace('w', pos_check1)
-            pos_stats1.append(i)
+            i.trace('w', twofivefive)
+            twofivefive_stats.append(i)
 
         # group of stats:
-        # stat amount, skill attribute amount, spell level, magic level
-        # a second grouping to help speed up program
-        # by allowing a second 255 check to run
-        pos_stats2 = []
-        for i in range(4):
+        # stat amount, skill attribute amount
+        onetwentyseven_stats = []
+        for i in range(2):
             i = StringVar()
-            i.trace('w', pos_check2)
-            pos_stats2.append(i)
+            i.trace('w', onetwentyseven)
+            onetwentyseven_stats.append(i)
 
         weapon_type = StringVar()
         value = StringVar()
