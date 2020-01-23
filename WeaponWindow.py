@@ -10,6 +10,7 @@ from variables import WEAPON_NAMES, WEAPON_ADDRESSES, WEAPON_TYPE, inv_WEAPON_TY
 class WeaponEdit:
     def __init__(self, filename):
         weapwin = Toplevel()
+        weapwin.resizable(False, False)
         weapwin.title('Weapon Edit')
         filename = filename
 

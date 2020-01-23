@@ -1,3 +1,4 @@
+from functools import partial
 from tkinter import Toplevel, Frame, LabelFrame, Entry, Button, Radiobutton, Label, StringVar, IntVar
 from tkinter.ttk import Combobox
 from variables import WEAPONS, inv_WEAPONS, ARMORS, inv_ARMORS, SHIELDS, inv_SHIELDS, \
@@ -7,6 +8,7 @@ from variables import WEAPONS, inv_WEAPONS, ARMORS, inv_ARMORS, SHIELDS, inv_SHI
 class CharacterEdit:
     def __init__(self, filename, characters, character_addresses, name_length):
         charwin = Toplevel()
+        charwin.resizable(False, False)
         charwin.title("Character Edit")
         filename = filename
         characters = characters
@@ -90,8 +92,8 @@ class CharacterEdit:
                 character_data = f.read(74)
                 d = character_data.hex()
 
-                towrite = [aspect.get(), int((d[3] + d[4]).encode('utf-8'), 16),
-                           int((d[5] + d[6]).encode('utf-8'), 16)]
+                towrite = [aspect.get(), int(d[3] + d[4]),
+                           int(d[5] + d[6])]
                 for i in skills:
                     j = i.get()
                     if j == '':
@@ -102,16 +104,16 @@ class CharacterEdit:
                     j = i.get()
                     towrite.append(int(j))
 
-                towrite.append(int((d[64] + d[65]).encode('utf-8'), 16))
+                towrite.append(int((d[64] + d[65])))
                 towrite.append(level.get())
-                towrite.append(int((d[68] + d[69]).encode('utf-8'), 16))
+                towrite.append(int((d[68] + d[69])))
 
                 for i in weapons:
                     towrite.append(int((WEAPONS[i.get()])[:2], 16))
                     towrite.append(int((WEAPONS[i.get()])[2:], 16))
 
-                towrite.append(int((d[82] + d[83]).encode('utf-8'), 16))
-                towrite.append(int((d[84] + d[85]).encode('utf-8'), 16))
+                towrite.append(int((d[82] + d[83])))
+                towrite.append(int((d[84] + d[85])))
 
                 for i in spells:
                     towrite.append(int((SPELLS[i.get()])[:2], 16))
@@ -123,11 +125,11 @@ class CharacterEdit:
                     towrite.append(i.get())
 
                 for i in range(118, 135, 2):
-                    towrite.append(int((d[i] + d[i + 1]).encode('utf-8'), 16))
+                    towrite.append(int((d[i] + d[i + 1])))
 
                 towrite.append(int((ARMORS[armor.get()])[:2], 16))
                 towrite.append(int((ARMORS[armor.get()])[2:], 16))
-                towrite.append(int((d[140] + d[141]).encode('utf-8'), 16))
+                towrite.append(int((d[140] + d[141])))
                 towrite.append(int((SHIELDS[shield.get()])[:2], 16))
                 towrite.append(int((SHIELDS[shield.get()])[2:], 16))
 
@@ -221,10 +223,9 @@ class CharacterEdit:
             shield_menu.config(width=16)
 
             # column 1, row all
-            neutralgood_frame = LabelFrame(charwin, text='Skills')
+            neutralgood_frame = LabelFrame(charwin, text='Skills\n(blank = cannot learn)')
             neutralgood_frame.grid(column=1, row=0, rowspan=23)
 
-            # todo: add note about blank being can't learn
             for skill in SKILLS:
                 x = SKILLS.index(skill)
                 skill_label = Label(neutralgood_frame, text=skill, anchor='e', width=9)
@@ -307,32 +308,18 @@ class CharacterEdit:
                     else:
                         i.set(val)
 
-        def limit1_10(*args):
-            pass
-
-        def limit2_10(*args):
-            pass
-
-        def limit3_10(*args):
-            pass
-
-        def limit4_10(*args):
-            pass
-
-        def input_val(inp):
-            if inp.isnumeric() and int(inp) in range(0, 256):
-                if int(inp) > 255:
-                    return 255
+        # places a limit of 10 on appropriate skills
+        def limit_10(i, *args):
+            val = i.get()
+            if not val.isnumeric():
+                val = ''.join(filter(str.isnumeric, val))
+                i.set(val)
+            elif val.isnumeric():
+                if int(val) > 10:
+                    i.set(10)
                 else:
-                    return True
-            elif inp == "":
-                return True
-            else:
-                return False
+                    i.set(val)
 
-        # todo max skill is 10
-        # todo max attribute is what defaults are
-        # todo level 40 is max
         # initial declaration of variables
         character = StringVar()
         character.trace('w', read_default_values)
@@ -343,8 +330,10 @@ class CharacterEdit:
         skills = []
         for _ in SKILLS:
             i = StringVar()
+            i.trace('w', partial(limit_10, i))
             skills.append(i)
         shield_skill = StringVar()
+        shield_skill.trace('w', partial(limit_10, shield_skill))
         atts = []
         for _ in ATTRIBUTES:
             i = StringVar()

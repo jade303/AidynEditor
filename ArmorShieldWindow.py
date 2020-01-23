@@ -8,6 +8,7 @@ from variables import inv_EQUIPMENT_STAT, inv_SKILL_ATTRIBUTE, inv_SPELLS, inv_R
 class ArmorShieldEdit:
     def __init__(self, filename, names, addresses):
         shiwin = Toplevel()
+        shiwin.resizable(False, False)
         shiwin.title("Armor and Shield Edit")
         filename = filename
         names = names

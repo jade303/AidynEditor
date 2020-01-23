@@ -79,6 +79,7 @@ def file_dialog():
 
 
 root = Tk()
+root.resizable(False, False)
 root.title("Aidyn Editor")
 
 browse_frame = LabelFrame(root, text="Aidyn Chronicles ROM")

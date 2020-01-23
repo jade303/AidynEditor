@@ -8,6 +8,7 @@ from variables import SPELL_ADDRESSES, SPELL_INGREDIENTS, SPELL_NAMES, inv_SPELL
 class SpellEdit:
     def __init__(self, filename):
         spellwin = Toplevel()
+        spellwin.resizable(False, False)
         spellwin.title("Spell Edit")
         filename = filename
 
