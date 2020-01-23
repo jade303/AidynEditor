@@ -6,10 +6,13 @@ from variables import WEAPONS, inv_WEAPONS, ARMORS, inv_ARMORS, SHIELDS, inv_SHI
 
 
 class CharacterEdit:
-    def __init__(self, filename, characters, character_addresses, name_length):
+    def __init__(self, filename, characters, character_addresses, name_length, title):
         charwin = Toplevel()
         charwin.resizable(False, False)
-        charwin.title("Character Edit")
+        if title == 1:
+            charwin.title("Party Edit -- Edits are NEW GAME only")
+        elif title == 0:
+            charwin.title("Enemy Edit")
         filename = filename
         characters = characters
         character_addresses = character_addresses

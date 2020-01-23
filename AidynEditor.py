@@ -23,11 +23,12 @@ def file_dialog():
         browse_frame.destroy()
         #filenamelabel = Label(root, text=filename)
         #filenamelabel.grid(column=0, row=0, sticky='ew')
-        party_button = Button(root, text="Party Edit*",
+        party_button = Button(root, text="Party Edit",
                               command=lambda: CharacterWindow.CharacterEdit(filename,
                                                                             PARTY,
                                                                             PARTY_ADDRESSES,
-                                                                            party_name_length))
+                                                                            party_name_length,
+                                                                            1))
         party_button.grid(column=0, row=1, sticky='ew')
         party_button.config(width=12)
 
@@ -35,7 +36,8 @@ def file_dialog():
                               command=lambda: CharacterWindow.CharacterEdit(filename,
                                                                             ENEMIES,
                                                                             ENEMY_ADDRESSES,
-                                                                            enemy_name_length))
+                                                                            enemy_name_length,
+                                                                            0))
         enemy_button.grid(column=0, row=2)
         enemy_button.config(width=12)
 
@@ -47,7 +49,8 @@ def file_dialog():
         armor_button = Button(root, text="Armor Edit",
                               command=lambda: ArmorShieldWindow.ArmorShieldEdit(filename,
                                                                                 ARMOR_NAMES,
-                                                                                ARMOR_ADDRESSES))
+                                                                                ARMOR_ADDRESSES,
+                                                                                1))
         armor_button.grid(column=0, row=4)
         armor_button.config(width=12)
 
@@ -59,7 +62,8 @@ def file_dialog():
         shield_button = Button(root, text="Shield Edit",
                                command=lambda: ArmorShieldWindow.ArmorShieldEdit(filename,
                                                                                  SHIELD_NAMES,
-                                                                                 SHIELD_ADDRESSES))
+                                                                                 SHIELD_ADDRESSES,
+                                                                                 0))
         shield_button.grid(column=0, row=6)
         shield_button.config(width=12)
 
@@ -72,10 +76,6 @@ def file_dialog():
                                command=lambda: WeaponWindow.WeaponEdit(filename))
         weapon_button.grid(column=0, row=8)
         weapon_button.config(width=12)
-
-        party_note = Label(root, text='*new game only')
-        party_note.grid(column=0, row=9)
-        party_note.config(width=12)
 
 
 root = Tk()
