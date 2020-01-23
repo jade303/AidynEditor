@@ -39,10 +39,10 @@ def file_dialog():
         enemy_button.grid(column=0, row=2)
         enemy_button.config(width=12)
 
-        accessory_button = Button(root, text="Accessory Edit",
+        """accessory_button = Button(root, text="Accessory Edit",
                                   command=lambda: AccessoryWindow.AccessoryEdit(filename))
         accessory_button.grid(column=0, row=3)
-        accessory_button.config(width=12)
+        accessory_button.config(width=12)"""
 
         armor_button = Button(root, text="Armor Edit",
                               command=lambda: ArmorShieldWindow.ArmorShieldEdit(filename,
@@ -51,10 +51,10 @@ def file_dialog():
         armor_button.grid(column=0, row=4)
         armor_button.config(width=12)
 
-        #item_button = Button(root, text='Item Edit',
-        #                     command=lambda: ItemWindow.ItemEdit(filename))
-        #item_button.grid(column=0, row=5)
-        #item_button.config(width=12)
+        """item_button = Button(root, text='Item Edit',
+                             command=lambda: ItemWindow.ItemEdit(filename))
+        item_button.grid(column=0, row=5)
+        item_button.config(width=12)"""
 
         shield_button = Button(root, text="Shield Edit",
                                command=lambda: ArmorShieldWindow.ArmorShieldEdit(filename,
