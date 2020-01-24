@@ -51,8 +51,6 @@ class CharacterEdit:
                 for a in atts:
                     aa = atts.index(a) * 2
                     an = int(d[aa + 52] + d[aa + 53], 16)
-                    if an == 255:
-                        an = ''
                     a.set(an)
 
                 # set level default
@@ -95,8 +93,8 @@ class CharacterEdit:
                 character_data = f.read(74)
                 d = character_data.hex()
 
-                towrite = [aspect.get(), int(d[3] + d[4]),
-                           int(d[5] + d[6])]
+                towrite = [aspect.get(), int(d[3] + d[4], 16),
+                           int(d[5] + d[6], 16)]
                 for i in skills:
                     j = i.get()
                     if j == '':
@@ -107,16 +105,16 @@ class CharacterEdit:
                     j = i.get()
                     towrite.append(int(j))
 
-                towrite.append(int((d[64] + d[65])))
-                towrite.append(level.get())
-                towrite.append(int((d[68] + d[69])))
+                towrite.append(int(d[64] + d[65], 16))
+                towrite.append(int(level.get()))
+                towrite.append(int(d[68] + d[69], 16))
 
                 for i in weapons:
                     towrite.append(int((WEAPONS[i.get()])[:2], 16))
                     towrite.append(int((WEAPONS[i.get()])[2:], 16))
 
-                towrite.append(int((d[82] + d[83])))
-                towrite.append(int((d[84] + d[85])))
+                towrite.append(int(d[82] + d[83], 16))
+                towrite.append(int(d[84] + d[85], 16))
 
                 for i in spells:
                     towrite.append(int((SPELLS[i.get()])[:2], 16))
@@ -125,14 +123,14 @@ class CharacterEdit:
                 towrite.append(school.get())
 
                 for i in spell_levels:
-                    towrite.append(i.get())
+                    towrite.append(int(i.get()))
 
                 for i in range(118, 135, 2):
-                    towrite.append(int((d[i] + d[i + 1])))
+                    towrite.append(int(d[i] + d[i + 1], 16))
 
                 towrite.append(int((ARMORS[armor.get()])[:2], 16))
                 towrite.append(int((ARMORS[armor.get()])[2:], 16))
-                towrite.append(int((d[140] + d[141])))
+                towrite.append(int(d[140] + d[141], 16))
                 towrite.append(int((SHIELDS[shield.get()])[:2], 16))
                 towrite.append(int((SHIELDS[shield.get()])[2:], 16))
 

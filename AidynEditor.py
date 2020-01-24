@@ -1,4 +1,4 @@
-from tkinter import Tk, LabelFrame, mainloop, Label, Button, Frame, PhotoImage
+from tkinter import Tk, LabelFrame, mainloop, Button
 from tkinter import filedialog
 
 import AccessoryWindow
@@ -21,8 +21,10 @@ def file_dialog():
                                           filetype=(("z64", "*.z64"), ("all files", "*.*")))
     if filename != '':
         browse_frame.destroy()
-        #filenamelabel = Label(root, text=filename)
-        #filenamelabel.grid(column=0, row=0, sticky='ew')
+        """
+        filenamelabel = Label(root, text=filename)
+        filenamelabel.grid(column=0, row=0, sticky='ew')
+        """
         party_button = Button(root, text="Party Edit",
                               command=lambda: CharacterWindow.CharacterEdit(filename,
                                                                             PARTY,

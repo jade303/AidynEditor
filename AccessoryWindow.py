@@ -7,3 +7,12 @@ class AccessoryEdit:
         accesswin.resizable(False, False)
         accesswin.title("Accessory Edit")
         filename = filename
+
+        def set_defaults(*args):
+            pass
+
+        def write():
+            pass
+
+        def build():
+            pass
