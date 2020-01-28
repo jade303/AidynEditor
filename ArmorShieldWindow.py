@@ -1,3 +1,4 @@
+from functools import partial
 from tkinter import Toplevel, StringVar, IntVar, LabelFrame, Frame, Entry, Label, Button, Radiobutton
 from tkinter.ttk import Combobox
 
@@ -53,10 +54,10 @@ class ArmorShieldEdit:
                     att_amount = att_amount - 256
                 onetwentyseven_stats[3].set(att_amount)
                 spell.set(inv_SPELLS[(d[26:30]).upper()])
-                twofivefive_stats[2].set(int(d[30] + d[31], 16))
+                spell_level.set(int(d[30] + d[31], 16))
 
                 magic.set(inv_SPELLS[(d[34:38]).upper()])
-                twofivefive_stats[3].set(int(d[38] + d[39], 16))
+                magic_level.set(int(d[38] + d[39], 16))
                 resist.set(inv_RESIST[(d[40] + d[41]).upper()])
                 resist_amount.set(inv_RESIST_AMOUNTS[(d[42] + d[43]).upper()])
 
@@ -103,11 +104,11 @@ class ArmorShieldEdit:
                     int(new_onetwentyseven_stats[3]),
                     int((SPELLS[spell.get()])[:2], 16),
                     int((SPELLS[spell.get()])[2:], 16),
-                    int(twofivefive_stats[2].get()),
+                    int(spell_level.get()),
                     int(d[32] + d[33], 16),
                     int((SPELLS[magic.get()])[:2], 16),
                     int((SPELLS[magic.get()])[2:], 16),
-                    int(twofivefive_stats[3].get()),
+                    int(magic_level.get()),
                     int(RESIST[resist.get()], 16),
                     int(RESIST_AMOUNTS[resist_amount.get()], 16)
                 ]
@@ -207,7 +208,7 @@ class ArmorShieldEdit:
             spell_menu = Combobox(spell_frame, textvariable=spell, values=list(SPELLS.keys()))
             spell_menu.grid(column=0, row=0)
             spell_menu.config(width=16)
-            spell_entry = Entry(spell_frame, textvariable=twofivefive_stats[2])
+            spell_entry = Entry(spell_frame, textvariable=spell_level)
             spell_entry.grid(column=1, row=0)
             spell_entry.config(width=4)
 
@@ -216,7 +217,7 @@ class ArmorShieldEdit:
             magic_menu = Combobox(magic_frame, textvariable=magic, values=list(SPELLS.keys()))
             magic_menu.grid(column=0, row=0)
             magic_menu.config(width=16)
-            magic_entry = Entry(magic_frame, textvariable=twofivefive_stats[3])
+            magic_entry = Entry(magic_frame, textvariable=magic_level)
             magic_entry.grid(column=1, row=0)
             magic_entry.config(width=4)
 
@@ -287,6 +288,18 @@ class ArmorShieldEdit:
                         else:
                             i.set(val)
 
+        # sets limit of 15
+        def fifteen(i, *args):
+            val = i.get()
+            if not val.isnumeric():
+                val = ''.join(filter(str.isnumeric, val))
+                i.set(val)
+            elif val.isnumeric():
+                if int(val) > 15:
+                    i.set(15)
+                else:
+                    i.set(val)
+
         item = StringVar()
         item.trace('w', set_defaults)
         name = StringVar()
@@ -296,7 +309,7 @@ class ArmorShieldEdit:
         # defense, protection, spell_level, magic_level
         # grouped to make it easier to run a 255 check
         twofivefive_stats = []
-        for i in range(4):
+        for i in range(2):
             i = StringVar()
             i.trace('w', twofivefive)
             twofivefive_stats.append(i)
@@ -315,7 +328,11 @@ class ArmorShieldEdit:
         stat = StringVar()
         skill_attribute = StringVar()
         spell = StringVar()
+        spell_level = StringVar()
+        spell_level.trace('w', partial(fifteen, spell_level))
         magic = StringVar()
+        magic_level = StringVar()
+        magic_level.trace('w', partial(fifteen, magic_level))
         resist = StringVar()
         resist_amount = StringVar()
 

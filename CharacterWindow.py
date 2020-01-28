@@ -310,6 +310,18 @@ class CharacterEdit:
                     else:
                         i.set(val)
 
+        # sets limit of 15
+        def fifteen(i, *args):
+            val = i.get()
+            if not val.isnumeric():
+                val = ''.join(filter(str.isnumeric, val))
+                i.set(val)
+            elif val.isnumeric():
+                if int(val) > 15:
+                    i.set(15)
+                else:
+                    i.set(val)
+
         # places a limit of 10 on appropriate skills
         def limit_10(i, *args):
             val = i.get()
@@ -349,7 +361,7 @@ class CharacterEdit:
         spell_levels = []
         for i in range(5):
             i = StringVar()
-            i.trace('w', twofivefive)
+            i.trace('w', partial(fifteen, i))
             spell_levels.append(i)
         armor = StringVar()
         shield = StringVar()

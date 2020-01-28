@@ -1,3 +1,4 @@
+from functools import partial
 from tkinter import Toplevel, Frame, LabelFrame, Entry, Label, Button, Radiobutton, StringVar, IntVar
 from tkinter.ttk import Combobox
 
@@ -47,10 +48,10 @@ class WeaponEdit:
                 onetwentyseven_stats[1].set(att_amount)
 
                 spell.set(inv_SPELLS[(d[32:36]).upper()])
-                twofivefive_stats[4].set(int(d[36] + d[37], 16))
+                spell_level.set(int(d[36] + d[37], 16))
 
                 magic.set(inv_SPELLS[(d[40:44]).upper()])
-                twofivefive_stats[5].set(int(d[44] + d[45], 16))
+                magic_level.set(int(d[44] + d[45], 16))
 
                 resist.set(inv_RESIST[(d[46] + d[47]).upper()])
                 resist_amount.set(inv_RESIST_AMOUNTS[(d[48] + d[49]).upper()])
@@ -99,11 +100,11 @@ class WeaponEdit:
                     int(new_onetwentyseven_stats[1]),
                     int((SPELLS[spell.get()])[:2], 16),
                     int((SPELLS[spell.get()])[2:], 16),
-                    int(twofivefive_stats[4].get()),
+                    int(spell_level.get()),
                     int(d[38] + d[39], 16),
                     int((SPELLS[magic.get()])[:2], 16),
                     int((SPELLS[magic.get()])[2:], 16),
-                    int(twofivefive_stats[5].get()),
+                    int(magic_level.get()),
                     int(RESIST[resist.get()], 16),
                     int(RESIST_AMOUNTS[resist_amount.get()], 16)
                 ]
@@ -213,7 +214,7 @@ class WeaponEdit:
             spell_menu = Combobox(spell_frame, textvariable=spell, values=list(SPELLS.keys()))
             spell_menu.grid(column=0, row=0)
             spell_menu.config(width=16)
-            spell_entry = Entry(spell_frame, textvariable=twofivefive_stats[4])
+            spell_entry = Entry(spell_frame, textvariable=spell_level)
             spell_entry.grid(column=1, row=0)
             spell_entry.config(width=4)
 
@@ -222,7 +223,7 @@ class WeaponEdit:
             magic_menu = Combobox(magic_frame, textvariable=magic, values=list(SPELLS.keys()))
             magic_menu.grid(column=0, row=0)
             magic_menu.config(width=16)
-            magic_entry = Entry(magic_frame, textvariable=twofivefive_stats[5])
+            magic_entry = Entry(magic_frame, textvariable=magic_level)
             magic_entry.grid(column=1, row=0)
             magic_entry.config(width=4)
 
@@ -279,6 +280,18 @@ class WeaponEdit:
                     else:
                         i.set(val)
 
+        # sets limit of 15
+        def fifteen(i, *args):
+            val = i.get()
+            if not val.isnumeric():
+                val = ''.join(filter(str.isnumeric, val))
+                i.set(val)
+            elif val.isnumeric():
+                if int(val) > 15:
+                    i.set(15)
+                else:
+                    i.set(val)
+
         weapon = StringVar()
         weapon.trace('w', set_defaults)
         name = StringVar()
@@ -288,7 +301,7 @@ class WeaponEdit:
         # strength, hit, damage, weapon range, spell level, magic level
         # grouped to make it easier to run a 255 check
         twofivefive_stats = []
-        for i in range(6):
+        for i in range(4):
             i = StringVar()
             i.trace('w', twofivefive)
             twofivefive_stats.append(i)
@@ -309,7 +322,11 @@ class WeaponEdit:
         stat = StringVar()
         skill_attribute = StringVar()
         spell = StringVar()
+        spell_level = StringVar()
+        spell_level.trace('w', partial(fifteen, spell_level))
         magic = StringVar()
+        magic_level = StringVar()
+        magic_level.trace('w', partial(fifteen, magic_level))
         resist = StringVar()
         resist_amount = StringVar()
 
