@@ -12,6 +12,7 @@ class WeaponEdit:
         weapwin = Toplevel()
         weapwin.resizable(False, False)
         weapwin.title('Weapon Edit')
+        weapwin.iconbitmap('images\icon.ico')
         filename = filename
 
         def set_defaults(*args):
@@ -232,7 +233,7 @@ class WeaponEdit:
             resist_menu.config(width=16)
             resist_amount_menu = Combobox(resist_frame, textvariable=resist_amount, values=list(RESIST_AMOUNTS.keys()))
             resist_amount_menu.grid(column=1, row=0)
-            resist_amount_menu.config(width=4)
+            resist_amount_menu.config(width=5)
 
         # limits the same size
         def limit_name_size(*args):

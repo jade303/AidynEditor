@@ -13,6 +13,7 @@ class ArmorShieldEdit:
             shiwin.title("Armor Edit")
         elif title == 0:
             shiwin.title("Shield Edit")
+        shiwin.iconbitmap('images\icon.ico')
         filename = filename
         names = names
         addresses = addresses
@@ -226,7 +227,7 @@ class ArmorShieldEdit:
             resist_menu.config(width=16)
             resist_amount_menu = Combobox(resist_frame, textvariable=resist_amount, values=list(RESIST_AMOUNTS.keys()))
             resist_amount_menu.grid(column=1, row=0)
-            resist_amount_menu.config(width=4)
+            resist_amount_menu.config(width=5)
 
         # limits the same size
         def limit_name_size(*args):

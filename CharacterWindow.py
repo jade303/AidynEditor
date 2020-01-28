@@ -13,6 +13,7 @@ class CharacterEdit:
             charwin.title("Party Edit -- Edits are NEW GAME only")
         elif title == 0:
             charwin.title("Enemy Edit")
+        charwin.iconbitmap('images\icon.ico')
         filename = filename
         characters = characters
         character_addresses = character_addresses
@@ -119,7 +120,7 @@ class CharacterEdit:
                 for i in spells:
                     towrite.append(int((SPELLS[i.get()])[:2], 16))
                     towrite.append(int((SPELLS[i.get()])[2:], 16))
-
+                #todo max spell level in game is 15
                 towrite.append(school.get())
 
                 for i in spell_levels:

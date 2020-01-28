@@ -637,8 +637,6 @@ ARMOR_ADDRESSES = [
     0x01FCBD08
 ]
 
-
-
 SPELLS = {
     "NONE": "0000",
     "Acid Bolt": "3B03",
@@ -1105,6 +1103,59 @@ ACCESSORY_NAMES = [
     "Wizard Hat",
     "Wizard's Wand",
     "Woodsman's Boots"
+]
+
+ACCESSORY_ADDRESSES = [
+    0x01FCEB0C,
+    0x01FCD918,
+    0x01FCD2E0,
+    0x01FCDA7C,
+    0x01FCDA50,
+    0x01FCDAD8,
+    0x01FCDB30,
+    0x01FCDB88,
+    0x01FCD49C,
+    0x01FCD4F8,
+    0x01FCD524,
+    0x01FCD338,
+    0x01FCD9F4,
+    0x01FCEB90,
+    0x01FCEC14,
+    0x01FCD0C8,
+    0x01FCD120,
+    0x01FCD14C,
+    0x01FCD0F4,
+    0x01FCD9C8,
+    0x01FCD390,
+    0x01FCD178,
+    0x01FCDB5C,
+    0x01FCD22C,
+    0x01FCD444,
+    0x01FCD3EC,
+    0x01FCEAE0,
+    0x01FCDAA8,
+    0x01FCD284,
+    0x01FCEB38,
+    0x01FCD944,
+    0x01FCD418,
+    0x01FCD200,
+    0x01FCEBE8,
+    0x01FCD258,
+    0x01FCD2B4,
+    0x01FCDA24,
+    0x01FCD3C0,
+    0x01FCD4CC,
+    0x01FCEC40,
+    0x01FCEB64,
+    0x01FCD1A4,
+    0x01FCEBBC,
+    0x01FCD970,
+    0x01FCD364,
+    0x01FCD30C,
+    0x01FCD470,
+    0x01FCD1D0,
+    0x01FCD99C,
+    0x01FCDB04
 ]
 
 EQUIPMENT_STAT = {

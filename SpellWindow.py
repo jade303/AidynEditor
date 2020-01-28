@@ -10,6 +10,7 @@ class SpellEdit:
         spellwin = Toplevel()
         spellwin.resizable(False, False)
         spellwin.title("Spell Edit")
+        spellwin.iconbitmap('images\icon.ico')
         filename = filename
 
         def read_defaults(*args):
@@ -32,7 +33,10 @@ class SpellEdit:
                 target_type.set(inv_TARGET_TYPE[d[9]])
                 # target_area.set(int(sd[10] + sd[11], 16))
                 pos_stats[2].set(int(d[12] + d[13], 16))
-                aspect.set(d[14])
+                asp = d[15]
+                if asp == range(0, 2):
+                    asp = 0
+                aspect.set(asp)
                 pos_stats[3].set(int(d[16] + d[17], 16))
                 ingredient.set(inv_SPELL_INGREDIENTS[d[19]])
                 pos_stats[4].set(int(d[20] + d[21], 16))

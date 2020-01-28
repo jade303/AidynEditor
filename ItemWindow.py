@@ -1,4 +1,4 @@
-from tkinter import Toplevel
+from tkinter import Toplevel, Label
 
 
 class ItemEdit:
@@ -6,4 +6,8 @@ class ItemEdit:
         itemwin = Toplevel()
         itemwin.resizable(False, False)
         itemwin.title("Item Edit")
+        itemwin.iconbitmap('images\icon.ico')
         filename = filename
+
+        label = Label(itemwin, text='Nothing yet!')
+        label.grid()
