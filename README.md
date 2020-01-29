@@ -3,8 +3,7 @@ An editor for Aidyn Chronicles - The First Mage
 
 Party edits are new game only or until the party member joins you.
 
-Wraith Touch is very glitchy. The only way I've gotten it to work on a character that isn't a Wraith 
-is by changing the battle model to that of the Wraith and using Wraith Touch. Otherwise the game crashes.
+Some spells are pretty glitchy, like Wraith Touch or Escape. Be cautious.
 
 If you want an exe file:
 <pre>
