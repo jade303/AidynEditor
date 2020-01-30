@@ -2,6 +2,7 @@ from functools import partial
 from tkinter import Toplevel, Frame, LabelFrame, Entry, Label, Button, Radiobutton, StringVar, IntVar
 from tkinter.ttk import Combobox
 
+from functions import limit, limit_name_size, limit_127
 from variables import WEAPON_NAMES, WEAPON_ADDRESSES, WEAPON_TYPE, inv_WEAPON_TYPE, \
     WEAPON_ANIMATIONS, inv_WEAPON_ANIMATIONS, EQUIPMENT_STAT, inv_EQUIPMENT_STAT, \
     SKILL_ATTRIBUTE, inv_SKILL_ATTRIBUTE, SPELLS, inv_SPELLS, \
@@ -13,39 +14,42 @@ class WeaponEdit:
         weapwin = Toplevel()
         weapwin.resizable(False, False)
         weapwin.title('Weapon Edit')
-        weapwin.iconbitmap('images\icon.ico')
+        weapwin.iconbitmap('images\\aidyn.ico')
         filename = filename
+        data_seek = 23
+        data_read = 25
+        name_length = 21
 
         def set_defaults(*args):
             with open(filename, 'rb') as f:
                 address = WEAPON_ADDRESSES[WEAPON_NAMES.index(weapon.get())]
                 f.seek(address)
-                name.set(f.read(21).decode("utf-8"))
+                name.set(f.read(name_length).decode("utf-8"))
 
-                f.seek(address + 23)
-                data = f.read(25)
+                f.seek(address + data_seek)
+                data = f.read(data_read)
                 d = data.hex()
 
                 weapon_type.set(inv_WEAPON_TYPE[d[1].upper()])
-                twofivefive_stats[0].set(int(d[2] + d[3], 16))
-                twofivefive_stats[1].set(int(d[4] + d[5], 16))
-                twofivefive_stats[2].set(int(d[6] + d[7], 16))
+                str_req.set(int(d[2] + d[3], 16))
+                hit.set(int(d[4] + d[5], 16))
+                damage.set(int(d[6] + d[7], 16))
                 value.set((int(d[10] + d[11], 16) * 256) + int(d[8] + d[9], 16))
-                twofivefive_stats[3].set(int(d[14] + d[15], 16))
+                weapon_range.set(int(d[14] + d[15], 16))
                 animation.set(inv_WEAPON_ANIMATIONS[d[16] + d[17].upper()])
                 aspect.set(d[23])
 
                 stat.set(inv_EQUIPMENT_STAT[(d[24] + d[25]).upper()])
-                stat_amount = int(d[26] + d[27], 16)
-                if stat_amount > 127:
-                    stat_amount = stat_amount - 256
-                onetwentyseven_stats[0].set(stat_amount)
+                st = int(d[26] + d[27], 16)
+                if st > 127:
+                    st = st - 256
+                stat_amount.set(st)
 
-                skill_attribute.set(inv_SKILL_ATTRIBUTE[(d[28] + d[29]).upper()])
+                skill.set(inv_SKILL_ATTRIBUTE[(d[28] + d[29]).upper()])
                 att_amount = int(d[30] + d[31], 16)
                 if att_amount > 127:
                     att_amount = att_amount - 256
-                onetwentyseven_stats[1].set(att_amount)
+                skill_amount.set(att_amount)
 
                 spell.set(inv_SPELLS[(d[32:36]).upper()])
                 spell_level.set(int(d[36] + d[37], 16))
@@ -60,14 +64,14 @@ class WeaponEdit:
             with open(filename, 'rb+') as f:
                 address = WEAPON_ADDRESSES[WEAPON_NAMES.index(weapon.get())]
                 new_name = bytearray(name.get(), 'utf-8')
-                if len(new_name) < 21:
-                    while len(new_name) < 21:
+                if len(new_name) < name_length:
+                    while len(new_name) < name_length:
                         new_name.append(0x00)
                 f.seek(address)
                 f.write(new_name)
 
-                f.seek(address + 23)
-                data = f.read(25)
+                f.seek(address + data_seek)
+                data = f.read(data_read)
                 d = data.hex()
 
                 new_value = value.get()
@@ -76,28 +80,29 @@ class WeaponEdit:
                     v2 = 255
                     v1 = 255
 
-                new_onetwentyseven_stats = []
-                for i in onetwentyseven_stats:
-                    j = int(i.get())
-                    if j < 0:
-                        j = j + 256
-                    new_onetwentyseven_stats.append(j)
+                st = int(stat_amount.get())
+                if st < 0:
+                    st = st + 256
+
+                sk = int(skill_amount.get())
+                if sk < 0:
+                    sk = sk + 256
 
                 towrite = [
                     int(WEAPON_TYPE[weapon_type.get()], 16),
-                    int(twofivefive_stats[0].get()),
-                    int(twofivefive_stats[1].get()),
-                    int(twofivefive_stats[2].get()),
+                    int(str_req.get()),
+                    int(hit.get()),
+                    int(damage.get()),
                     int(v1), int(v2),
                     int(d[12] + d[13], 16),
-                    int(twofivefive_stats[3].get()),
+                    int(weapon_range.get()),
                     int(WEAPON_ANIMATIONS[animation.get()], 16),
                     int(d[18] + d[19], 16), int(d[20] + d[21], 16),
                     aspect.get(),
                     int(EQUIPMENT_STAT[stat.get()], 16),
-                    int(new_onetwentyseven_stats[0]),
-                    int(SKILL_ATTRIBUTE[skill_attribute.get()], 16),
-                    int(new_onetwentyseven_stats[1]),
+                    int(st),
+                    int(SKILL_ATTRIBUTE[skill.get()], 16),
+                    int(sk),
                     int((SPELLS[spell.get()])[:2], 16),
                     int((SPELLS[spell.get()])[2:], 16),
                     int(spell_level.get()),
@@ -109,7 +114,7 @@ class WeaponEdit:
                     int(RESIST_AMOUNTS[resist_amount.get()], 16)
                 ]
 
-                f.seek(address + 23)
+                f.seek(address + data_seek)
                 for i in towrite:
                     f.write(i.to_bytes(1, byteorder='big'))
 
@@ -135,25 +140,25 @@ class WeaponEdit:
 
             strength_label = Label(lawfulneutral_frame, text='Str Required:')
             strength_label.grid(column=0, row=0, sticky='e')
-            strength_entry = Entry(lawfulneutral_frame, textvariable=twofivefive_stats[0])
+            strength_entry = Entry(lawfulneutral_frame, textvariable=str_req)
             strength_entry.grid(column=1, row=0, stick='e')
             strength_entry.config(width=4)
 
             hit_label = Label(lawfulneutral_frame, text='Hit:')
             hit_label.grid(column=0, row=1, sticky='e')
-            hit_entry = Entry(lawfulneutral_frame, textvariable=twofivefive_stats[1])
+            hit_entry = Entry(lawfulneutral_frame, textvariable=hit)
             hit_entry.grid(column=1, row=1, sticky='e')
             hit_entry.config(width=4)
 
             damage_label = Label(lawfulneutral_frame, text='Damage:')
             damage_label.grid(column=0, row=2, sticky='e')
-            damage_entry = Entry(lawfulneutral_frame, textvariable=twofivefive_stats[2])
+            damage_entry = Entry(lawfulneutral_frame, textvariable=damage)
             damage_entry.grid(column=1, row=2, sticky='e')
             damage_entry.config(width=4)
 
             range_label = Label(lawfulneutral_frame, text='Range:')
             range_label.grid(column=0, row=3, sticky='e')
-            range_entry = Entry(lawfulneutral_frame, textvariable=twofivefive_stats[3])
+            range_entry = Entry(lawfulneutral_frame, textvariable=weapon_range)
             range_entry.grid(column=1, row=3, sticky='e')
             range_entry.config(width=4)
 
@@ -196,16 +201,16 @@ class WeaponEdit:
             stat_menu = Combobox(stat_frame, textvariable=stat, values=list(EQUIPMENT_STAT.keys()))
             stat_menu.grid(column=0, row=0)
             stat_menu.config(width=16)
-            stat_entry = Entry(stat_frame, textvariable=onetwentyseven_stats[0])
+            stat_entry = Entry(stat_frame, textvariable=stat_amount)
             stat_entry.grid(column=1, row=0, sticky='e')
             stat_entry.config(width=4)
 
             ski_att_frame = LabelFrame(trueneutral_frame, text='Skill/Attribute')
             ski_att_frame.grid(column=0, row=1)
-            ski_att_menu = Combobox(ski_att_frame, textvariable=skill_attribute, values=list(SKILL_ATTRIBUTE.keys()))
+            ski_att_menu = Combobox(ski_att_frame, textvariable=skill, values=list(SKILL_ATTRIBUTE.keys()))
             ski_att_menu.grid(column=0, row=0)
             ski_att_menu.config(width=16)
-            ski_att_amo_entry = Entry(ski_att_frame, textvariable=onetwentyseven_stats[1])
+            ski_att_amo_entry = Entry(ski_att_frame, textvariable=skill_amount)
             ski_att_amo_entry.grid(column=1, row=0)
             ski_att_amo_entry.config(width=4)
 
@@ -236,97 +241,36 @@ class WeaponEdit:
             resist_amount_menu.grid(column=1, row=0)
             resist_amount_menu.config(width=5)
 
-        # limits the same size
-        def limit_name_size(*args):
-            n = name.get()
-            if len(n) > 21:
-                name.set(n[:21])
-
-        # check for max value of item
-        def value_check(*args):
-            val = value.get()
-            if val.isnumeric():
-                if int(val) > 65535:
-                    value.set(65535)
-                else:
-                    value.set(val)
-            else:
-                val = ''.join(filter(str.isnumeric, val))
-                value.set(val)
-
-        # check for positive 255
-        def twofivefive(*args):
-            for i in twofivefive_stats:
-                val = i.get()
-                if not val.isnumeric():
-                    val = ''.join(filter(str.isnumeric, val))
-                    i.set(val)
-                elif val.isnumeric():
-                    if int(val) > 255:
-                        i.set(255)
-                    else:
-                        i.set(val)
-
-        # check for 127
-        def onetwentyseven(*args):
-            for i in onetwentyseven_stats:
-                val = i.get()
-                if not val.isnumeric():
-                    val = ''.join(filter(str.isnumeric, val))
-                    i.set(val)
-                elif val.isnumeric():
-                    if int(val) > 255:
-                        i.set(255)
-                    else:
-                        i.set(val)
-
-        # sets limit of 15
-        def fifteen(i, *args):
-            val = i.get()
-            if not val.isnumeric():
-                val = ''.join(filter(str.isnumeric, val))
-                i.set(val)
-            elif val.isnumeric():
-                if int(val) > 15:
-                    i.set(15)
-                else:
-                    i.set(val)
-
         weapon = StringVar()
         weapon.trace('w', set_defaults)
         name = StringVar()
-        name.trace('w', limit_name_size)
+        name.trace('w', partial(limit_name_size, name, name_length))
 
-        # group of stats:
-        # strength, hit, damage, weapon range, spell level, magic level
-        # grouped to make it easier to run a 255 check
-        twofivefive_stats = []
-        for i in range(4):
-            i = StringVar()
-            i.trace('w', twofivefive)
-            twofivefive_stats.append(i)
-
-        # group of stats:
-        # stat amount, skill attribute amount
-        onetwentyseven_stats = []
-        for i in range(2):
-            i = StringVar()
-            i.trace('w', onetwentyseven)
-            onetwentyseven_stats.append(i)
-
+        str_req = StringVar()
+        str_req.trace('w', partial(limit, str_req, 30))
+        hit = StringVar()
+        hit.trace('w', partial(limit, hit, 255))
+        damage = StringVar()
+        damage.trace('w', partial(limit, damage, 255))
+        weapon_range = StringVar()
+        weapon_range.trace('w', partial(limit, weapon_range, 255))
         weapon_type = StringVar()
         value = StringVar()
-        value.trace('w', value_check)
+        value.trace('w', partial(limit, value, 65535))
         animation = StringVar()
         aspect = IntVar()
         stat = StringVar()
-        skill_attribute = StringVar()
+        stat_amount = StringVar()
+        stat_amount.trace('w', partial(limit_127, stat_amount))
+        skill = StringVar()
+        skill_amount = StringVar()
+        skill_amount.trace('w', partial(limit_127, skill_amount))
         spell = StringVar()
         spell_level = StringVar()
-        spell_level.trace('w', partial(fifteen, spell_level))
+        spell_level.trace('w', partial(limit, spell_level, 15))
         magic = StringVar()
         magic_level = StringVar()
-        magic_level.trace('w', partial(fifteen, magic_level))
+        magic_level.trace('w', partial(limit, magic_level, 15))
         resist = StringVar()
         resist_amount = StringVar()
 

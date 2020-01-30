@@ -2,6 +2,7 @@ from functools import partial
 from tkinter import Toplevel, StringVar, IntVar, Frame, LabelFrame, Entry, Label, Button, Radiobutton
 from tkinter.ttk import Combobox
 
+from functions import limit_name_size, limit, limit_127
 from variables import ACCESSORY_NAMES, ACCESSORY_ADDRESSES, inv_EQUIPMENT_STAT, inv_SKILL_ATTRIBUTE, inv_SPELLS, \
     inv_RESIST, inv_RESIST_AMOUNTS, EQUIPMENT_STAT, SKILL_ATTRIBUTE, SPELLS, RESIST, RESIST_AMOUNTS
 
@@ -11,17 +12,20 @@ class AccessoryEdit:
         accesswin = Toplevel()
         accesswin.resizable(False, False)
         accesswin.title("Accessory Edit")
-        accesswin.iconbitmap('images\icon.ico')
+        accesswin.iconbitmap('images\\aidyn.ico')
         filename = filename
+        data_seek = 24
+        data_read = 20
+        name_length = 20
 
         def set_defaults(*args):
             with open(filename, 'rb') as f:
                 address = ACCESSORY_ADDRESSES[ACCESSORY_NAMES.index(item.get())]
                 f.seek(address)
-                name.set(f.read(20).decode("utf-8"))
+                name.set(f.read(name_length).decode("utf-8"))
 
-                f.seek(address + 24)
-                data = f.read(20)
+                f.seek(address + data_seek)
+                data = f.read(data_read)
                 d = data.hex()
 
                 damage.set(int(d[0] + d[1], 16))
@@ -53,14 +57,14 @@ class AccessoryEdit:
                 address = ACCESSORY_ADDRESSES[ACCESSORY_NAMES.index(item.get())]
 
                 new_name = bytearray(name.get(), 'utf-8')
-                if len(new_name) < 20:
-                    while len(new_name) < 20:
+                if len(new_name) < name_length:
+                    while len(new_name) < name_length:
                         new_name.append(0x00)
                 f.seek(address)
                 f.write(new_name)
 
-                f.seek(address + 24)
-                data = f.read(20)
+                f.seek(address + data_seek)
+                data = f.read(data_read)
                 d = data.hex()
 
                 new_value = value.get()
@@ -99,7 +103,7 @@ class AccessoryEdit:
                     int(RESIST_AMOUNTS[resist_amount.get()], 16)
                 ]
 
-                f.seek(address + 24)
+                f.seek(address + data_seek)
                 for i in towrite:
                     f.write(i.to_bytes(1, byteorder='big'))
 
@@ -216,102 +220,34 @@ class AccessoryEdit:
             resist_amount_menu.grid(column=1, row=0)
             resist_amount_menu.config(width=5)
 
-        # limits the same size
-        def limit_name_size(*args):
-            n = name.get()
-            if len(n) > 20:
-                name.set(n[:21])
-
-        # check for max value of item
-        def value_check(*args):
-            val = value.get()
-            if val.isnumeric():
-                if int(val) > 65535:
-                    value.set(65535)
-                else:
-                    value.set(val)
-            else:
-                val = ''.join(filter(str.isnumeric, val))
-                value.set(val)
-
-        # check for positive 255
-        def twofivefive(i, *args):
-            val = i.get()
-            if not val.isnumeric():
-                val = ''.join(filter(str.isnumeric, val))
-                i.set(val)
-            elif val.isnumeric():
-                if int(val) > 255:
-                    i.set(255)
-                else:
-                    i.set(val)
-
-        # check for neg/pos 127
-        def onetwentyseven(i, *args):
-            val = i.get()
-            if len(val) > 0 and val[0] == '-':
-                if val == '-':
-                    return
-                else:
-                    val = val[1:]
-                if not val.isnumeric():
-                    val = ''.join(filter(str.isnumeric, val))
-                    i.set(int(val) * -1)
-                elif val.isnumeric():
-                    if int(val) > 127:
-                        i.set('-127')
-                    else:
-                        i.set(int(val) * -1)
-            else:
-                if not val.isnumeric():
-                    val = ''.join(filter(str.isnumeric, val))
-                    i.set(val)
-                elif val.isnumeric():
-                    if int(val) > 127:
-                        i.set(127)
-                    else:
-                        i.set(val)
-
-        # sets limit of 15
-        def fifteen(i, *args):
-            val = i.get()
-            if not val.isnumeric():
-                val = ''.join(filter(str.isnumeric, val))
-                i.set(val)
-            elif val.isnumeric():
-                if int(val) > 15:
-                    i.set(15)
-                else:
-                    i.set(val)
-
         item = StringVar()
         item.trace('w', set_defaults)
         name = StringVar()
-        name.trace('w', limit_name_size)
+        name.trace('w', partial(limit_name_size, name, name_length))
 
         damage = StringVar()
-        damage.trace('w', partial(twofivefive, damage))
+        damage.trace('w', partial(limit, damage, 255))
         protection = StringVar()
-        protection.trace('w', partial(twofivefive, protection))
+        protection.trace('w', partial(limit, protection, 255))
         str_req = StringVar()
-        str_req.trace('w', partial(twofivefive, str_req))
+        str_req.trace('w', partial(limit, str_req, 30))
         int_req = StringVar()
-        int_req.trace('w', partial(twofivefive, int_req))
+        int_req.trace('w', partial(limit, int_req, 30))
         value = StringVar()
-        value.trace('w', value_check)
+        value.trace('w', partial(limit, value, 65535))
         aspect = IntVar()
         stat = StringVar()
         stat_amount = StringVar()
-        stat_amount.trace('w', partial(onetwentyseven, stat_amount))
+        stat_amount.trace('w', partial(limit_127, stat_amount))
         skill = StringVar()
         skill_amount = StringVar()
-        skill_amount.trace('w', partial(onetwentyseven, skill_amount))
+        skill_amount.trace('w', partial(limit_127, skill_amount))
         spell = StringVar()
         spell_level = StringVar()
-        spell_level.trace('w', partial(fifteen, spell_level))
+        spell_level.trace('w', partial(limit, spell_level, 15))
         magic = StringVar()
         magic_level = StringVar()
-        magic_level.trace('w', partial(fifteen, magic_level))
+        magic_level.trace('w', partial(limit, magic_level, 15))
         resist = StringVar()
         resist_amount = StringVar()
 

@@ -1,6 +1,8 @@
 from functools import partial
 from tkinter import Toplevel, Frame, LabelFrame, Entry, Button, Radiobutton, Label, StringVar, IntVar
 from tkinter.ttk import Combobox
+
+from functions import limit, limit_name_size
 from variables import WEAPONS, inv_WEAPONS, ARMORS, inv_ARMORS, SHIELDS, inv_SHIELDS, \
     SPELLS, inv_SPELLS, ATTRIBUTES, SKILLS
 
@@ -13,23 +15,25 @@ class CharacterEdit:
             charwin.title("Party Edit -- Edits are NEW GAME only")
         elif title == 0:
             charwin.title("Enemy Edit")
-        charwin.iconbitmap('images\icon.ico')
+        charwin.iconbitmap('images\\aidyn.ico')
         filename = filename
+        data_seek = 44
+        data_read = 74
+        name_length = name_length
         characters = characters
         character_addresses = character_addresses
-        name_length = name_length
 
         def read_default_values(*args):
             with open(filename, 'rb') as f:
                 address = character_addresses[characters.index(character.get())]
 
                 # get name that can be changed
-                f.seek(address - 44)
+                f.seek(address)
                 name.set(f.read(name_length).decode("utf-8"))
 
                 # seek address for everything else
-                f.seek(address)
-                character_data = f.read(74)
+                f.seek(address + data_seek)
+                character_data = f.read(data_read)
                 d = character_data.hex()
 
                 # set aspect default
@@ -87,11 +91,11 @@ class CharacterEdit:
                 if len(new_name) < name_length:
                     while len(new_name) < name_length:
                         new_name.append(0x00)
-                f.seek(address - 44)
+                f.seek(address)
                 f.write(new_name)
 
-                f.seek(address)
-                character_data = f.read(74)
+                f.seek(address + data_seek)
+                character_data = f.read(data_read)
                 d = character_data.hex()
 
                 towrite = [aspect.get(), int(d[3] + d[4], 16),
@@ -120,7 +124,6 @@ class CharacterEdit:
                 for i in spells:
                     towrite.append(int((SPELLS[i.get()])[:2], 16))
                     towrite.append(int((SPELLS[i.get()])[2:], 16))
-                #todo max spell level in game is 15
                 towrite.append(school.get())
 
                 for i in spell_levels:
@@ -140,7 +143,7 @@ class CharacterEdit:
                     shi = 255
                 towrite.append(int(shi))
 
-                f.seek(address)
+                f.seek(address + data_seek)
                 for item in towrite:
                     f.write(item.to_bytes(1, byteorder='big'))
 
@@ -251,117 +254,45 @@ class CharacterEdit:
                 spell_level.grid(column=1, row=x)
                 spell_level.config(width=4)
 
-        # limits the same size
-        def limit_name_size(*args):
-            n = name.get()
-            if len(n) > name_length:
-                name.set(n[:name_length])
-
-        # limits stats and level to appropriate numbers
-        # higher numbers than limits causes the game to crash
-        # or the numbers don't work right
-        def limit_atts(*args):
-            # int, wil, dex, str
-            limit_30_stats = [atts[0], atts[1], atts[2], atts[4]]
-            for i in limit_30_stats:
-                val = i.get()
-                if not val.isnumeric():
-                    val = ''.join(filter(str.isnumeric, val))
-                    i.set(val)
-                elif val.isnumeric():
-                    if int(val) > 30:
-                        i.set(30)
-                    else:
-                        i.set(val)
-
-            # end and level
-            limit_40_stats = [atts[3], level]
-            for i in limit_40_stats:
-                val = i.get()
-                if not val.isnumeric():
-                    val = ''.join(filter(str.isnumeric, val))
-                    i.set(val)
-                elif val.isnumeric():
-                    if int(val) > 40:
-                        i.set(40)
-                    else:
-                        i.set(val)
-
-            # stamina
-            stamina = atts[5].get()
-            if not stamina.isnumeric():
-                stamina = ''.join(filter(str.isnumeric, stamina))
-                atts[5].set(stamina)
-            elif stamina.isnumeric():
-                if int(stamina) > 120:
-                    atts[5].set(120)
-                else:
-                    atts[5].set(stamina)
-
-        def twofivefive(*args):
-            for i in spell_levels:
-                val = i.get()
-                if not val.isnumeric():
-                    val = ''.join(filter(str.isnumeric, val))
-                    i.set(val)
-                elif val.isnumeric():
-                    if int(val) > 255:
-                        i.set(255)
-                    else:
-                        i.set(val)
-
-        # sets limit of 15
-        def fifteen(i, *args):
-            val = i.get()
-            if not val.isnumeric():
-                val = ''.join(filter(str.isnumeric, val))
-                i.set(val)
-            elif val.isnumeric():
-                if int(val) > 15:
-                    i.set(15)
-                else:
-                    i.set(val)
-
-        # places a limit of 10 on appropriate skills
-        def limit_10(i, *args):
-            val = i.get()
-            if not val.isnumeric():
-                val = ''.join(filter(str.isnumeric, val))
-                i.set(val)
-            elif val.isnumeric():
-                if int(val) > 10:
-                    i.set(10)
-                else:
-                    i.set(val)
-
         # initial declaration of variables
         character = StringVar()
         character.trace('w', read_default_values)
 
         name = StringVar()
-        name.trace('w', limit_name_size)
+        name.trace('w', partial(limit_name_size, name, name_length))
         aspect = IntVar()
         skills = []
         for _ in SKILLS:
             i = StringVar()
-            i.trace('w', partial(limit_10, i))
+            i.trace('w', partial(limit, i, 10))
             skills.append(i)
         shield_skill = StringVar()
-        shield_skill.trace('w', partial(limit_10, shield_skill))
+        shield_skill.trace('w', partial(limit, shield_skill, 10))
         atts = []
         for _ in ATTRIBUTES:
             i = StringVar()
-            i.trace('w', limit_atts)
             atts.append(i)
+            if atts.index(i) == 0:
+                i.trace('w', partial(limit, i, 30))
+            elif atts.index(i) == 1:
+                i.trace('w', partial(limit, i, 30))
+            elif atts.index(i) == 2:
+                i.trace('w', partial(limit, i, 30))
+            elif atts.index(i) == 3:
+                i.trace('w', partial(limit, i, 40))
+            elif atts.index(i) == 4:
+                i.trace('w', partial(limit, i, 30))
+            elif atts.index(i) == 5:
+                i.trace('w', partial(limit, i, 120))
         level = StringVar()
-        level.trace('w', limit_atts)
+        level.trace('w', partial(limit, level, 40))
         weapons = [StringVar(), StringVar(), StringVar()]
         spells = [StringVar(), StringVar(), StringVar(), StringVar(), StringVar()]
         school = IntVar()
         spell_levels = []
         for i in range(5):
             i = StringVar()
-            i.trace('w', partial(fifteen, i))
+            i.trace('w', partial(limit, i, 15))
             spell_levels.append(i)
         armor = StringVar()
         shield = StringVar()

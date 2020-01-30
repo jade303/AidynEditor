@@ -2,6 +2,7 @@ from functools import partial
 from tkinter import Toplevel, StringVar, IntVar, LabelFrame, Frame, Entry, Label, Button, Radiobutton
 from tkinter.ttk import Combobox
 
+from functions import limit_name_size, limit, limit_127
 from variables import inv_EQUIPMENT_STAT, inv_SKILL_ATTRIBUTE, inv_SPELLS, inv_RESIST, inv_RESIST_AMOUNTS, \
     EQUIPMENT_STAT, SKILL_ATTRIBUTE, SPELLS, RESIST, RESIST_AMOUNTS
 
@@ -14,8 +15,11 @@ class ArmorShieldEdit:
             shiwin.title("Armor Edit")
         elif title == 0:
             shiwin.title("Shield Edit")
-        shiwin.iconbitmap('images\icon.ico')
+        shiwin.iconbitmap('images\\aidyn.ico')
         filename = filename
+        data_seek = 26
+        data_read = 25
+        name_length = 22
         names = names
         addresses = addresses
 
@@ -23,36 +27,36 @@ class ArmorShieldEdit:
             with open(filename, 'rb') as f:
                 address = addresses[names.index(item.get())]
                 f.seek(address)
-                name.set(f.read(22).decode("utf-8"))
+                name.set(f.read(name_length).decode("utf-8"))
 
-                f.seek(address + 26)
-                data = f.read(22)
+                f.seek(address + data_seek)
+                data = f.read(data_read)
                 d = data.hex()
 
-                twofivefive_stats[0].set(int(d[0] + d[1], 16))
-                twofivefive_stats[1].set(int(d[2] + d[3], 16))
+                defense.set(int(d[0] + d[1], 16))
+                protection.set(int(d[2] + d[3], 16))
                 dx = int(d[4] + d[5], 16)
                 if dx > 127:
                     dx = dx - 256
-                onetwentyseven_stats[0].set(dx)
+                dexterity.set(dx)
 
-                stealth = int(d[8] + d[9], 16)
-                if stealth > 127:
-                    stealth = stealth - 256
-                onetwentyseven_stats[1].set(stealth)
+                sneak = int(d[8] + d[9], 16)
+                if sneak > 127:
+                    sneak = sneak - 256
+                stealth.set(sneak)
                 value.set((int(d[12] + d[13], 16) * 256) + int(d[10] + d[11], 16))
 
                 aspect.set(d[17])
                 stat.set(inv_EQUIPMENT_STAT[(d[18] + d[19]).upper()])
-                stat_amount = int(d[20] + d[21], 16)
-                if stat_amount > 127:
-                    stat_amount = stat_amount - 256
-                onetwentyseven_stats[2].set(stat_amount)
-                skill_attribute.set(inv_SKILL_ATTRIBUTE[(d[22] + d[23]).upper()])
+                st = int(d[20] + d[21], 16)
+                if st > 127:
+                    st = st - 256
+                stat_amount.set(st)
+                skill.set(inv_SKILL_ATTRIBUTE[(d[22] + d[23]).upper()])
                 att_amount = int(d[24] + d[25], 16)
                 if att_amount > 127:
                     att_amount = att_amount - 256
-                onetwentyseven_stats[3].set(att_amount)
+                skill_amount.set(att_amount)
                 spell.set(inv_SPELLS[(d[26:30]).upper()])
                 spell_level.set(int(d[30] + d[31], 16))
 
@@ -66,14 +70,14 @@ class ArmorShieldEdit:
                 address = addresses[names.index(item.get())]
 
                 new_name = bytearray(name.get(), 'utf-8')
-                if len(new_name) < 22:
-                    while len(new_name) < 22:
+                if len(new_name) < name_length:
+                    while len(new_name) < name_length:
                         new_name.append(0x00)
                 f.seek(address)
                 f.write(new_name)
 
-                f.seek(address + 26)
-                data = f.read(25)
+                f.seek(address + data_seek)
+                data = f.read(data_read)
                 d = data.hex()
 
                 new_value = value.get()
@@ -82,26 +86,35 @@ class ArmorShieldEdit:
                     v2 = 255
                     v1 = 255
 
-                new_onetwentyseven_stats = []
-                for i in onetwentyseven_stats:
-                    j = int(i.get())
-                    if j < 0:
-                        j = j + 256
-                    new_onetwentyseven_stats.append(j)
+                dx = int(dexterity.get())
+                if dx < 0:
+                    dx = dx + 256
+
+                sneak = int(stealth.get())
+                if sneak < 0:
+                    sneak = sneak + 256
+
+                st = int(stat_amount.get())
+                if st < 0:
+                    st = st + 256
+
+                sk = int(skill_amount.get())
+                if sk < 0:
+                    sk = sk + 256
 
                 towrite = [
-                    int(twofivefive_stats[0].get()),
-                    int(twofivefive_stats[1].get()),
-                    int(new_onetwentyseven_stats[0]),
+                    int(defense.get()),
+                    int(protection.get()),
+                    int(dx),
                     int(d[6] + d[7], 16),
-                    int(new_onetwentyseven_stats[1]),
+                    int(sneak),
                     int(v1), int(v2),
                     int(d[14] + d[15], 16),
                     aspect.get(),
                     int(EQUIPMENT_STAT[stat.get()], 16),
-                    int(new_onetwentyseven_stats[2]),
-                    int(SKILL_ATTRIBUTE[skill_attribute.get()], 16),
-                    int(new_onetwentyseven_stats[3]),
+                    int(st),
+                    int(SKILL_ATTRIBUTE[skill.get()], 16),
+                    int(sk),
                     int((SPELLS[spell.get()])[:2], 16),
                     int((SPELLS[spell.get()])[2:], 16),
                     int(spell_level.get()),
@@ -113,7 +126,7 @@ class ArmorShieldEdit:
                     int(RESIST_AMOUNTS[resist_amount.get()], 16)
                 ]
 
-                f.seek(address + 26)
+                f.seek(address + data_seek)
                 for i in towrite:
                     f.write(i.to_bytes(1, byteorder='big'))
 
@@ -135,25 +148,25 @@ class ArmorShieldEdit:
 
             defense_label = Label(lawfulneutral_frame, text='Defense:')
             defense_label.grid(column=0, row=0, sticky='e')
-            defense_entry = Entry(lawfulneutral_frame, textvariable=twofivefive_stats[0])
+            defense_entry = Entry(lawfulneutral_frame, textvariable=defense)
             defense_entry.grid(column=1, row=0, stick='e')
             defense_entry.config(width=4)
 
             protection_label = Label(lawfulneutral_frame, text='Protection:')
             protection_label.grid(column=0, row=1, sticky='e')
-            protection_entry = Entry(lawfulneutral_frame, textvariable=twofivefive_stats[1])
+            protection_entry = Entry(lawfulneutral_frame, textvariable=protection)
             protection_entry.grid(column=1, row=1, sticky='e')
             protection_entry.config(width=4)
 
             dexterity_label = Label(lawfulneutral_frame, text='Dexterity:')
             dexterity_label.grid(column=0, row=2, sticky='e')
-            dexterity_entry = Entry(lawfulneutral_frame, textvariable=onetwentyseven_stats[0])
+            dexterity_entry = Entry(lawfulneutral_frame, textvariable=dexterity)
             dexterity_entry.grid(column=1, row=2, sticky='e')
             dexterity_entry.config(width=4)
 
             stealth_label = Label(lawfulneutral_frame, text='Stealth:')
             stealth_label.grid(column=0, row=3, sticky='e')
-            stealth_entry = Entry(lawfulneutral_frame, textvariable=onetwentyseven_stats[1])
+            stealth_entry = Entry(lawfulneutral_frame, textvariable=stealth)
             stealth_entry.grid(column=1, row=3, sticky='e')
             stealth_entry.config(width=4)
 
@@ -190,16 +203,16 @@ class ArmorShieldEdit:
             stat_menu = Combobox(stat_frame, textvariable=stat, values=list(EQUIPMENT_STAT.keys()))
             stat_menu.grid(column=0, row=0)
             stat_menu.config(width=16)
-            stat_entry = Entry(stat_frame, textvariable=onetwentyseven_stats[2])
+            stat_entry = Entry(stat_frame, textvariable=stat_amount)
             stat_entry.grid(column=1, row=0, sticky='e')
             stat_entry.config(width=4)
 
             ski_att_frame = LabelFrame(trueneutral_frame, text='Skill/Attribute')
             ski_att_frame.grid(column=0, row=1)
-            ski_att_menu = Combobox(ski_att_frame, textvariable=skill_attribute, values=list(SKILL_ATTRIBUTE.keys()))
+            ski_att_menu = Combobox(ski_att_frame, textvariable=skill, values=list(SKILL_ATTRIBUTE.keys()))
             ski_att_menu.grid(column=0, row=0)
             ski_att_menu.config(width=16)
-            ski_att_amo_entry = Entry(ski_att_frame, textvariable=onetwentyseven_stats[3])
+            ski_att_amo_entry = Entry(ski_att_frame, textvariable=skill_amount)
             ski_att_amo_entry.grid(column=1, row=0)
             ski_att_amo_entry.config(width=4)
 
@@ -230,109 +243,34 @@ class ArmorShieldEdit:
             resist_amount_menu.grid(column=1, row=0)
             resist_amount_menu.config(width=5)
 
-        # limits the same size
-        def limit_name_size(*args):
-            n = name.get()
-            if len(n) > 21:
-                name.set(n[:22])
-
-        # check for max value of item
-        def value_check(*args):
-            val = value.get()
-            if val.isnumeric():
-                if int(val) > 65535:
-                    value.set(65535)
-                else:
-                    value.set(val)
-            else:
-                val = ''.join(filter(str.isnumeric, val))
-                value.set(val)
-
-        # check for positive 255
-        def twofivefive(*args):
-            for i in twofivefive_stats:
-                val = i.get()
-                if not val.isnumeric():
-                    val = ''.join(filter(str.isnumeric, val))
-                    i.set(val)
-                elif val.isnumeric():
-                    if int(val) > 255:
-                        i.set(255)
-                    else:
-                        i.set(val)
-
-        # check for neg/pos 127
-        def onetwentyseven(*args):
-            for i in onetwentyseven_stats:
-                val = i.get()
-                if len(val) > 0 and val[0] == '-':
-                    if val == '-':
-                        break
-                    else:
-                        val = val[1:]
-                    if not val.isnumeric():
-                        val = ''.join(filter(str.isnumeric, val))
-                        i.set(int(val) * -1)
-                    elif val.isnumeric():
-                        if int(val) > 127:
-                            i.set('-127')
-                        else:
-                            i.set(int(val) * -1)
-                else:
-                    if not val.isnumeric():
-                        val = ''.join(filter(str.isnumeric, val))
-                        i.set(val)
-                    elif val.isnumeric():
-                        if int(val) > 127:
-                            i.set(127)
-                        else:
-                            i.set(val)
-
-        # sets limit of 15
-        def fifteen(i, *args):
-            val = i.get()
-            if not val.isnumeric():
-                val = ''.join(filter(str.isnumeric, val))
-                i.set(val)
-            elif val.isnumeric():
-                if int(val) > 15:
-                    i.set(15)
-                else:
-                    i.set(val)
-
         item = StringVar()
         item.trace('w', set_defaults)
         name = StringVar()
-        name.trace('w', limit_name_size)
+        name.trace('w', partial(limit_name_size, name, name_length))
 
-        # group of stats:
-        # defense, protection, spell_level, magic_level
-        # grouped to make it easier to run a 255 check
-        twofivefive_stats = []
-        for i in range(2):
-            i = StringVar()
-            i.trace('w', twofivefive)
-            twofivefive_stats.append(i)
-
-        # dexterity, stealth, stat_amount, skill_attribute_amount
-        # grouped to make it easier to run a neg/pos 127 check
-        onetwentyseven_stats = []
-        for i in range(4):
-            i = StringVar()
-            i.trace('w', onetwentyseven)
-            onetwentyseven_stats.append(i)
-
+        defense = StringVar()
+        defense.trace('w', partial(limit_127, defense))
+        protection = StringVar()
+        protection.trace('w', partial(limit_127, protection))
+        dexterity = StringVar()
+        dexterity.trace('w', partial(limit_127, dexterity))
+        stealth = StringVar()
+        stealth.trace('w', partial(limit_127, stealth))
         value = StringVar()
-        value.trace('w', value_check)
+        value.trace('w', partial(limit, value, 65535))
         aspect = IntVar()
         stat = StringVar()
-        skill_attribute = StringVar()
+        stat_amount = StringVar()
+        stat_amount.trace('w', partial(limit_127, stat_amount))
+        skill = StringVar()
+        skill_amount = StringVar()
+        skill_amount.trace('w', partial(limit_127, skill_amount))
         spell = StringVar()
         spell_level = StringVar()
-        spell_level.trace('w', partial(fifteen, spell_level))
+        spell_level.trace('w', partial(limit, spell_level, 15))
         magic = StringVar()
         magic_level = StringVar()
-        magic_level.trace('w', partial(fifteen, magic_level))
+        magic_level.trace('w', partial(limit, magic_level, 15))
         resist = StringVar()
         resist_amount = StringVar()
 
