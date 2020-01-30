@@ -2,7 +2,7 @@ from functools import partial
 from tkinter import Toplevel, StringVar, IntVar, LabelFrame, Frame, Entry, Label, Button, Radiobutton
 from tkinter.ttk import Combobox
 
-from lib.functions import limit_name_size, limit_127, limit
+from lib.limits import limit_name_size, limit_127, limit
 from lib.variables import inv_EQUIPMENT_STAT, inv_SKILL_ATTRIBUTE, inv_SPELLS, inv_RESIST, inv_RESIST_AMOUNTS, \
     EQUIPMENT_STAT, SKILL_ATTRIBUTE, SPELLS, RESIST, RESIST_AMOUNTS
 
