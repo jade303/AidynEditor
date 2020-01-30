@@ -179,9 +179,9 @@ class WeaponEdit:
             neutralgood_frame = Frame(weapwin)
             neutralgood_frame.grid(column=1, row=0)
 
-            write_button = Button(neutralgood_frame, text='Write To File', command=write)
-            write_button.grid(column=0, row=0)
-            write_button.config(width=16)
+            save = Button(neutralgood_frame, text='Save', command=write)
+            save.grid(column=0, row=0)
+            save.config(width=8)
 
             aspect_frame = LabelFrame(neutralgood_frame, text='Aspect')
             aspect_frame.grid(column=0, row=1)

@@ -10,6 +10,7 @@ def file_dialog():
     # Searching function for the Browse button
     party_name_length = 9
     enemy_name_length = 17
+    button_width = 10
 
     filename = filedialog.askopenfilename(initialdir="/",
                                           title="Select A File",
@@ -21,7 +22,7 @@ def file_dialog():
         aidyn = Label(root, image=image)
         aidyn.grid(column=0, row=0, rowspan=9)
 
-        party_button = Button(root, text="Party Edit", width=12,
+        party_button = Button(root, text="Party", width=button_width,
                               command=lambda: characters.CharacterEdit(filename,
                                                                        PARTY,
                                                                        PARTY_ADDRESSES,
@@ -29,7 +30,7 @@ def file_dialog():
                                                                        1))
         party_button.grid(column=1, row=0, sticky='ew')
 
-        enemy_button = Button(root, text="Enemy Edit", width=12,
+        enemy_button = Button(root, text="Enemy", width=button_width,
                               command=lambda: characters.CharacterEdit(filename,
                                                                        ENEMIES,
                                                                        ENEMY_ADDRESSES,
@@ -37,33 +38,33 @@ def file_dialog():
                                                                        0))
         enemy_button.grid(column=1, row=1)
 
-        accessory_button = Button(root, text="Accessory Edit", width=12,
+        accessory_button = Button(root, text="Accessory", width=button_width,
                                   command=lambda: accessories.AccessoryEdit(filename))
         accessory_button.grid(column=1, row=2)
 
-        armor_button = Button(root, text="Armor Edit", width=12,
+        armor_button = Button(root, text="Armor", width=button_width,
                               command=lambda: armorshields.ArmorShieldEdit(filename,
                                                                            ARMOR_NAMES,
                                                                            ARMOR_ADDRESSES,
                                                                            1))
         armor_button.grid(column=1, row=3)
 
-        item_button = Button(root, text='Item Edit', width=12,
-                             command=lambda: wandsscrolls.ItemEdit(filename))
+        item_button = Button(root, text='Wand / Scroll', width=button_width,
+                             command=lambda: wandsscrolls.WandScrollEdit(filename))
         item_button.grid(column=1, row=4)
 
-        shield_button = Button(root, text="Shield Edit", width=12,
+        shield_button = Button(root, text="Shield", width=button_width,
                                command=lambda: armorshields.ArmorShieldEdit(filename,
                                                                             SHIELD_NAMES,
                                                                             SHIELD_ADDRESSES,
                                                                             0))
         shield_button.grid(column=1, row=5)
 
-        spell_button = Button(root, text="Spell Edit", width=12,
+        spell_button = Button(root, text="Spell", width=button_width,
                               command=lambda: spells.SpellEdit(filename))
         spell_button.grid(column=1, row=6)
 
-        weapon_button = Button(root, text="Weapon Edit", width=12,
+        weapon_button = Button(root, text="Weapon", width=button_width,
                                command=lambda: weapons.WeaponEdit(filename))
         weapon_button.grid(column=1, row=7)
 

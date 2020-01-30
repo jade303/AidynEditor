@@ -23,7 +23,7 @@ class CharacterEdit:
         characters = characters
         character_addresses = character_addresses
 
-        def read_default_values(*args):
+        def set_defaults(*args):
             with open(filename, 'rb') as f:
                 address = character_addresses[characters.index(character.get())]
 
@@ -83,7 +83,7 @@ class CharacterEdit:
                     x = (spell_levels.index(s) * 2) + 108
                     s.set(int(d[x] + d[x + 1], 16))
 
-        def write_to_file():
+        def write():
             with open(filename, 'rb+') as f:
                 address = (character_addresses[characters.index(character.get())])
                 # write new name to file
@@ -147,7 +147,7 @@ class CharacterEdit:
                 for item in towrite:
                     f.write(item.to_bytes(1, byteorder='big'))
 
-        def build_window():
+        def build():
             # column 0, row 0
             lawfulgood_frame = Frame(charwin)
             lawfulgood_frame.grid(column=0, row=0)
@@ -163,8 +163,9 @@ class CharacterEdit:
             new_name_entry.grid(column=0, row=1)
             new_name_entry.config(width=18)
 
-            write = Button(lawfulgood_frame, text="Write To File", command=write_to_file)
-            write.grid(column=1, row=0)
+            save = Button(lawfulgood_frame, text="Save", command=write)
+            save.grid(column=1, row=0)
+            save.config(width=8)
 
             # column 0, row 1
             lawfulneutral_frame = Frame(charwin)
@@ -256,7 +257,7 @@ class CharacterEdit:
 
         # initial declaration of variables
         character = StringVar()
-        character.trace('w', read_default_values)
+        character.trace('w', set_defaults)
 
         name = StringVar()
         name.trace('w', partial(limit_name_size, name, name_length))
@@ -298,4 +299,4 @@ class CharacterEdit:
         shield = StringVar()
 
         character.set(characters[0])
-        build_window()
+        build()

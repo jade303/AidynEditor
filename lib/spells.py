@@ -18,7 +18,7 @@ class SpellEdit:
         data_read = 11
         name_length = 22
 
-        def read_defaults(*args):
+        def set_defaults(*args):
             with open(filename, 'rb') as f:
                 address = SPELL_ADDRESSES[SPELL_NAMES.index(spell.get())]
 
@@ -46,7 +46,7 @@ class SpellEdit:
                 ingredient.set(inv_SPELL_INGREDIENTS[d[19]])
                 exp.set(int(d[20] + d[21], 16))
 
-        def write_values():
+        def write():
             with open(filename, 'rb+') as f:
                 address = SPELL_ADDRESSES[SPELL_NAMES.index(spell.get())]
                 new_name = bytearray(name.get(), 'utf-8')
@@ -78,7 +78,7 @@ class SpellEdit:
                 for item in towrite:
                     f.write(item.to_bytes(1, byteorder='big'))
 
-        def build_window():
+        def build():
             lawfulgood_frame = Frame(spellwin)
             lawfulgood_frame.grid(column=0, row=0)
             default_spell_menu = Combobox(lawfulgood_frame, textvariable=spell, values=SPELL_NAMES)
@@ -141,8 +141,9 @@ class SpellEdit:
 
             another_frame = Frame(spellwin)
             another_frame.grid(column=1, row=1)
-            write_button = Button(spellwin, text='Write To File', command=write_values)
-            write_button.grid(column=1, row=0)
+            save = Button(spellwin, text='Save', command=write)
+            save.grid(column=1, row=0)
+            save.config(width=8)
             ingredient_frame = LabelFrame(another_frame, text='Ingredient')
             ingredient_frame.grid(column=0, row=0)
             ingredient_menu = Combobox(ingredient_frame, textvariable=ingredient, values=list(SPELL_INGREDIENTS.keys()))
@@ -173,7 +174,7 @@ class SpellEdit:
             target_type_menu.config(width=23)
 
         spell = StringVar()
-        spell.trace('w', read_defaults)
+        spell.trace('w', set_defaults)
         name = StringVar()
         name.trace('w', partial(limit_name_size, name, name_length))
 
@@ -195,4 +196,4 @@ class SpellEdit:
         ingredient = StringVar()
 
         spell.set(SPELL_NAMES[0])
-        build_window()
+        build()

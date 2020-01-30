@@ -1,13 +1,16 @@
 from tkinter import Toplevel, Label
 
 
-class ItemEdit:
+class WandScrollEdit:
     def __init__(self, filename):
-        itemwin = Toplevel()
-        itemwin.resizable(False, False)
-        itemwin.title("Item Edit")
-        itemwin.iconbitmap('images\icon.ico')
+        wandwin = Toplevel()
+        wandwin.resizable(False, False)
+        wandwin.title("Item Edit")
+        wandwin.iconbitmap('images\\aidyn.ico')
         filename = filename
+        data_seek = 0
+        data_read = 0
+        name_length = 0
 
-        label = Label(itemwin, text='Nothing yet!')
+        label = Label(wandwin, text='Nothing yet!')
         label.grid()
