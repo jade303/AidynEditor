@@ -1,14 +1,9 @@
 from tkinter import Tk, LabelFrame, mainloop, Button, PhotoImage, Label
 from tkinter import filedialog
 
-import AccessoryWindow
-import ItemWindow
-from variables import PARTY, PARTY_ADDRESSES, ENEMIES, ENEMY_ADDRESSES, ARMOR_NAMES, ARMOR_ADDRESSES, SHIELD_NAMES, \
+from lib import characters, accessories, armorshields, wandsscrolls, spells, weapons
+from lib.variables import PARTY, PARTY_ADDRESSES, ENEMIES, ENEMY_ADDRESSES, ARMOR_NAMES, ARMOR_ADDRESSES, SHIELD_NAMES, \
     SHIELD_ADDRESSES
-import CharacterWindow
-import SpellWindow
-import WeaponWindow
-import ArmorShieldWindow
 
 
 def file_dialog():
@@ -27,49 +22,49 @@ def file_dialog():
         aidyn.grid(column=0, row=0, rowspan=9)
 
         party_button = Button(root, text="Party Edit", width=12,
-                              command=lambda: CharacterWindow.CharacterEdit(filename,
-                                                                            PARTY,
-                                                                            PARTY_ADDRESSES,
-                                                                            party_name_length,
-                                                                            1))
+                              command=lambda: characters.CharacterEdit(filename,
+                                                                       PARTY,
+                                                                       PARTY_ADDRESSES,
+                                                                       party_name_length,
+                                                                       1))
         party_button.grid(column=1, row=0, sticky='ew')
 
         enemy_button = Button(root, text="Enemy Edit", width=12,
-                              command=lambda: CharacterWindow.CharacterEdit(filename,
-                                                                            ENEMIES,
-                                                                            ENEMY_ADDRESSES,
-                                                                            enemy_name_length,
-                                                                            0))
+                              command=lambda: characters.CharacterEdit(filename,
+                                                                       ENEMIES,
+                                                                       ENEMY_ADDRESSES,
+                                                                       enemy_name_length,
+                                                                       0))
         enemy_button.grid(column=1, row=1)
 
         accessory_button = Button(root, text="Accessory Edit", width=12,
-                                  command=lambda: AccessoryWindow.AccessoryEdit(filename))
+                                  command=lambda: accessories.AccessoryEdit(filename))
         accessory_button.grid(column=1, row=2)
 
         armor_button = Button(root, text="Armor Edit", width=12,
-                              command=lambda: ArmorShieldWindow.ArmorShieldEdit(filename,
-                                                                                ARMOR_NAMES,
-                                                                                ARMOR_ADDRESSES,
-                                                                                1))
+                              command=lambda: armorshields.ArmorShieldEdit(filename,
+                                                                           ARMOR_NAMES,
+                                                                           ARMOR_ADDRESSES,
+                                                                           1))
         armor_button.grid(column=1, row=3)
 
         item_button = Button(root, text='Item Edit', width=12,
-                             command=lambda: ItemWindow.ItemEdit(filename))
+                             command=lambda: wandsscrolls.ItemEdit(filename))
         item_button.grid(column=1, row=4)
 
         shield_button = Button(root, text="Shield Edit", width=12,
-                               command=lambda: ArmorShieldWindow.ArmorShieldEdit(filename,
-                                                                                 SHIELD_NAMES,
-                                                                                 SHIELD_ADDRESSES,
-                                                                                 0))
+                               command=lambda: armorshields.ArmorShieldEdit(filename,
+                                                                            SHIELD_NAMES,
+                                                                            SHIELD_ADDRESSES,
+                                                                            0))
         shield_button.grid(column=1, row=5)
 
         spell_button = Button(root, text="Spell Edit", width=12,
-                              command=lambda: SpellWindow.SpellEdit(filename))
+                              command=lambda: spells.SpellEdit(filename))
         spell_button.grid(column=1, row=6)
 
         weapon_button = Button(root, text="Weapon Edit", width=12,
-                               command=lambda: WeaponWindow.WeaponEdit(filename))
+                               command=lambda: weapons.WeaponEdit(filename))
         weapon_button.grid(column=1, row=7)
 
 
