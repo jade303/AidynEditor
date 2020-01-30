@@ -21,4 +21,4 @@ If you want an exe file:
 6. One file or one folder options are found in the dist folder that is created
 </pre>
 
-TODO: item edits.
+TODO: item, drop, and trainer edits.
