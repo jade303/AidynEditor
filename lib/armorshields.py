@@ -8,14 +8,14 @@ from lib.variables import inv_EQUIPMENT_STAT, inv_SKILL_ATTRIBUTE, inv_SPELLS, i
 
 
 class ArmorShieldEdit:
-    def __init__(self, filename, names, addresses, title):
+    def __init__(self, filename, icon_dir, names, addresses, title):
         shiwin = Toplevel()
         shiwin.resizable(False, False)
         if title == 1:
             shiwin.title("Armor Edit")
         elif title == 0:
             shiwin.title("Shield Edit")
-        shiwin.iconbitmap('images\\aidyn.ico')
+        shiwin.iconbitmap(icon_dir)
         filename = filename
         data_seek = 26
         data_read = 25

@@ -9,11 +9,11 @@ from lib.variables import WEAPON_ADDRESSES, WEAPON_NAMES, inv_WEAPON_TYPE, inv_W
 
 
 class WeaponEdit:
-    def __init__(self, filename):
+    def __init__(self, filename, icon_dir):
         weapwin = Toplevel()
         weapwin.resizable(False, False)
         weapwin.title('Weapon Edit')
-        weapwin.iconbitmap('images\\aidyn.ico')
+        weapwin.iconbitmap(icon_dir)
         filename = filename
         data_seek = 23
         data_read = 25

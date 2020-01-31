@@ -8,11 +8,11 @@ from lib.variables import ACCESSORY_ADDRESSES, ACCESSORY_NAMES, inv_EQUIPMENT_ST
 
 
 class AccessoryEdit:
-    def __init__(self, filename):
+    def __init__(self, filename, icon_dir):
         accesswin = Toplevel()
         accesswin.resizable(False, False)
         accesswin.title("Accessory Edit")
-        accesswin.iconbitmap('images\\aidyn.ico')
+        accesswin.iconbitmap(icon_dir)
         filename = filename
         data_seek = 24
         data_read = 20

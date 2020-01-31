@@ -8,17 +8,20 @@ from lib.variables import WAND_NAMES, SCROLL_NAMES, WAND_ADDRESSES, SCROLL_ADDRE
 
 
 class WandScrollEdit:
-    def __init__(self, filename):
+    def __init__(self, filename, icon_dir):
         wandwin = Toplevel()
         wandwin.resizable(False, False)
         wandwin.title("Item Edit")
-        wandwin.iconbitmap('images\\aidyn.ico')
+        wandwin.iconbitmap(icon_dir)
         filename = filename
         data_seek = 24
         data_read = 20
         name_length = 18
 
-        def wand_defaults(*args):
+        label = Label(wandwin, text='Not yet finished')
+        label.grid()
+
+        """def wand_defaults(*args):
             with open(filename, 'rb') as f:
                 address = WAND_ADDRESSES[WAND_NAMES.index(wand.get())]
                 f.seek(address)
@@ -109,4 +112,4 @@ class WandScrollEdit:
 
         wand.set(WAND_NAMES[0])
         scroll.set(SCROLL_NAMES[0])
-        build()
+        build()"""

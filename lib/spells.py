@@ -8,11 +8,11 @@ from lib.variables import SPELL_ADDRESSES, SPELL_NAMES, inv_TARGET_NUM, inv_TARG
 
 
 class SpellEdit:
-    def __init__(self, filename):
+    def __init__(self, filename, icon_dir):
         spellwin = Toplevel()
         spellwin.resizable(False, False)
         spellwin.title("Spell Edit")
-        spellwin.iconbitmap('images\\aidyn.ico')
+        spellwin.iconbitmap(icon_dir)
         filename = filename
         data_seek = 25
         data_read = 11

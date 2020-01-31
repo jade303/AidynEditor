@@ -4,6 +4,7 @@ def limit_name_size(name, name_length, *args):
     if len(n) > name_length:
         name.set(n[:name_length])
 
+
 # sets appropriate limits
 def limit(i, x, *args):
     val = i.get()
@@ -15,6 +16,7 @@ def limit(i, x, *args):
             i.set(x)
         else:
             i.set(val)
+
 
 # check for neg/pos 127
 def limit_127(i, *args):

@@ -8,14 +8,14 @@ from lib.variables import inv_WEAPONS, inv_SHIELDS, inv_ARMORS, inv_SPELLS, WEAP
 
 
 class CharacterEdit:
-    def __init__(self, filename, characters, character_addresses, name_length, title):
+    def __init__(self, filename, icon_dir, characters, character_addresses, name_length, title):
         charwin = Toplevel()
         charwin.resizable(False, False)
         if title == 1:
             charwin.title("Party Edit -- Edits are NEW GAME only")
         elif title == 0:
             charwin.title("Enemy Edit")
-        charwin.iconbitmap('images\\aidyn.ico')
+        charwin.iconbitmap(icon_dir)
         filename = filename
         data_seek = 44
         data_read = 74
