@@ -2,7 +2,7 @@ from tkinter import Tk, LabelFrame, mainloop, Button, PhotoImage, Label
 from tkinter import filedialog
 import os
 
-from lib import accessories, armorshields, characters, spells, wandsscrolls, weapons
+from lib import accessories, armorshields, characters, spells, wandsscrolls, weapons, trainers
 from lib.variables import PARTY, PARTY_ADDRESSES, ENEMIES, ENEMY_ADDRESSES, ARMOR_NAMES, ARMOR_ADDRESSES, \
     SHIELD_NAMES, SHIELD_ADDRESSES
 
@@ -18,17 +18,17 @@ def file_dialog():
     enemy_name_length = 17
     button_width = 10
 
-    filename = filedialog.askopenfilename(initialdir="/",
-                                          title="Select A File",
-                                          filetype=(("z64", "*.z64"), ("all files", "*.*")))
+    filename = filedialog.askopenfilename(initialdir='/',
+                                          title='Select A File',
+                                          filetype=(('z64', '*.z64'), ('all files', '*.*')))
     if filename != '':
         browse_frame.destroy()
         root.configure(background='white')
-        # root.geometry("500x500")
+        # root.geometry('500x500')
         aidyn = Label(root, image=image)
         aidyn.grid(column=0, row=0, rowspan=9)
 
-        party_button = Button(root, text="Party", width=button_width,
+        party_button = Button(root, text='Party', width=button_width,
                               command=lambda: characters.CharacterEdit(filename,
                                                                        icon_dir,
                                                                        PARTY,
@@ -37,7 +37,7 @@ def file_dialog():
                                                                        1))
         party_button.grid(column=1, row=0, sticky='ew')
 
-        enemy_button = Button(root, text="Enemy", width=button_width,
+        enemy_button = Button(root, text='Enemy', width=button_width,
                               command=lambda: characters.CharacterEdit(filename,
                                                                        icon_dir,
                                                                        ENEMIES,
@@ -46,11 +46,11 @@ def file_dialog():
                                                                        0))
         enemy_button.grid(column=1, row=1)
 
-        accessory_button = Button(root, text="Accessory", width=button_width,
+        accessory_button = Button(root, text='Accessory', width=button_width,
                                   command=lambda: accessories.AccessoryEdit(filename, icon_dir))
         accessory_button.grid(column=1, row=2)
 
-        armor_button = Button(root, text="Armor", width=button_width,
+        armor_button = Button(root, text='Armor', width=button_width,
                               command=lambda: armorshields.ArmorShieldEdit(filename,
                                                                            icon_dir,
                                                                            ARMOR_NAMES,
@@ -62,7 +62,7 @@ def file_dialog():
                                      command=lambda: wandsscrolls.WandScrollEdit(filename, icon_dir))
         wandsscrolls_button.grid(column=1, row=4)
 
-        shield_button = Button(root, text="Shield", width=button_width,
+        shield_button = Button(root, text='Shield', width=button_width,
                                command=lambda: armorshields.ArmorShieldEdit(filename,
                                                                             icon_dir,
                                                                             SHIELD_NAMES,
@@ -70,22 +70,26 @@ def file_dialog():
                                                                             0))
         shield_button.grid(column=1, row=5)
 
-        spell_button = Button(root, text="Spell", width=button_width,
+        spell_button = Button(root, text='Spell', width=button_width,
                               command=lambda: spells.SpellEdit(filename, icon_dir))
         spell_button.grid(column=1, row=6)
+        
+        trainer_button = Button(root, text='Trainer', width=button_width,
+                                command=lambda: trainers.TrainerEdit(filename, icon_dir))
+        trainer_button.grid(column=1, row=7)
 
-        weapon_button = Button(root, text="Weapon", width=button_width,
+        weapon_button = Button(root, text='Weapon', width=button_width,
                                command=lambda: weapons.WeaponEdit(filename, icon_dir))
-        weapon_button.grid(column=1, row=7)
+        weapon_button.grid(column=1, row=8)
 
 
 root = Tk()
 root.resizable(False, False)
-root.title("Aidyn Editor")
+root.title('Aidyn Editor')
 root.iconbitmap(icon_dir)
 image = PhotoImage(file=background_dir)
 
-browse_frame = LabelFrame(root, text="Aidyn Chronicles ROM")
+browse_frame = LabelFrame(root, text='Aidyn Chronicles ROM')
 browse_frame.pack()
 browse_button = Button(browse_frame, text='Browse', command=file_dialog)
 browse_button.pack()
