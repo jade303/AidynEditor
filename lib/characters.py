@@ -11,21 +11,15 @@ class CharacterEdit:
     def __init__(self, filename, icon_dir, characters, character_addresses, name_length, char_type):
         charwin = Toplevel()
         charwin.resizable(False, False)
-        if char_type == 1:
-            charwin.title("Party Edit -- Edits are NEW GAME only")
-        elif char_type == 0:
-            charwin.title("Enemy Edit")
-        charwin.iconbitmap(icon_dir)
-        filename = filename
-        data_seek = 44
         if char_type == 0:
-            data_read = 92
-        elif char_type == 1:
+            charwin.title("Party Edit -- Edits are NEW GAME only")
             data_read = 74
+        elif char_type == 1:
+            charwin.title("Enemy Edit")
+            data_read = 92
+        charwin.iconbitmap(icon_dir)
+        data_seek = 44           
         drop_data_read = 34
-        name_length = name_length
-        characters = characters
-        character_addresses = character_addresses
 
         def set_defaults(*args):
             with open(filename, 'rb') as f:
@@ -91,7 +85,7 @@ class CharacterEdit:
                 # exp.set(int(d[180] + d[181], 16))
 
                 # enemy drop
-                if char_type == 0:
+                if char_type == 1:
                     enemy_drop_cat.set(inv_DROP_CAT[(d[182] + d[183]).upper()])
                     drop_cat.set(inv_DROP_CAT[(d[182] + d[183]).upper()])
 
@@ -248,7 +242,7 @@ class CharacterEdit:
                     shi = 255
                 towrite.append(int(shi))
 
-                if char_type == 0:    
+                if char_type == 1:    
                     for i in range(148, 181, 2):
                     towrite.append(int(d[i] + d[i + 1], 16))
                     towrite.append(int((DROP_CAT[enemy_drop_cat.get()]), 16))
@@ -368,7 +362,7 @@ class CharacterEdit:
                 spell_level.grid(column=1, row=x)
                 spell_level.config(width=4)
 
-            if char_type == 0:
+            if char_type == 1:
                 """
                 exp_frame = LabelFrame(charwin, text='EXP given')
                 exp_frame.grid(column=0, row=4)
@@ -514,7 +508,7 @@ class CharacterEdit:
                 item6_chance_entry.grid(column=1, row=1, sticky='e')
 
         # initial declaration of variables
-        if char_type == 0:
+        if char_type == 1:
             enemy_drop_cat = StringVar()
             drop_cat = StringVar()
             drop_cat.trace('w', set_drop_defaults)
