@@ -149,7 +149,7 @@ class ArmorShieldEdit:
             defense_label = Label(lawfulneutral_frame, text='Defense:')
             defense_label.grid(column=0, row=0, sticky='e')
             defense_entry = Entry(lawfulneutral_frame, textvariable=defense)
-            defense_entry.grid(column=1, row=0, stick='e')
+            defense_entry.grid(column=1, row=0, sticky='e')
             defense_entry.config(width=4)
 
             protection_label = Label(lawfulneutral_frame, text='Protection:')
