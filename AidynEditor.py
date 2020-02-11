@@ -34,7 +34,7 @@ def file_dialog():
                                                                        PARTY,
                                                                        PARTY_ADDRESSES,
                                                                        party_name_length,
-                                                                       1))
+                                                                       0))
         party_button.grid(column=1, row=0, sticky='ew')
 
         enemy_button = Button(root, text='Enemy', width=button_width,
@@ -43,7 +43,7 @@ def file_dialog():
                                                                        ENEMIES,
                                                                        ENEMY_ADDRESSES,
                                                                        enemy_name_length,
-                                                                       0))
+                                                                       1))
         enemy_button.grid(column=1, row=1)
 
         accessory_button = Button(root, text='Accessory', width=button_width,

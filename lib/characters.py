@@ -9,17 +9,17 @@ from lib.variables import inv_WEAPONS, inv_SHIELDS, inv_ARMORS, inv_SPELLS, WEAP
 
 class CharacterEdit:
     def __init__(self, filename, icon_dir, characters, character_addresses, name_length, char_type):
-        charwin = Toplevel()
-        charwin.resizable(False, False)
+        win = Toplevel()
+        win.resizable(False, False)
         if char_type == 0:
-            charwin.title("Party Edit -- Edits are NEW GAME only")
+            win.title("Party Edit -- Edits are NEW GAME only")
             data_read = 74
         elif char_type == 1:
-            charwin.title("Enemy Edit")
+            win.title("Enemy and Loot Edit")
             data_read = 92
-        charwin.iconbitmap(icon_dir)
+            drop_data_read = 34
+        win.iconbitmap(icon_dir)
         data_seek = 44           
-        drop_data_read = 34
 
         def set_defaults(*args):
             with open(filename, 'rb') as f:
@@ -31,16 +31,14 @@ class CharacterEdit:
 
                 # seek address for everything else
                 f.seek(address + data_seek)
-                character_data = f.read(data_read)
-                d = character_data.hex()
+                d = f.read(data_read).hex()
 
                 # set aspect default
                 aspect.set(d[1])
 
                 # set skill defaults
                 for s in skills:
-                    sa = skills.index(s) * 2
-                    sn = int(d[sa + 6] + d[sa + 7], 16)
+                    sn = int(d[(skills.index(s) * 2) + 6] + d[(skills.index(s) * 2) + 7], 16)
                     if sn == 255:
                         sn = ''
                     s.set(sn)
@@ -52,18 +50,14 @@ class CharacterEdit:
 
                 # set attribute defaults
                 for a in atts:
-                    aa = atts.index(a) * 2
-                    an = int(d[aa + 52] + d[aa + 53], 16)
-                    a.set(an)
+                    a.set(int(d[(atts.index(a) * 2) + 52] + d[(atts.index(a) * 2) + 53], 16))
 
                 # set level default
                 level.set(int(d[66] + d[67], 16))
 
                 # set equipment defaults
                 for w in weapons:
-                    x = (weapons.index(w) * 4) + 70
-                    y = x + 4
-                    w.set(inv_WEAPONS[d[x:y].upper()])
+                    w.set(inv_WEAPONS[d[((weapons.index(w) * 4) + 70):(((weapons.index(w) * 4) + 70) + 4)].upper()])
                 armor.set(inv_ARMORS[d[136:140].upper()])
                 shield.set(inv_SHIELDS[d[142:146].upper()])
 
@@ -72,14 +66,11 @@ class CharacterEdit:
 
                 # 5 initial spells
                 for s in spells:
-                    x = (spells.index(s) * 4) + 86
-                    y = x + 4
-                    s.set(inv_SPELLS[d[x:y].upper()])
+                    s.set(inv_SPELLS[d[((spells.index(s) * 4) + 86):(((spells.index(s) * 4) + 86) + 4)].upper()])
 
                 # spell levels
                 for s in spell_levels:
-                    x = (spell_levels.index(s) * 2) + 108
-                    s.set(int(d[x] + d[x + 1], 16))
+                    s.set(int(d[((spell_levels.index(s) * 2) + 108)] + d[((spell_levels.index(s) * 2) + 108) + 1], 16))
 
                 # set exp
                 # exp.set(int(d[180] + d[181], 16))
@@ -94,8 +85,7 @@ class CharacterEdit:
                 address = DROP_CAT_ADDRESSES[list(DROP_CAT).index(drop_cat.get())]
 
                 f.seek(address)
-                data = f.read(drop_data_read)
-                d = data.hex()
+                d = f.read(drop_data_read).hex()
 
                 gold_min.set(int((d[2] + d[3]) + (d[0] + d[1]), 16))
                 gold_max.set(int(d[6] + d[7] + d[4] + d[5], 16))
@@ -244,8 +234,8 @@ class CharacterEdit:
 
                 if char_type == 1:    
                     for i in range(148, 181, 2):
-                    towrite.append(int(d[i] + d[i + 1], 16))
-                    towrite.append(int((DROP_CAT[enemy_drop_cat.get()]), 16))
+                        towrite.append(int(d[i] + d[i + 1], 16))
+                        towrite.append(int((DROP_CAT[enemy_drop_cat.get()]), 16))
 
                 f.seek(address + data_seek)
                 for item in towrite:
@@ -253,7 +243,7 @@ class CharacterEdit:
 
         def build():
             # column 0, row 0
-            box = Frame(charwin)
+            box = Frame(win)
             box.grid(column=0, row=0)
 
             lawfulgood_frame = Frame(box)
@@ -364,7 +354,7 @@ class CharacterEdit:
 
             if char_type == 1:
                 """
-                exp_frame = LabelFrame(charwin, text='EXP given')
+                exp_frame = LabelFrame(win, text='EXP given')
                 exp_frame.grid(column=0, row=4)
                 exp_entry = Entry(exp_frame, textvariable=exp)
                 exp_entry.grid(column=0, row=0)
@@ -373,24 +363,24 @@ class CharacterEdit:
                 exp_note.config(font=(None, 8))
                 """
 
-                enemy_drop_cat_label = LabelFrame(box, text='Current Enemy Drop Type')
+                enemy_drop_cat_label = LabelFrame(box, text='Current Enemy Loot Type')
                 enemy_drop_cat_label.grid(row=4, column=0, pady=12)
                 enemy_drop_cat_box = Combobox(enemy_drop_cat_label, textvariable=enemy_drop_cat,
                                               values=list(DROP_CAT.keys()))
                 enemy_drop_cat_box.grid(column=0, row=0)
 
-                drop_frame = LabelFrame(charwin, text='Chests and Drop Editing:', bd=4)
+                drop_frame = LabelFrame(win, text='Loot Editing:', bd=4)
                 drop_frame.grid(column=2, row=0)
 
-                drop_box_label = Label(drop_frame, text='Drop Category:')
+                drop_box_label = Label(drop_frame, text='Loot Category:')
                 drop_box_label.grid(column=0, row=0, sticky='e')
                 drop_box = Combobox(drop_frame, textvariable=drop_cat, values=list(DROP_CAT.keys()))
                 drop_box.grid(column=1, row=0, sticky='w')
 
-                save = Button(drop_frame, text="Save Drop Changes", command=drop_save, width=18)
+                save = Button(drop_frame, text="Save Loot Changes", command=drop_save, width=18)
                 save.grid(column=0, row=1, columnspan=2, pady=12)
 
-                drop_stats = LabelFrame(drop_frame, text='Drop details\n(editing these affects all enemies with the '
+                drop_stats = LabelFrame(drop_frame, text='Loot details\n(editing these affects all enemies with the '
                                                          'same drop type)')
                 drop_stats.grid(column=0, row=2, columnspan=2)
 
