@@ -248,10 +248,10 @@ class CharacterEdit:
                     shi = 255
                 towrite.append(int(shi))
 
-                for i in range(148, 181, 2):
+                if char_type == 0:    
+                    for i in range(148, 181, 2):
                     towrite.append(int(d[i] + d[i + 1], 16))
-
-                towrite.append(int((DROP_CAT[enemy_drop_cat.get()]), 16))
+                    towrite.append(int((DROP_CAT[enemy_drop_cat.get()]), 16))
 
                 f.seek(address + data_seek)
                 for item in towrite:
