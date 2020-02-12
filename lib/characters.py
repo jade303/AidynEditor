@@ -13,12 +13,12 @@ class CharacterEdit:
         win.resizable(False, False)
         if char_type == 0:
             win.title("Party Edit -- Edits are NEW GAME only")
-            data_read = 74
         elif char_type == 1:
             win.title("Enemy and Loot Edit")
             data_read = 92
             drop_data_read = 34
         win.iconbitmap(icon_dir)
+        data_read = 74
         data_seek = 44           
 
         def set_defaults(*args):
