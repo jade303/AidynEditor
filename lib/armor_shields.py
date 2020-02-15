@@ -9,13 +9,13 @@ from lib.variables import inv_EQUIPMENT_STAT, inv_SKILL_ATTRIBUTE, inv_SPELLS, i
 
 class ArmorShieldEdit:
     def __init__(self, filename, icon_dir, names, addresses, title):
-        shiwin = Toplevel()
-        shiwin.resizable(False, False)
+        win = Toplevel()
+        win.resizable(False, False)
         if title == 1:
-            shiwin.title("Armor Edit")
+            win.title("Armor Edit")
         elif title == 0:
-            shiwin.title("Shield Edit")
-        shiwin.iconbitmap(icon_dir)
+            win.title("Shield Edit")
+        win.iconbitmap(icon_dir)
         filename = filename
         data_seek = 26
         data_read = 25
@@ -30,8 +30,7 @@ class ArmorShieldEdit:
                 name.set(f.read(name_length).decode("utf-8"))
 
                 f.seek(address + data_seek)
-                data = f.read(data_read)
-                d = data.hex()
+                d = f.read(data_read).hex()
 
                 defense.set(int(d[0] + d[1], 16))
                 protection.set(int(d[2] + d[3], 16))
@@ -77,8 +76,7 @@ class ArmorShieldEdit:
                 f.write(new_name)
 
                 f.seek(address + data_seek)
-                data = f.read(data_read)
-                d = data.hex()
+                d = f.read(data_read).hex()
 
                 new_value = value.get()
                 v2, v1 = divmod(int(new_value), 256)
@@ -131,7 +129,7 @@ class ArmorShieldEdit:
                     f.write(i.to_bytes(1, byteorder='big'))
 
         def build():
-            lawfulgood_frame = Frame(shiwin)
+            lawfulgood_frame = Frame(win)
             lawfulgood_frame.grid(column=0, row=0)
             default_item_menu = Combobox(lawfulgood_frame, textvariable=item, values=names)
             default_item_menu.grid(column=0, row=0)
@@ -143,7 +141,7 @@ class ArmorShieldEdit:
             new_name_entry.grid()
             new_name_entry.config(width=21)
 
-            lawfulneutral_frame = LabelFrame(shiwin, text='Stats:')
+            lawfulneutral_frame = LabelFrame(win, text='Stats:')
             lawfulneutral_frame.grid(column=0, row=1)
 
             defense_label = Label(lawfulneutral_frame, text='Defense:')
@@ -179,7 +177,7 @@ class ArmorShieldEdit:
             value_label2.grid(row=5, columnspan=2)
             value_label2.config(font=(None, 8))
 
-            neutralgood_frame = Frame(shiwin)
+            neutralgood_frame = Frame(win)
             neutralgood_frame.grid(column=1, row=0)
 
             save = Button(neutralgood_frame, text='Save', command=write)
@@ -195,7 +193,7 @@ class ArmorShieldEdit:
             lunar_radio = Radiobutton(aspect_frame, text='Lunar', variable=aspect, value=1)
             lunar_radio.grid(column=2, row=0)
 
-            trueneutral_frame = Frame(shiwin)
+            trueneutral_frame = Frame(win)
             trueneutral_frame.grid(column=1, row=1)
 
             stat_frame = LabelFrame(trueneutral_frame, text='Stat')
@@ -234,7 +232,7 @@ class ArmorShieldEdit:
             magic_entry.grid(column=1, row=0)
             magic_entry.config(width=4)
 
-            resist_frame = LabelFrame(shiwin, text='Resist')
+            resist_frame = LabelFrame(win, text='Resist')
             resist_frame.grid(column=1, row=2)
             resist_menu = Combobox(resist_frame, textvariable=resist, values=list(RESIST.keys()))
             resist_menu.grid(column=0, row=0)

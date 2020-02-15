@@ -10,10 +10,10 @@ from lib.variables import WEAPON_ADDRESSES, WEAPON_NAMES, inv_WEAPON_TYPE, inv_W
 
 class WeaponEdit:
     def __init__(self, filename, icon_dir):
-        weapwin = Toplevel()
-        weapwin.resizable(False, False)
-        weapwin.title('Weapon Edit')
-        weapwin.iconbitmap(icon_dir)
+        win = Toplevel()
+        win.resizable(False, False)
+        win.title('Weapon Edit')
+        win.iconbitmap(icon_dir)
         filename = filename
         data_seek = 23
         data_read = 25
@@ -26,8 +26,7 @@ class WeaponEdit:
                 name.set(f.read(name_length).decode("utf-8"))
 
                 f.seek(address + data_seek)
-                data = f.read(data_read)
-                d = data.hex()
+                d = f.read(data_read).hex()
 
                 weapon_type.set(inv_WEAPON_TYPE[d[1].upper()])
                 str_req.set(int(d[2] + d[3], 16))
@@ -70,8 +69,7 @@ class WeaponEdit:
                 f.write(new_name)
 
                 f.seek(address + data_seek)
-                data = f.read(data_read)
-                d = data.hex()
+                d = f.read(data_read).hex()
 
                 new_value = value.get()
                 v2, v1 = divmod(int(new_value), 256)
@@ -118,7 +116,7 @@ class WeaponEdit:
                     f.write(i.to_bytes(1, byteorder='big'))
 
         def build():
-            lawfulgood_frame = Frame(weapwin)
+            lawfulgood_frame = Frame(win)
             lawfulgood_frame.grid(column=0, row=0)
             default_weapon_menu = Combobox(lawfulgood_frame, textvariable=weapon, values=WEAPON_NAMES)
             default_weapon_menu.grid(column=0, row=0)
@@ -134,7 +132,7 @@ class WeaponEdit:
             weapon_type_menu.grid(column=0, row=3)
             weapon_type_menu.config(width=9)
 
-            lawfulneutral_frame = LabelFrame(weapwin, text='Stats:')
+            lawfulneutral_frame = LabelFrame(win, text='Stats:')
             lawfulneutral_frame.grid(column=0, row=1)
 
             strength_label = Label(lawfulneutral_frame, text='Str Required:')
@@ -170,13 +168,13 @@ class WeaponEdit:
             value_label2.grid(row=5, columnspan=2)
             value_label2.config(font=(None, 8))
 
-            animation_frame = LabelFrame(weapwin, text='Animation')
+            animation_frame = LabelFrame(win, text='Animation')
             animation_frame.grid(column=0, row=2)
             animation_menu = Combobox(animation_frame, textvariable=animation, values=list(WEAPON_ANIMATIONS.keys()))
             animation_menu.grid(column=0, row=0)
             animation_menu.config(width=12)
 
-            neutralgood_frame = Frame(weapwin)
+            neutralgood_frame = Frame(win)
             neutralgood_frame.grid(column=1, row=0)
 
             save = Button(neutralgood_frame, text='Save', command=write)
@@ -192,7 +190,7 @@ class WeaponEdit:
             lunar_radio = Radiobutton(aspect_frame, text='Lunar', variable=aspect, value=1)
             lunar_radio.grid(column=2, row=0)
 
-            trueneutral_frame = Frame(weapwin)
+            trueneutral_frame = Frame(win)
             trueneutral_frame.grid(column=1, row=1)
 
             stat_frame = LabelFrame(trueneutral_frame, text='Stat')
@@ -231,7 +229,7 @@ class WeaponEdit:
             magic_entry.grid(column=1, row=0)
             magic_entry.config(width=4)
 
-            resist_frame = LabelFrame(weapwin, text='Resist')
+            resist_frame = LabelFrame(win, text='Resist')
             resist_frame.grid(column=1, row=2)
             resist_menu = Combobox(resist_frame, textvariable=resist, values=list(RESIST.keys()))
             resist_menu.grid(column=0, row=0)

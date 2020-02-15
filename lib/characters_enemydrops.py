@@ -98,24 +98,16 @@ class CharacterEdit:
                 reagent_min.set(int(d[20] + d[21], 16))
                 reagent_max.set(int(d[22] + d[23], 16))
 
-                item1.set(inv_DROP_ITEMS[d[24:28].upper()])
-                item1_chance.set(int(d[28] + d[29], 16))
-                item1_min.set(int(d[30] + d[31], 16))
-                item1_max.set(int(d[32] + d[33], 16))
+                for i, c, mi, mx in zip(item, item_chance, item_min, item_max):
+                    i.set(inv_DROP_ITEMS[d[(10 * item.index(i) + 24):(10 * item.index(i) + 28)].upper()])
+                    c.set(int(d[(10 * item.index(i) + 28)] + d[(10 * item.index(i) + 29)], 16))
+                    mi.set(int(d[(10 * item.index(i) + 30)] + d[(10 * item.index(i) + 31)], 16))
+                    mx.set(int(d[(10 * item.index(i) + 32)] + d[(10 * item.index(i) + 33)], 16))
 
-                item2.set(inv_DROP_ITEMS[d[34:38].upper()])
-                item2_chance.set(int(d[38] + d[39], 16))
-                item2_min.set(int(d[40] + d[41], 16))
-                item2_max.set(int(d[42] + d[43], 16))
-
-                item3.set(inv_DROP_ITEMS[d[44:48].upper()])
-                item3_chance.set(int(d[48] + d[49], 16))
-                item4.set(inv_DROP_ITEMS[d[50:54].upper()])
-                item4_chance.set(int(d[54] + d[55], 16))
-                item5.set(inv_DROP_ITEMS[d[56:60].upper()])
-                item5_chance.set(int(d[60] + d[61], 16))
-                item6.set(inv_DROP_ITEMS[d[62:66].upper()])
-                item6_chance.set(int(d[66] + d[67], 16))
+                for i, c in zip(other_items, other_items_chance):
+                    i.set(inv_DROP_ITEMS[d[((other_items.index(i) * 6) + 44):
+                                           ((other_items.index(i) * 6) + 48)].upper()])
+                    c.set(int(d[((other_items.index(i) * 6) + 48)] + d[((other_items.index(i) * 6) + 49)], 16))
 
         def drop_save():
             with open(filename, 'rb+') as f:
@@ -143,34 +135,24 @@ class CharacterEdit:
                     int(weap3_chance.get()),
                     int(reagent_chance.get()),
                     int(reagent_min.get()),
-                    int(reagent_max.get()),
-                    int((ITEMS[item1.get()])[:2], 16),
-                    int((ITEMS[item1.get()])[2:], 16),
-                    int(item1_chance.get()),
-                    int(item1_min.get()),
-                    int(item1_max.get()),
-                    int((ITEMS[item2.get()])[:2], 16),
-                    int((ITEMS[item2.get()])[2:], 16),
-                    int(item2_chance.get()),
-                    int(item2_min.get()),
-                    int(item2_max.get()),
-                    int((ITEMS[item3.get()])[:2], 16),
-                    int((ITEMS[item3.get()])[2:], 16),
-                    int(item3_chance.get()),
-                    int((ITEMS[item4.get()])[:2], 16),
-                    int((ITEMS[item4.get()])[2:], 16),
-                    int(item4_chance.get()),
-                    int((ITEMS[item5.get()])[:2], 16),
-                    int((ITEMS[item5.get()])[2:], 16),
-                    int(item5_chance.get()),
-                    int((ITEMS[item6.get()])[:2], 16),
-                    int((ITEMS[item6.get()])[2:], 16),
-                    int(item6_chance.get())
+                    int(reagent_max.get())
                 ]
 
+                for i in item:
+                    towrite.append(int((ITEMS[i.get()])[:2], 16))
+                    towrite.append(int((ITEMS[i.get()])[2:], 16))
+                    towrite.append(int(item_chance[item.index(i)].get()))
+                    towrite.append(int(item_min[item.index(i)].get()))
+                    towrite.append(int(item_max[item.index(i)].get()))
+
+                for i, c in zip(other_items, other_items_chance):
+                    towrite.append(int((ITEMS[i.get()])[:2], 16))
+                    towrite.append(int((ITEMS[i.get()])[2:], 16))
+                    towrite.append(int(c.get()))
+
                 f.seek(address)
-                for item in towrite:
-                    f.write(item.to_bytes(1, byteorder='big'))
+                for i in towrite:
+                    f.write(i.to_bytes(1, byteorder='big'))
 
         def write():
             with open(filename, 'rb+') as f:
@@ -184,8 +166,7 @@ class CharacterEdit:
                 f.write(new_name)
 
                 f.seek(address + data_seek)
-                character_data = f.read(data_read)
-                d = character_data.hex()
+                d = f.read(data_read).hex()
 
                 towrite = [aspect.get(), int(d[3] + d[4], 16),
                            int(d[5] + d[6], 16)]
@@ -232,14 +213,14 @@ class CharacterEdit:
                     shi = 255
                 towrite.append(int(shi))
 
-                if char_type == 1:    
+                if char_type == 1:
                     for i in range(148, 181, 2):
                         towrite.append(int(d[i] + d[i + 1], 16))
                         towrite.append(int((DROP_CAT[enemy_drop_cat.get()]), 16))
 
                 f.seek(address + data_seek)
-                for item in towrite:
-                    f.write(item.to_bytes(1, byteorder='big'))
+                for i in towrite:
+                    f.write(i.to_bytes(1, byteorder='big'))
 
         def build():
             # column 0, row 0
@@ -428,74 +409,35 @@ class CharacterEdit:
                 reagent_max_entry = Entry(drop_stats, textvariable=reagent_max, width=4)
                 reagent_max_entry.grid(column=2, row=8, sticky='w')
 
-                item1_frame = LabelFrame(drop_stats, text='Item 1')
-                item1_frame.grid(column=0, row=9, sticky='e', columnspan=2)
-                item1_box = Combobox(item1_frame, textvariable=item1, values=list(ITEMS.keys()), width=28)
-                item1_box.grid(column=0, row=0, columnspan=3)
-                item1_chance_label = Label(item1_frame, text='% chance to drop item:')
-                item1_chance_label.grid(column=0, row=1, sticky='e')
-                item1_chance_entry = Entry(item1_frame, textvariable=item1_chance, width=4)
-                item1_chance_entry.grid(column=1, row=1, sticky='e')
-                item1_min_max = Label(item1_frame, text='MIN/MAX item amount:')
-                item1_min_max.grid(column=0, row=2)
-                item1_min_entry = Entry(item1_frame, textvariable=item1_min, width=4)
-                item1_min_entry.grid(column=1, row=2, sticky='e')
-                item1_max_entry = Entry(item1_frame, textvariable=item1_max, width=4)
-                item1_max_entry.grid(column=2, row=2, sticky='w')
-
-                item2_frame = LabelFrame(drop_stats, text='Item 2')
-                item2_frame.grid(column=0, row=10, sticky='e', columnspan=2)
-                item2_box = Combobox(item2_frame, textvariable=item2, values=list(ITEMS.keys()), width=28)
-                item2_box.grid(column=0, row=3, columnspan=3)
-                item2_chance_label = Label(item2_frame, text='% chance to drop item:')
-                item2_chance_label.grid(column=0, row=4, sticky='e')
-                item2_chance_entry = Entry(item2_frame, textvariable=item2_chance, width=4)
-                item2_chance_entry.grid(column=1, row=4, sticky='e')
-                item2_min_max = Label(item2_frame, text='MIN/MAX item amount:')
-                item2_min_max.grid(column=0, row=5)
-                item2_min_entry = Entry(item2_frame, textvariable=item2_min, width=4)
-                item2_min_entry.grid(column=1, row=5, sticky='e')
-                item2_max_entry = Entry(item2_frame, textvariable=item2_max, width=4)
-                item2_max_entry.grid(column=2, row=5, sticky='w')
+                for i in item:
+                    item_frame = LabelFrame(drop_stats, text=('Item ' + str(item.index(i))))
+                    item_frame.grid(column=0, row=(9 + item.index(i)), sticky='e', columnspan=2)
+                    item_box = Combobox(item_frame, textvariable=i, values=list(ITEMS.keys()), width=28)
+                    item_box.grid(column=0, row=0, columnspan=3)
+                    item_chance_label = Label(item_frame, text='% chance to drop item:')
+                    item_chance_label.grid(column=0, row=1, sticky='e')
+                    item_chance_entry = Entry(item_frame, textvariable=item_chance[item.index(i)], width=4)
+                    item_chance_entry.grid(column=1, row=1, sticky='e')
+                    item_min_max = Label(item_frame, text='MIN/MAX item amount:')
+                    item_min_max.grid(column=0, row=2)
+                    item_min_entry = Entry(item_frame, textvariable=item_min[item.index(i)], width=4)
+                    item_min_entry.grid(column=1, row=2, sticky='e')
+                    item_max_entry = Entry(item_frame, textvariable=item_max[item.index(i)], width=4)
+                    item_max_entry.grid(column=2, row=2, sticky='w')
 
                 item_more = LabelFrame(drop_stats, text='Items 3-6 and drop %')
                 item_more.grid(column=0, row=11, sticky='e', columnspan=2)
 
-                item3_frame = LabelFrame(item_more, text='Item 3')
-                item3_frame.grid(column=0, row=0)
-                item3_box = Combobox(item3_frame, textvariable=item3, values=list(ITEMS.keys()), width=28)
-                item3_box.grid(column=0, row=0, columnspan=2)
-                item3_chance_label = Label(item3_frame, text='% chance to drop item:')
-                item3_chance_label.grid(column=0, row=1, sticky='e')
-                item3_chance_entry = Entry(item3_frame, textvariable=item3_chance, width=4)
-                item3_chance_entry.grid(column=1, row=1, sticky='e')
-
-                item4_frame = LabelFrame(item_more, text='Item 4')
-                item4_frame.grid(column=0, row=1)
-                item4_box = Combobox(item4_frame, textvariable=item4, values=list(ITEMS.keys()), width=28)
-                item4_box.grid(column=0, row=0, columnspan=2)
-                item4_chance_label = Label(item4_frame, text='% chance to drop item:')
-                item4_chance_label.grid(column=0, row=1, sticky='e')
-                item4_chance_entry = Entry(item4_frame, textvariable=item4_chance, width=4)
-                item4_chance_entry.grid(column=1, row=1, sticky='e')
-
-                item5_frame = LabelFrame(item_more, text='Item 5')
-                item5_frame.grid(column=0, row=2)
-                item5_box = Combobox(item5_frame, textvariable=item5, values=list(ITEMS.keys()), width=28)
-                item5_box.grid(column=0, row=0, columnspan=2)
-                item5_chance_label = Label(item5_frame, text='% chance to drop item:')
-                item5_chance_label.grid(column=0, row=1, sticky='e')
-                item5_chance_entry = Entry(item5_frame, textvariable=item5_chance, width=4)
-                item5_chance_entry.grid(column=1, row=1, sticky='e')
-
-                item6_frame = LabelFrame(item_more, text='Item 6')
-                item6_frame.grid(column=0, row=3)
-                item6_box = Combobox(item6_frame, textvariable=item6, values=list(ITEMS.keys()), width=28)
-                item6_box.grid(column=0, row=0, columnspan=2)
-                item6_chance_label = Label(item6_frame, text='% chance to drop item:')
-                item6_chance_label.grid(column=0, row=1, sticky='e')
-                item6_chance_entry = Entry(item6_frame, textvariable=item6_chance, width=4)
-                item6_chance_entry.grid(column=1, row=1, sticky='e')
+                for i in other_items:
+                    other_item_frame = LabelFrame(item_more, text=('Item' + str(other_items.index(i) + 3)))
+                    other_item_frame.grid(column=0, row=other_items.index(i))
+                    other_item_box = Combobox(other_item_frame, textvariable=i, values=list(ITEMS.keys()), width=28)
+                    other_item_box.grid(column=0, row=0, columnspan=2)
+                    other_item_chance_label = Label(other_item_frame, text='% chance to drop item:')
+                    other_item_chance_label.grid(column=0, row=1, sticky='e')
+                    other_item_chance_entry = Entry(other_item_frame,
+                                                    textvariable=other_items_chance[other_items.index(i)], width=4)
+                    other_item_chance_entry.grid(column=1, row=1, sticky='e')
 
         # initial declaration of variables
         if char_type == 1:
@@ -523,34 +465,27 @@ class CharacterEdit:
             reagent_max = StringVar()
             reagent_max.trace('w', partial(limit, reagent_max, 99))
 
-            item1 = StringVar()
-            item1_chance = StringVar()
-            item1_chance.trace('w', partial(limit, item1_chance, 100))
-            item1_min = StringVar()
-            item1_min.trace('w', partial(limit, item1_min, 99))
-            item1_max = StringVar()
-            item1_max.trace('w', partial(limit, item1_max, 99))
+            item, item_chance, item_min, item_max = ([] for i in range(4))
+            for i in range(2):
+                i = StringVar()
+                item.append(i)
+                c = StringVar()
+                c.trace('w', partial(limit, c, 100))
+                item_chance.append(c)
+                mi = StringVar()
+                mi.trace('w', partial(limit, mi, 99))
+                item_min.append(mi)
+                mx = StringVar()
+                mx.trace('w', partial(limit, mx, 99))
+                item_max.append(mx)
 
-            item2 = StringVar()
-            item2_chance = StringVar()
-            item2_chance.trace('w', partial(limit, item2_chance, 100))
-            item2_min = StringVar()
-            item2_min.trace('w', partial(limit, item2_min, 99))
-            item2_max = StringVar()
-            item2_max.trace('w', partial(limit, item2_max, 99))
-
-            item3 = StringVar()
-            item3_chance = StringVar()
-            item3_chance.trace('w', partial(limit, item3_chance, 100))
-            item4 = StringVar()
-            item4_chance = StringVar()
-            item4_chance.trace('w', partial(limit, item4_chance, 100))
-            item5 = StringVar()
-            item5_chance = StringVar()
-            item5_chance.trace('w', partial(limit, item5_chance, 100))
-            item6 = StringVar()
-            item6_chance = StringVar()
-            item6_chance.trace('w', partial(limit, item6_chance, 100))
+            other_items, other_items_chance = ([] for i in range(2))
+            for i in range(4):
+                i = StringVar()
+                other_items.append(i)
+                c = StringVar()
+                c.trace('w', partial(limit, c, 100))
+                other_items_chance.append(c)
 
         character = StringVar()
         character.trace('w', set_defaults)
@@ -569,22 +504,16 @@ class CharacterEdit:
         for _ in ATTRIBUTES:
             i = StringVar()
             atts.append(i)
-            if atts.index(i) == 0:
-                i.trace('w', partial(limit, i, 30))
-            elif atts.index(i) == 1:
-                i.trace('w', partial(limit, i, 30))
-            elif atts.index(i) == 2:
+            if atts.index(i) in range(3) or atts.index(i) == 4:
                 i.trace('w', partial(limit, i, 30))
             elif atts.index(i) == 3:
                 i.trace('w', partial(limit, i, 40))
-            elif atts.index(i) == 4:
-                i.trace('w', partial(limit, i, 30))
             elif atts.index(i) == 5:
                 i.trace('w', partial(limit, i, 120))
         level = StringVar()
         level.trace('w', partial(limit, level, 40))
-        weapons = [StringVar(), StringVar(), StringVar()]
-        spells = [StringVar(), StringVar(), StringVar(), StringVar(), StringVar()]
+        weapons = [StringVar() for i in range(3)]
+        spells = [StringVar() for i in range(5)]
         school = IntVar()
         spell_levels = []
         for i in range(5):

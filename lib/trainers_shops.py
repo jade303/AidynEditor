@@ -29,8 +29,7 @@ class TrainerEdit:
                 # trainer skills + shield
                 address = SHOP_SKILLS[SHOPS.index(trainer.get())]
                 f.seek(address)
-                data = f.read(skill_read)
-                d = data.hex()
+                d = f.read(skill_read).hex()
 
                 for s in skills:
                     sa = skills.index(s) * 2
@@ -41,8 +40,7 @@ class TrainerEdit:
 
                 address = SHOP_SHIELD[SHOPS.index(trainer.get())]
                 f.seek(address)
-                data = f.read(shield_read)
-                d = data.hex()
+                d = f.read(shield_read).hex()
 
                 shi = int(d[0] + d[1], 16)
                 if shi == 255:
@@ -52,8 +50,7 @@ class TrainerEdit:
                 # trainer spells
                 address = SHOP_SPELLS[SHOPS.index(trainer.get())]
                 f.seek(address)
-                data = f.read(spell_read)
-                d = data.hex()
+                d = f.read(spell_read).hex()
 
                 for s in spells:
                     x = (spells.index(s) * 4)
@@ -194,7 +191,7 @@ class TrainerEdit:
             item_frame.grid(column=2, row=0, rowspan=23)
 
             for item in shop_item:
-                item_box = Combobox(item_frame, textvariable=item, values=list(ITEMS.keys()))
+                item_box = Combobox(item_frame, textvariable=item, values=list(ITEMS.keys()), width=28)
                 item_box.grid()
 
         trainer = StringVar()

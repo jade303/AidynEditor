@@ -9,10 +9,10 @@ from lib.variables import SPELL_ADDRESSES, SPELL_NAMES, inv_TARGET_NUM, inv_TARG
 
 class SpellEdit:
     def __init__(self, filename, icon_dir):
-        spellwin = Toplevel()
-        spellwin.resizable(False, False)
-        spellwin.title("Spell Edit")
-        spellwin.iconbitmap(icon_dir)
+        win = Toplevel()
+        win.resizable(False, False)
+        win.title("Spell Edit")
+        win.iconbitmap(icon_dir)
         filename = filename
         data_seek = 25
         data_read = 11
@@ -28,8 +28,7 @@ class SpellEdit:
 
                 # get everything else
                 f.seek(address + data_seek)
-                spell_data = f.read(data_read)
-                d = spell_data.hex()
+                d = f.read(data_read).hex()
 
                 school.set(d[1])
                 damage.set(int(d[2] + d[3], 16))
@@ -57,8 +56,7 @@ class SpellEdit:
                 f.write(new_name)
 
                 f.seek(address + data_seek)
-                spell_data = f.read(data_read)
-                d = spell_data.hex()
+                d = f.read(data_read).hex()
 
                 towrite = [
                     school.get(),
@@ -79,7 +77,7 @@ class SpellEdit:
                     f.write(item.to_bytes(1, byteorder='big'))
 
         def build():
-            lawfulgood_frame = Frame(spellwin)
+            lawfulgood_frame = Frame(win)
             lawfulgood_frame.grid(column=0, row=0)
             default_spell_menu = Combobox(lawfulgood_frame, textvariable=spell, values=SPELL_NAMES)
             default_spell_menu.grid()
@@ -91,7 +89,7 @@ class SpellEdit:
             new_name_entry.grid()
             new_name_entry.config(width=22)
 
-            school_frame = LabelFrame(spellwin, text='School')
+            school_frame = LabelFrame(win, text='School')
             school_frame.grid()
             school1 = Radiobutton(school_frame, text='Elemental', variable=school, value='1')
             school1.grid(sticky='w')
@@ -104,7 +102,7 @@ class SpellEdit:
             school4 = Radiobutton(school_frame, text='NONE', variable=school, value='4')
             school4.grid(sticky='w')
 
-            stuff_frame = Frame(spellwin)
+            stuff_frame = Frame(win)
             stuff_frame.grid()
             damage_label = Label(stuff_frame, text='Damage:')
             damage_label.grid(column=0, row=0, sticky='e')
@@ -139,9 +137,9 @@ class SpellEdit:
             exp_label2.grid(row=5, columnspan=2, rowspan=2, sticky='ew')
             exp_label2.config(font=(None, 8))
 
-            another_frame = Frame(spellwin)
+            another_frame = Frame(win)
             another_frame.grid(column=1, row=1)
-            save = Button(spellwin, text='Save', command=write)
+            save = Button(win, text='Save', command=write)
             save.grid(column=1, row=0)
             save.config(width=8)
             ingredient_frame = LabelFrame(another_frame, text='Ingredient')
@@ -159,7 +157,7 @@ class SpellEdit:
             aspect_lunar = Radiobutton(aspect_frame, text='Lunar', variable=aspect, value=3)
             aspect_lunar.grid(column=0, row=2, sticky='w')
 
-            target_frame = Frame(spellwin)
+            target_frame = Frame(win)
             target_frame.grid(column=1, row=2)
             target_num_frame = LabelFrame(target_frame, text='Number of targets:')
             target_num_frame.grid(column=0, row=0)

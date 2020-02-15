@@ -9,10 +9,10 @@ from lib.variables import ACCESSORY_ADDRESSES, ACCESSORY_NAMES, inv_EQUIPMENT_ST
 
 class AccessoryEdit:
     def __init__(self, filename, icon_dir):
-        accesswin = Toplevel()
-        accesswin.resizable(False, False)
-        accesswin.title("Accessory Edit")
-        accesswin.iconbitmap(icon_dir)
+        win = Toplevel()
+        win.resizable(False, False)
+        win.title("Accessory Edit")
+        win.iconbitmap(icon_dir)
         filename = filename
         data_seek = 24
         data_read = 20
@@ -25,8 +25,7 @@ class AccessoryEdit:
                 name.set(f.read(name_length).decode("utf-8"))
 
                 f.seek(address + data_seek)
-                data = f.read(data_read)
-                d = data.hex()
+                d = f.read(data_read).hex()
 
                 damage.set(int(d[0] + d[1], 16))
                 protection.set(int(d[2] + d[3], 16))
@@ -64,8 +63,7 @@ class AccessoryEdit:
                 f.write(new_name)
 
                 f.seek(address + data_seek)
-                data = f.read(data_read)
-                d = data.hex()
+                d = f.read(data_read).hex()
 
                 new_value = value.get()
                 v2, v1 = divmod(int(new_value), 256)
@@ -108,7 +106,7 @@ class AccessoryEdit:
                     f.write(i.to_bytes(1, byteorder='big'))
 
         def build():
-            lawfulgood_frame = Frame(accesswin)
+            lawfulgood_frame = Frame(win)
             lawfulgood_frame.grid(column=0, row=0)
             default_item_menu = Combobox(lawfulgood_frame, textvariable=item, values=ACCESSORY_NAMES)
             default_item_menu.grid(column=0, row=0)
@@ -120,7 +118,7 @@ class AccessoryEdit:
             new_name_entry.grid()
             new_name_entry.config(width=21)
 
-            lawfulneutral_frame = LabelFrame(accesswin, text='Stats:')
+            lawfulneutral_frame = LabelFrame(win, text='Stats:')
             lawfulneutral_frame.grid(column=0, row=1)
 
             defense_label = Label(lawfulneutral_frame, text='Damage:')
@@ -156,7 +154,7 @@ class AccessoryEdit:
             value_label2.grid(row=5, columnspan=2)
             value_label2.config(font=(None, 8))
 
-            neutralgood_frame = Frame(accesswin)
+            neutralgood_frame = Frame(win)
             neutralgood_frame.grid(column=1, row=0)
 
             save = Button(neutralgood_frame, text='Save', command=write)
@@ -172,7 +170,7 @@ class AccessoryEdit:
             lunar_radio = Radiobutton(aspect_frame, text='Lunar', variable=aspect, value=1)
             lunar_radio.grid(column=2, row=0)
 
-            trueneutral_frame = Frame(accesswin)
+            trueneutral_frame = Frame(win)
             trueneutral_frame.grid(column=1, row=1)
 
             stat_frame = LabelFrame(trueneutral_frame, text='Stat')
@@ -211,7 +209,7 @@ class AccessoryEdit:
             magic_entry.grid(column=1, row=0)
             magic_entry.config(width=4)
 
-            resist_frame = LabelFrame(accesswin, text='Resist')
+            resist_frame = LabelFrame(win, text='Resist')
             resist_frame.grid(column=1, row=2)
             resist_menu = Combobox(resist_frame, textvariable=resist, values=list(RESIST.keys()))
             resist_menu.grid(column=0, row=0)

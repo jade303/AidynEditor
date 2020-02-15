@@ -9,10 +9,10 @@ from lib.variables import WAND_NAMES, SCROLL_NAMES, WAND_ADDRESSES, SCROLL_ADDRE
 
 class WandScrollEdit:
     def __init__(self, filename, icon_dir):
-        wandwin = Toplevel()
-        wandwin.resizable(False, False)
-        wandwin.title("Wand and Scroll Edit")
-        wandwin.iconbitmap(icon_dir)
+        win = Toplevel()
+        win.resizable(False, False)
+        win.title("Wand and Scroll Edit")
+        win.iconbitmap(icon_dir)
         filename = filename
         data_seek = 24
         data_read = 20
@@ -25,8 +25,7 @@ class WandScrollEdit:
                 wa_name.set(f.read(name_length).decode("utf-8"))
 
                 f.seek(address + data_seek)
-                data = f.read(data_read)
-                d = data.hex()
+                d = f.read(data_read).hex()
 
                 wa_damage.set(int(d[0] + d[1], 16))
                 wa_protection.set(int(d[2] + d[3], 16))
@@ -52,8 +51,7 @@ class WandScrollEdit:
                 sc_name.set(f.read(name_length).decode("utf-8"))
 
                 f.seek(address + data_seek)
-                data = f.read(data_read)
-                d = data.hex()
+                d = f.read(data_read).hex()
 
                 sc_value.set((int(d[10] + d[11], 16) * 256) + int(d[8] + d[9], 16))
                 sc_spell.set(inv_SPELLS[(d[22:26]).upper()])
@@ -71,8 +69,7 @@ class WandScrollEdit:
                 f.write(new_name)
 
                 f.seek(address + data_seek)
-                data = f.read(data_read)
-                d = data.hex()
+                d = f.read(data_read).hex()
 
                 new_value = wa_value.get()
                 v2, v1 = divmod(int(new_value), 256)
@@ -122,8 +119,7 @@ class WandScrollEdit:
                 f.write(new_name)
 
                 f.seek(address + data_seek)
-                data = f.read(data_read)
-                d = data.hex()
+                d = f.read(data_read).hex()
 
                 new_value = sc_value.get()
                 v2, v1 = divmod(int(new_value), 256)
@@ -155,7 +151,7 @@ class WandScrollEdit:
                     f.write(i.to_bytes(1, byteorder='big'))
 
         def build():
-            sc_fr = LabelFrame(wandwin, text='Scrolls:', bd=6)
+            sc_fr = LabelFrame(win, text='Scrolls:', bd=6)
             sc_fr.grid(column=0, row=0, sticky='n')
 
             sc_box = Combobox(sc_fr, textvariable=scroll, values=SCROLL_NAMES)
@@ -186,7 +182,7 @@ class WandScrollEdit:
             sc_save = Button(sc_fr, text='Save Scroll Edits', command=scroll_write)
             sc_save.grid(column=0, row=4)
 
-            wa_fr = LabelFrame(wandwin, text='Wands', bd=6)
+            wa_fr = LabelFrame(win, text='Wands', bd=6)
             wa_fr.grid(column=1, row=0)
 
             wa_box = Combobox(wa_fr, textvariable=wand, values=WAND_NAMES)
