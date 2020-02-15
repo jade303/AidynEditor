@@ -1784,7 +1784,7 @@ DROP_CAT_ADDRESSES = [
     0x01FD285A
 ]
 
-DROP_ITEMS = {
+ITEMS = {
     "NONE": "0000",
     "Acid (wand)": "170D",
     "Acid Bolt (scroll)": "3311",
@@ -2107,7 +2107,7 @@ DROP_ITEMS = {
     "Spirit Bite": "5B07",
     "Spirit Shield": "1906",
     "Spirit Shield (scroll)": "5311",
-    "Spiritdrake Helm": "0209",
+    "Spiritdrake Helm": "2609",
     "ST Gem": "0313",
     "Staff": "2107",
     "Staff of Lugash": "3E07",
@@ -2173,4 +2173,60 @@ DROP_ITEMS = {
     "Zombie Fist": "0E07"
 }
 
-inv_DROP_ITEMS = {v: k for k, v in DROP_ITEMS.items()}
+inv_DROP_ITEMS = {v: k for k, v in ITEMS.items()}
+
+SHOP_ITEM_ADDRESSES = [
+    0X01FD50EE,
+    0X01FD3F36,
+    0X01FD3FA2,
+    0X01FD4446,
+    0X01FD4152,
+    0X01FD44B2,
+    0X01FD41BE,
+    0X01FD43DA,
+    0X01FD436E,
+    0X01FD4302,
+    0X01FD4296,
+    0X01FD422A,
+    0X01FD40E6,
+    0X01FD400E,
+    0X01FD407A,
+    0X01FD3E5E,
+    0X01FD3DF2,
+    0X01FD328E,
+    0X01FD3AFE,
+    0X01FD3C42,
+    0X01FD3B6A,
+    0X01FD3CAE,
+    0X01FD3D1A,
+    0X01FD3BD6,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0X01FD380A,
+    0X01FD3876,
+    0X01FD3A92,
+    0X01FD39BA,
+    0X01FD3A26,
+    0X01FD38E2,
+    0X01FD394E,
+    0X01FD4F3E,
+    0X01FD5016,
+    0X01FD4E66,
+    0X01FD4DFA,
+    0X01FD4D8E,
+    0X01FD5082,
+    0X01FD4D22,
+    0X01FD4C4A,
+    0X01FD458A,
+    0X01FD4A9A,
+    0X01FD4812,
+    0X01FD4956,
+    0X01FD48EA,
+    0X01FD45F6,
+    0X01FD4A2E,
+    0X01FD4B06,
+    0X01FD47A6,
+    0X01FD451E
+]
