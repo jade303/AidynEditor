@@ -8,11 +8,11 @@ from lib.variables import WAND_NAMES, SCROLL_NAMES, WAND_ADDRESSES, SCROLL_ADDRE
 
 
 class WandScrollEdit:
-    def __init__(self, filename, icon_dir):
+    def __init__(self, filename, icon):
         win = Toplevel()
         win.resizable(False, False)
         win.title("Wand and Scroll Edit")
-        win.iconbitmap(icon_dir)
+        win.iconbitmap(icon)
         filename = filename
         data_seek = 24
         data_read = 20

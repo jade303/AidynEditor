@@ -8,11 +8,11 @@ from lib.variables import SKILLS, SHOP_SKILLS, SHOPS, SHOP_SHIELD, SHOP_SPELLS, 
 
 
 class TrainerEdit:
-    def __init__(self, filename, icon_dir):
+    def __init__(self, filename, icon):
         win = Toplevel()
         win.resizable(False, False)
         win.title("Shops and Trainer Edit")
-        win.iconbitmap(icon_dir)
+        win.iconbitmap(icon)
         filename = filename
         skill_read = 23
         shield_read = 1

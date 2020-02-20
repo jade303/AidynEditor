@@ -8,7 +8,7 @@ from lib.variables import inv_WEAPONS, inv_SHIELDS, inv_ARMORS, inv_SPELLS, WEAP
 
 
 class CharacterEdit:
-    def __init__(self, filename, icon_dir, characters, character_addresses, name_length, char_type):
+    def __init__(self, filename, icon, characters, character_addresses, name_length, char_type):
         win = Toplevel()
         win.resizable(False, False)
         if char_type == 0:
@@ -18,7 +18,7 @@ class CharacterEdit:
             win.title("Enemy and Loot Edit")
             data_read = 92
             drop_data_read = 34
-        win.iconbitmap(icon_dir)
+        win.iconbitmap(icon)
         data_seek = 44
 
         def set_defaults(*args):
@@ -231,19 +231,15 @@ class CharacterEdit:
             lawfulgood_frame.grid(column=0, row=0)
             new_name_frame = LabelFrame(lawfulgood_frame, text="New Name")
             new_name_frame.grid(column=0, row=1)
-            new_name_frame.config(width=18)
 
-            default_name_menu = Combobox(lawfulgood_frame, textvariable=character, values=characters)
+            default_name_menu = Combobox(lawfulgood_frame, textvariable=character, values=characters, width=18)
             default_name_menu.grid(column=0, row=0)
-            default_name_menu.config(width=18)
 
-            new_name_entry = Entry(new_name_frame, textvariable=name)
+            new_name_entry = Entry(new_name_frame, textvariable=name, width=18)
             new_name_entry.grid(column=0, row=1)
-            new_name_entry.config(width=18)
 
-            save = Button(lawfulgood_frame, text="Save", command=write)
+            save = Button(lawfulgood_frame, text="Save", command=write, width=8)
             save.grid(column=1, row=0)
-            save.config(width=8)
 
             # column 0, row 1
             lawfulneutral_frame = Frame(box)
@@ -296,15 +292,12 @@ class CharacterEdit:
             shield_frame.grid(column=1, row=1)
 
             for w in weapons:
-                weapon_menu = Combobox(weapon_frame, textvariable=w, values=list(WEAPONS.keys()))
+                weapon_menu = Combobox(weapon_frame, textvariable=w, values=list(WEAPONS.keys()), width=16)
                 weapon_menu.grid()
-                weapon_menu.config(width=16)
-            armor_menu = Combobox(armor_frame, textvariable=armor, values=list(ARMORS.keys()))
-            armor_menu.grid(column=1)
-            armor_menu.config(width=16)
-            shield_menu = Combobox(shield_frame, textvariable=shield, values=list(SHIELDS.keys()))
+            armor_menu = Combobox(armor_frame, textvariable=armor, values=list(ARMORS.keys()), width=16)
+            armor_menu.grid()
+            shield_menu = Combobox(shield_frame, textvariable=shield, values=list(SHIELDS.keys()), width=16)
             shield_menu.grid()
-            shield_menu.config(width=16)
 
             # column 1, row all
             neutralgood_frame = LabelFrame(box, text='Skills\n(blank = cannot learn)')
@@ -326,12 +319,10 @@ class CharacterEdit:
             chaoticgood_frame.grid(column=0, row=3)
             for s in spells:
                 x = spells.index(s)
-                spell = Combobox(chaoticgood_frame, textvariable=s, values=list(SPELLS.keys()))
+                spell = Combobox(chaoticgood_frame, textvariable=s, values=list(SPELLS.keys()), width=16)
                 spell.grid(column=0, row=x)
-                spell.config(width=16)
-                spell_level = Entry(chaoticgood_frame, textvariable=spell_levels[spells.index(s)])
+                spell_level = Entry(chaoticgood_frame, textvariable=spell_levels[spells.index(s)], width=4)
                 spell_level.grid(column=1, row=x)
-                spell_level.config(width=4)
 
             if char_type == 1:
                 """

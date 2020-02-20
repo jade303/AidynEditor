@@ -8,14 +8,14 @@ from lib.variables import inv_EQUIPMENT_STAT, inv_SKILL_ATTRIBUTE, inv_SPELLS, i
 
 
 class ArmorShieldEdit:
-    def __init__(self, filename, icon_dir, names, addresses, title):
+    def __init__(self, filename, icon, names, addresses, title):
         win = Toplevel()
         win.resizable(False, False)
         if title == 1:
             win.title("Armor Edit")
         elif title == 0:
             win.title("Shield Edit")
-        win.iconbitmap(icon_dir)
+        win.iconbitmap(icon)
         filename = filename
         data_seek = 26
         data_read = 25

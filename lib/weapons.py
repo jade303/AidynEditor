@@ -9,11 +9,11 @@ from lib.variables import WEAPON_ADDRESSES, WEAPON_NAMES, inv_WEAPON_TYPE, inv_W
 
 
 class WeaponEdit:
-    def __init__(self, filename, icon_dir):
+    def __init__(self, filename, icon):
         win = Toplevel()
         win.resizable(False, False)
         win.title('Weapon Edit')
-        win.iconbitmap(icon_dir)
+        win.iconbitmap(icon)
         filename = filename
         data_seek = 23
         data_read = 25
