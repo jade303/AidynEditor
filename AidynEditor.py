@@ -3,12 +3,9 @@ import shutil
 from tkinter import Tk, LabelFrame, mainloop, Button, PhotoImage, Label, Checkbutton, BooleanVar
 from tkinter import filedialog
 
+
 from lib import accessories, armor_shields, characters_enemydrops, spells, wands_scrolls, weapons, trainers_shops
 from lib.variables import ARMOR_ADDRESSES, SHIELD_ADDRESSES, PARTY_ADDRESSES, ENEMY_ADDRESSES
-
-# todo: add comments/documentation
-# todo: test exp stat / enemy vulnerabilities
-# todo: giant bat vulnerable to solar and alchemist? 170 max hp lvl 40 with Pochangaret's stats (160 hp at lvl 30)
 
 p = Path()
 background = p / 'images/aidyn.gif'
