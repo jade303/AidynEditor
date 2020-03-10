@@ -3,7 +3,8 @@ from tkinter import Toplevel, Label, StringVar, LabelFrame, Entry, Frame, Button
 from tkinter.ttk import Combobox
 
 from lib.limits import limit, limit_127, limit_name_size
-from lib.variables import WAND_NAMES, SCROLL_NAMES, WAND_ADDRESSES, SCROLL_ADDRESSES, inv_SPELLS, inv_SKILL_ATTRIBUTE, \
+from lib.list_functions import build_lst
+from lib.variables import WAND_ADDRESSES, SCROLL_ADDRESSES, inv_SPELLS, inv_SKILL_ATTRIBUTE, \
     inv_RESIST, inv_RESIST_AMOUNTS, SPELLS, SKILL_ATTRIBUTE, RESIST, RESIST_AMOUNTS
 
 
@@ -20,7 +21,7 @@ class WandScrollEdit:
 
         def wand_defaults(*args):
             with open(filename, 'rb') as f:
-                address = WAND_ADDRESSES[WAND_NAMES.index(wand.get())]
+                address = WAND_ADDRESSES[build_lst(filename, WAND_ADDRESSES, name_length).index(wand.get())]
                 f.seek(address)
                 wa_name.set(f.read(name_length).decode("utf-8"))
 
@@ -46,7 +47,7 @@ class WandScrollEdit:
 
         def scroll_defaults(*args):
             with open(filename, 'rb') as f:
-                address = SCROLL_ADDRESSES[SCROLL_NAMES.index(scroll.get())]
+                address = SCROLL_ADDRESSES[build_lst(filename, SCROLL_ADDRESSES, name_length).index(scroll.get())]
                 f.seek(address)
                 sc_name.set(f.read(name_length).decode("utf-8"))
 
@@ -59,7 +60,7 @@ class WandScrollEdit:
 
         def wand_write():
             with open(filename, 'rb+') as f:
-                address = WAND_ADDRESSES[WAND_NAMES.index(wand.get())]
+                address = WAND_ADDRESSES[build_lst(filename, WAND_ADDRESSES, name_length).index(wand.get())]
 
                 new_name = bytearray(wa_name.get(), 'utf-8')
                 if len(new_name) < name_length:
@@ -109,7 +110,7 @@ class WandScrollEdit:
 
         def scroll_write():
             with open(filename, 'rb+') as f:
-                address = SCROLL_ADDRESSES[SCROLL_NAMES.index(scroll.get())]
+                address = SCROLL_ADDRESSES[build_lst(filename, SCROLL_ADDRESSES, name_length).index(scroll.get())]
 
                 new_name = bytearray(sc_name.get(), 'utf-8')
                 if len(new_name) < name_length:
@@ -154,50 +155,52 @@ class WandScrollEdit:
             sc_fr = LabelFrame(win, text='Scrolls:', bd=6)
             sc_fr.grid(column=0, row=0, sticky='n')
 
-            sc_box = Combobox(sc_fr, textvariable=scroll, values=SCROLL_NAMES)
+            def sc_reset_list():
+                sc_box['values'] = build_lst(filename, SCROLL_ADDRESSES, name_length)
+
+            sc_box = Combobox(sc_fr, textvariable=scroll, width=20,
+                              values=build_lst(filename, SCROLL_ADDRESSES, name_length),
+                              postcommand=sc_reset_list)
             sc_box.grid(column=0, row=0)
-            sc_box.config(width=20)
             sc_new_name_label = LabelFrame(sc_fr, text='New Name')
             sc_new_name_label.grid(column=0, row=1)
-            sc_new_name_entry = Entry(sc_new_name_label, textvariable=sc_name)
+            sc_new_name_entry = Entry(sc_new_name_label, textvariable=sc_name, width=20)
             sc_new_name_entry.grid(column=0, row=0)
-            sc_new_name_entry.config(width=20)
             sc_spell_label = LabelFrame(sc_fr, text='Spell learned/cast')
             sc_spell_label.grid(column=0, row=2)
-            sc_spell_menu = Combobox(sc_spell_label, textvariable=sc_spell, values=list(SPELLS.keys()))
+            sc_spell_menu = Combobox(sc_spell_label, textvariable=sc_spell, width=20, values=list(SPELLS.keys()))
             sc_spell_menu.grid(column=0, row=0)
-            sc_spell_menu.config(width=20)
             sc_other_atts = Frame(sc_fr)
             sc_other_atts.grid(column=0, row=3)
             sc_spell_label = Label(sc_other_atts, text='Cast Level')
             sc_spell_label.grid(column=0, row=0, sticky='e')
-            sc_spell_entry = Entry(sc_other_atts, textvariable=sc_cast_level)
+            sc_spell_entry = Entry(sc_other_atts, textvariable=sc_cast_level, width=4)
             sc_spell_entry.grid(column=1, row=0, sticky='e')
-            sc_spell_entry.config(width=4)
             sc_value_label = Label(sc_other_atts, text='Base Value')
             sc_value_label.grid(column=0, row=1, sticky='e')
-            sc_value_entry = Entry(sc_other_atts, textvariable=sc_value)
+            sc_value_entry = Entry(sc_other_atts, textvariable=sc_value, width=6)
             sc_value_entry.grid(column=1, row=1, sticky='e')
-            sc_value_entry.config(width=6)
             sc_save = Button(sc_fr, text='Save Scroll Edits', command=scroll_write)
             sc_save.grid(column=0, row=4)
 
             wa_fr = LabelFrame(win, text='Wands', bd=6)
             wa_fr.grid(column=1, row=0)
 
-            wa_box = Combobox(wa_fr, textvariable=wand, values=WAND_NAMES)
+            def wa_reset_list():
+                wa_box['values'] = build_lst(filename, WAND_ADDRESSES, name_length)
+
+            wa_box = Combobox(wa_fr, textvariable=wand, width=20,
+                              values=build_lst(filename, WAND_ADDRESSES, name_length),
+                              postcommand=wa_reset_list)
             wa_box.grid(column=0, row=0)
-            wa_box.config(width=20)
             wa_new_name_label = LabelFrame(wa_fr, text='New Name')
             wa_new_name_label.grid(column=0, row=1)
-            wa_new_name_entry = Entry(wa_new_name_label, textvariable=wa_name)
+            wa_new_name_entry = Entry(wa_new_name_label, textvariable=wa_name, width=20)
             wa_new_name_entry.grid(column=0, row=0)
-            wa_new_name_entry.config(width=20)
             wa_spell_label = LabelFrame(wa_fr, text='Spell Cast')
             wa_spell_label.grid(column=0, row=2)
-            wa_spell_menu = Combobox(wa_spell_label, textvariable=wa_spell, values=list(SPELLS.keys()))
+            wa_spell_menu = Combobox(wa_spell_label, textvariable=wa_spell, width=20, values=list(SPELLS.keys()))
             wa_spell_menu.grid(column=0, row=0)
-            wa_spell_menu.config(width=20)
 
             wa_other_atts = Frame(wa_fr)
             wa_other_atts.grid(column=0, row=3)
@@ -251,21 +254,19 @@ class WandScrollEdit:
 
             ski_att_frame = LabelFrame(wa_bottom, text='Skill/Attribute')
             ski_att_frame.grid(column=0, row=0)
-            ski_att_menu = Combobox(ski_att_frame, textvariable=wa_skill, values=list(SKILL_ATTRIBUTE.keys()))
+            ski_att_menu = Combobox(ski_att_frame, textvariable=wa_skill, width=16,
+                                    values=list(SKILL_ATTRIBUTE.keys()))
             ski_att_menu.grid(column=0, row=0)
-            ski_att_menu.config(width=16)
-            ski_att_amo_entry = Entry(ski_att_frame, textvariable=wa_skill_amount)
+            ski_att_amo_entry = Entry(ski_att_frame, textvariable=wa_skill_amount, width=4)
             ski_att_amo_entry.grid(column=1, row=0)
-            ski_att_amo_entry.config(width=4)
 
             resist_frame = LabelFrame(wa_bottom, text='Resist')
             resist_frame.grid(column=0, row=1)
-            resist_menu = Combobox(resist_frame, textvariable=wa_resist, values=list(RESIST.keys()))
+            resist_menu = Combobox(resist_frame, textvariable=wa_resist, width=16, values=list(RESIST.keys()))
             resist_menu.grid(column=0, row=0)
-            resist_menu.config(width=16)
-            resist_amount_menu = Combobox(resist_frame, textvariable=wa_resist_amount, values=list(RESIST_AMOUNTS.keys()))
+            resist_amount_menu = Combobox(resist_frame, textvariable=wa_resist_amount, width=5,
+                                          values=list(RESIST_AMOUNTS.keys()))
             resist_amount_menu.grid(column=1, row=0)
-            resist_amount_menu.config(width=5)
 
             wa_save = Button(wa_fr, text='Save Wand Edits', command=wand_write)
             wa_save.grid(column=0, row=6)
@@ -306,6 +307,6 @@ class WandScrollEdit:
         sc_cast_level = StringVar()
         sc_cast_level.trace('w', partial(limit, sc_cast_level, 15))
 
-        wand.set(WAND_NAMES[0])
-        scroll.set(SCROLL_NAMES[0])
+        wand.set(build_lst(filename, WAND_ADDRESSES, name_length)[0])
+        scroll.set(build_lst(filename, SCROLL_ADDRESSES, name_length)[0])
         build()

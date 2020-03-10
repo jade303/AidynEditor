@@ -3,27 +3,43 @@ from tkinter import Toplevel, Frame, LabelFrame, Entry, Button, Radiobutton, Lab
 from tkinter.ttk import Combobox
 
 from lib.limits import limit_name_size, limit
-from lib.variables import inv_WEAPONS, inv_SHIELDS, inv_ARMORS, inv_SPELLS, WEAPONS, SPELLS, ARMORS, SHIELDS, \
-    ATTRIBUTES, SKILLS, DROP_CAT, ITEMS, inv_DROP_CAT, DROP_CAT_ADDRESSES, inv_DROP_ITEMS
+from lib.list_functions import build_lst, get_major_dic, get_minor_dic
+from lib.variables import ATTRIBUTES, SKILLS, DROP_CAT, inv_DROP_CAT, DROP_CAT_ADDRESSES, SPELL_DIC
 
 
 class CharacterEdit:
-    def __init__(self, filename, icon, characters, character_addresses, name_length, char_type):
+    def __init__(self, filename, icon, characters, name_length, char_type):
         win = Toplevel()
         win.resizable(False, False)
         if char_type == 0:
             win.title("Party Edit -- Edits are NEW GAME only")
             data_read = 74
+            self.max_stats = [30, 30, 30, 40, 30, 90]
         elif char_type == 1:
             win.title("Enemy and Loot Edit")
             data_read = 92
             drop_data_read = 34
+            self.max_stats = [255, 255, 255, 255, 255, 255]
         win.iconbitmap(icon)
         data_seek = 44
 
+        self.character_lst = build_lst(filename, characters, name_length)
+        self.default_name_menu = Combobox()
+
+        major_dic = get_major_dic(filename)
+        inv_major_dic = {v: k for k, v in major_dic.items()}
+        armor_lst = ['NONE'] + [item[8:] for item in major_dic.values() if item.startswith('(armor)')]
+        shield_lst = ['NONE'] + [item[9:] for item in major_dic.values() if item.startswith('(shield)')]
+        weapon_lst = ['NONE'] + [item[9:] for item in major_dic.values() if item.startswith('(weapon)')]
+        spell_dic = get_minor_dic(filename, SPELL_DIC, 22)
+        inv_spell_dic = {v: k for k, v in spell_dic.items()}
+
         def set_defaults(*args):
             with open(filename, 'rb') as f:
-                address = character_addresses[characters.index(character.get())]
+                idx = self.default_name_menu.current()
+                if idx == -1:
+                    idx = 0
+                address = characters[idx]
 
                 # get name that can be changed
                 f.seek(address)
@@ -57,16 +73,30 @@ class CharacterEdit:
 
                 # set equipment defaults
                 for w in weapons:
-                    w.set(inv_WEAPONS[d[((weapons.index(w) * 4) + 70):(((weapons.index(w) * 4) + 70) + 4)].upper()])
-                armor.set(inv_ARMORS[d[136:140].upper()])
-                shield.set(inv_SHIELDS[d[142:146].upper()])
+                    i = d[((weapons.index(w) * 4) + 70):((weapons.index(w) * 4) + 74)].upper()
+                    if i == '0000':
+                        w.set(major_dic[i])
+                    else:
+                        w.set(major_dic[i][9:])
+
+                ar = d[136:140].upper()
+                if ar == '0000':
+                    armor.set(major_dic[ar])
+                else:
+                    armor.set(major_dic[ar][8:])
+
+                sh = d[142:146].upper()
+                if sh == '0000':
+                    shield.set(major_dic[sh])
+                else:
+                    shield.set(major_dic[sh][9:])
 
                 # set school
                 school.set(d[107])
 
                 # 5 initial spells
                 for s in spells:
-                    s.set(inv_SPELLS[d[((spells.index(s) * 4) + 86):(((spells.index(s) * 4) + 86) + 4)].upper()])
+                    s.set(spell_dic[d[((spells.index(s) * 4) + 86):(((spells.index(s) * 4) + 86) + 4)].upper()])
 
                 # spell levels
                 for s in spell_levels:
@@ -99,14 +129,13 @@ class CharacterEdit:
                 reagent_max.set(int(d[22] + d[23], 16))
 
                 for i, c, mi, mx in zip(item, item_chance, item_min, item_max):
-                    i.set(inv_DROP_ITEMS[d[(10 * item.index(i) + 24):(10 * item.index(i) + 28)].upper()])
+                    i.set(major_dic[d[(10 * item.index(i) + 24):(10 * item.index(i) + 28)].upper()])
                     c.set(int(d[(10 * item.index(i) + 28)] + d[(10 * item.index(i) + 29)], 16))
                     mi.set(int(d[(10 * item.index(i) + 30)] + d[(10 * item.index(i) + 31)], 16))
                     mx.set(int(d[(10 * item.index(i) + 32)] + d[(10 * item.index(i) + 33)], 16))
 
                 for i, c in zip(other_items, other_items_chance):
-                    i.set(inv_DROP_ITEMS[d[((other_items.index(i) * 6) + 44):
-                                           ((other_items.index(i) * 6) + 48)].upper()])
+                    i.set(major_dic[d[((other_items.index(i) * 6) + 44):((other_items.index(i) * 6) + 48)].upper()])
                     c.set(int(d[((other_items.index(i) * 6) + 48)] + d[((other_items.index(i) * 6) + 49)], 16))
 
         def drop_save():
@@ -139,15 +168,15 @@ class CharacterEdit:
                 ]
 
                 for i in item:
-                    towrite.append(int((ITEMS[i.get()])[:2], 16))
-                    towrite.append(int((ITEMS[i.get()])[2:], 16))
+                    towrite.append(int((inv_major_dic[i.get()])[:2], 16))
+                    towrite.append(int((inv_major_dic[i.get()])[2:], 16))
                     towrite.append(int(item_chance[item.index(i)].get()))
                     towrite.append(int(item_min[item.index(i)].get()))
                     towrite.append(int(item_max[item.index(i)].get()))
 
                 for i, c in zip(other_items, other_items_chance):
-                    towrite.append(int((ITEMS[i.get()])[:2], 16))
-                    towrite.append(int((ITEMS[i.get()])[2:], 16))
+                    towrite.append(int((inv_major_dic[i.get()])[:2], 16))
+                    towrite.append(int((inv_major_dic[i.get()])[2:], 16))
                     towrite.append(int(c.get()))
 
                 f.seek(address)
@@ -156,7 +185,10 @@ class CharacterEdit:
 
         def write():
             with open(filename, 'rb+') as f:
-                address = (character_addresses[characters.index(character.get())])
+                idx = self.default_name_menu.current()
+                if idx == -1:
+                    idx = 0
+                address = characters[idx]
                 # write new name to file
                 new_name = bytearray(name.get(), 'utf-8')
                 if len(new_name) < name_length:
@@ -185,15 +217,21 @@ class CharacterEdit:
                 towrite.append(int(d[68] + d[69], 16))
 
                 for i in weapons:
-                    towrite.append(int((WEAPONS[i.get()])[:2], 16))
-                    towrite.append(int((WEAPONS[i.get()])[2:], 16))
+                    if i.get() == 'NONE':
+                        towrite.append(int((inv_major_dic[i.get()])[:2], 16))
+                        towrite.append(int((inv_major_dic[i.get()])[2:], 16))
+                    else:
+                        w = '(weapon) ' + i.get()
+                        towrite.append(int((inv_major_dic[w])[:2], 16))
+                        towrite.append(int((inv_major_dic[w])[2:], 16))
 
                 towrite.append(int(d[82] + d[83], 16))
                 towrite.append(int(d[84] + d[85], 16))
 
                 for i in spells:
-                    towrite.append(int((SPELLS[i.get()])[:2], 16))
-                    towrite.append(int((SPELLS[i.get()])[2:], 16))
+                    towrite.append(int((inv_spell_dic[i.get()])[:2], 16))
+                    towrite.append(int((inv_spell_dic[i.get()])[2:], 16))
+
                 towrite.append(school.get())
 
                 for i in spell_levels:
@@ -202,11 +240,23 @@ class CharacterEdit:
                 for i in range(118, 135, 2):
                     towrite.append(int(d[i] + d[i + 1], 16))
 
-                towrite.append(int((ARMORS[armor.get()])[:2], 16))
-                towrite.append(int((ARMORS[armor.get()])[2:], 16))
+                a = armor.get()
+                if a == 'NONE':
+                    towrite.append(int((inv_major_dic[a])[:2], 16))
+                    towrite.append(int((inv_major_dic[a])[2:], 16))
+                else:
+                    towrite.append(int((inv_major_dic['(armor) ' + a])[:2], 16))
+                    towrite.append(int((inv_major_dic['(armor) ' + a])[2:], 16))
+
                 towrite.append(int(d[140] + d[141], 16))
-                towrite.append(int((SHIELDS[shield.get()])[:2], 16))
-                towrite.append(int((SHIELDS[shield.get()])[2:], 16))
+
+                s = shield.get()
+                if s == 'NONE':
+                    towrite.append(int((inv_major_dic[s])[:2], 16))
+                    towrite.append(int((inv_major_dic[s])[2:], 16))
+                else:
+                    towrite.append(int((inv_major_dic['(shield) ' + s])[:2], 16))
+                    towrite.append(int((inv_major_dic['(shield) ' + s])[2:], 16))
 
                 shi = shield_skill.get()
                 if shi == '':
@@ -223,6 +273,11 @@ class CharacterEdit:
                     f.write(i.to_bytes(1, byteorder='big'))
 
         def build():
+            def reset_list():
+                self.character_lst[:] = []
+                self.character_lst = build_lst(filename, characters, name_length)
+                self.default_name_menu['values'] = self.character_lst
+
             # column 0, row 0
             box = Frame(win)
             box.grid(column=0, row=0)
@@ -232,8 +287,12 @@ class CharacterEdit:
             new_name_frame = LabelFrame(lawfulgood_frame, text="New Name")
             new_name_frame.grid(column=0, row=1)
 
-            default_name_menu = Combobox(lawfulgood_frame, textvariable=character, values=characters, width=18)
-            default_name_menu.grid(column=0, row=0)
+            self.default_name_menu = Combobox(lawfulgood_frame, width=18,
+                                              state='readonly',
+                                              textvariable=self.character,
+                                              values=self.character_lst,
+                                              postcommand=reset_list)
+            self.default_name_menu.grid(column=0, row=0)
 
             new_name_entry = Entry(new_name_frame, textvariable=name, width=18)
             new_name_entry.grid(column=0, row=1)
@@ -292,11 +351,12 @@ class CharacterEdit:
             shield_frame.grid(column=1, row=1)
 
             for w in weapons:
-                weapon_menu = Combobox(weapon_frame, textvariable=w, values=list(WEAPONS.keys()), width=16)
+                weapon_menu = Combobox(weapon_frame, textvariable=w, values=weapon_lst, width=16, state='readonly')
                 weapon_menu.grid()
-            armor_menu = Combobox(armor_frame, textvariable=armor, values=list(ARMORS.keys()), width=16)
+
+            armor_menu = Combobox(armor_frame, textvariable=armor, values=armor_lst, width=16, state='readonly')
             armor_menu.grid()
-            shield_menu = Combobox(shield_frame, textvariable=shield, values=list(SHIELDS.keys()), width=16)
+            shield_menu = Combobox(shield_frame, textvariable=shield, values=shield_lst, width=16, state='readonly')
             shield_menu.grid()
 
             # column 1, row all
@@ -319,7 +379,8 @@ class CharacterEdit:
             chaoticgood_frame.grid(column=0, row=3)
             for s in spells:
                 x = spells.index(s)
-                spell = Combobox(chaoticgood_frame, textvariable=s, values=list(SPELLS.keys()), width=16)
+                spell = Combobox(chaoticgood_frame, textvariable=s, values=list(inv_spell_dic.keys()),
+                                 width=16, state='readonly')
                 spell.grid(column=0, row=x)
                 spell_level = Entry(chaoticgood_frame, textvariable=spell_levels[spells.index(s)], width=4)
                 spell_level.grid(column=1, row=x)
@@ -338,7 +399,8 @@ class CharacterEdit:
                 enemy_drop_cat_label = LabelFrame(box, text='Current Enemy Loot Type')
                 enemy_drop_cat_label.grid(row=4, column=0, pady=12)
                 enemy_drop_cat_box = Combobox(enemy_drop_cat_label, textvariable=enemy_drop_cat,
-                                              values=list(DROP_CAT.keys()))
+                                              values=list(DROP_CAT.keys()),
+                                              state='readonly')
                 enemy_drop_cat_box.grid(column=0, row=0)
 
                 drop_frame = LabelFrame(win, text='Loot Editing:', bd=4)
@@ -346,7 +408,8 @@ class CharacterEdit:
 
                 drop_box_label = Label(drop_frame, text='Loot Category:')
                 drop_box_label.grid(column=0, row=0, sticky='e')
-                drop_box = Combobox(drop_frame, textvariable=drop_cat, values=list(DROP_CAT.keys()))
+                drop_box = Combobox(drop_frame, textvariable=drop_cat, values=list(DROP_CAT.keys()),
+                                    state='readonly')
                 drop_box.grid(column=1, row=0, sticky='w')
 
                 save = Button(drop_frame, text="Save Loot Changes", command=drop_save, width=18)
@@ -403,7 +466,8 @@ class CharacterEdit:
                 for i in item:
                     item_frame = LabelFrame(drop_stats, text=('Item ' + str(item.index(i))))
                     item_frame.grid(column=0, row=(9 + item.index(i)), sticky='e', columnspan=2)
-                    item_box = Combobox(item_frame, textvariable=i, values=list(ITEMS.keys()), width=28)
+                    item_box = Combobox(item_frame, textvariable=i, values=list(major_dic.values()), width=28,
+                                        state='readonly')
                     item_box.grid(column=0, row=0, columnspan=3)
                     item_chance_label = Label(item_frame, text='% chance to drop item:')
                     item_chance_label.grid(column=0, row=1, sticky='e')
@@ -422,7 +486,8 @@ class CharacterEdit:
                 for i in other_items:
                     other_item_frame = LabelFrame(item_more, text=('Item' + str(other_items.index(i) + 3)))
                     other_item_frame.grid(column=0, row=other_items.index(i))
-                    other_item_box = Combobox(other_item_frame, textvariable=i, values=list(ITEMS.keys()), width=28)
+                    other_item_box = Combobox(other_item_frame, textvariable=i, values=list(major_dic.values()), width=28,
+                                              state='readonly')
                     other_item_box.grid(column=0, row=0, columnspan=2)
                     other_item_chance_label = Label(other_item_frame, text='% chance to drop item:')
                     other_item_chance_label.grid(column=0, row=1, sticky='e')
@@ -478,8 +543,8 @@ class CharacterEdit:
                 c.trace('w', partial(limit, c, 100))
                 other_items_chance.append(c)
 
-        character = StringVar()
-        character.trace('w', set_defaults)
+        self.character = StringVar()
+        self.character.trace('w', set_defaults)
 
         name = StringVar()
         name.trace('w', partial(limit_name_size, name, name_length))
@@ -495,12 +560,8 @@ class CharacterEdit:
         for _ in ATTRIBUTES:
             i = StringVar()
             atts.append(i)
-            if atts.index(i) in range(3) or atts.index(i) == 4:
-                i.trace('w', partial(limit, i, 30))
-            elif atts.index(i) == 3:
-                i.trace('w', partial(limit, i, 40))
-            elif atts.index(i) == 5:
-                i.trace('w', partial(limit, i, 120))
+        for i in atts:
+            i.trace('w', partial(limit, i, self.max_stats[atts.index(i)]))
         level = StringVar()
         level.trace('w', partial(limit, level, 40))
         weapons = [StringVar() for i in range(3)]
@@ -515,5 +576,5 @@ class CharacterEdit:
         shield = StringVar()
         # exp = StringVar()
 
-        character.set(characters[0])
+        self.character.set(self.character_lst[0])
         build()

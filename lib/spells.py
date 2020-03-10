@@ -3,7 +3,8 @@ from tkinter import Toplevel, Frame, LabelFrame, Entry, Radiobutton, Label, Butt
 from tkinter.ttk import Combobox
 
 from lib.limits import limit_name_size, limit
-from lib.variables import SPELL_ADDRESSES, SPELL_NAMES, inv_TARGET_NUM, inv_TARGET_TYPE, inv_SPELL_INGREDIENTS, \
+from lib.list_functions import build_lst
+from lib.variables import SPELL_ADDRESSES, inv_TARGET_NUM, inv_TARGET_TYPE, inv_SPELL_INGREDIENTS, \
     TARGET_NUM, TARGET_TYPE, SPELL_INGREDIENTS
 
 
@@ -20,7 +21,7 @@ class SpellEdit:
 
         def set_defaults(*args):
             with open(filename, 'rb') as f:
-                address = SPELL_ADDRESSES[SPELL_NAMES.index(spell.get())]
+                address = SPELL_ADDRESSES[build_lst(filename, SPELL_ADDRESSES, name_length).index(spell.get())]
 
                 # get name that can be changed
                 f.seek(address)
@@ -47,7 +48,7 @@ class SpellEdit:
 
         def write():
             with open(filename, 'rb+') as f:
-                address = SPELL_ADDRESSES[SPELL_NAMES.index(spell.get())]
+                address = SPELL_ADDRESSES[build_lst(filename, SPELL_ADDRESSES, name_length).index(spell.get())]
                 new_name = bytearray(name.get(), 'utf-8')
                 if len(new_name) < name_length:
                     while len(new_name) < name_length:
@@ -77,17 +78,20 @@ class SpellEdit:
                     f.write(item.to_bytes(1, byteorder='big'))
 
         def build():
+            def reset_list():
+                default_spell_menu['values'] = build_lst(filename, SPELL_ADDRESSES, name_length)
+
             lawfulgood_frame = Frame(win)
             lawfulgood_frame.grid(column=0, row=0)
-            default_spell_menu = Combobox(lawfulgood_frame, textvariable=spell, values=SPELL_NAMES)
+            default_spell_menu = Combobox(lawfulgood_frame, textvariable=spell, width=22,
+                                          values=build_lst(filename, SPELL_ADDRESSES, name_length),
+                                          postcommand=reset_list)
             default_spell_menu.grid()
-            default_spell_menu.config(width=22)
 
             new_name_label = LabelFrame(lawfulgood_frame, text='New Name')
             new_name_label.grid()
-            new_name_entry = Entry(new_name_label, textvariable=name)
+            new_name_entry = Entry(new_name_label, textvariable=name, width=22)
             new_name_entry.grid()
-            new_name_entry.config(width=22)
 
             school_frame = LabelFrame(win, text='School')
             school_frame.grid()
@@ -106,47 +110,41 @@ class SpellEdit:
             stuff_frame.grid()
             damage_label = Label(stuff_frame, text='Damage:')
             damage_label.grid(column=0, row=0, sticky='e')
-            damage_entry = Entry(stuff_frame, textvariable=damage)
+            damage_entry = Entry(stuff_frame, textvariable=damage, width=4)
             damage_entry.grid(column=1, row=0, sticky='e')
-            damage_entry.config(width=4)
 
             stamina_label = Label(stuff_frame, text='Stamina Cost:')
             stamina_label.grid(column=0, row=1, sticky='e')
-            stamina_entry = Entry(stuff_frame, textvariable=stamina)
+            stamina_entry = Entry(stuff_frame, textvariable=stamina, width=4)
             stamina_entry.grid(column=1, row=1, sticky='e')
-            stamina_entry.config(width=4)
 
             wizard_label = Label(stuff_frame, text='Wizard Required:')
             wizard_label.grid(column=0, row=2, sticky='e')
-            wizard_entry = Entry(stuff_frame, textvariable=wizard)
+            wizard_entry = Entry(stuff_frame, textvariable=wizard, width=4)
             wizard_entry.grid(column=1, row=2, sticky='e')
-            wizard_entry.config(width=4)
 
             range_label = Label(stuff_frame, text='Range:')
             range_label.grid(column=0, row=3, sticky='e')
-            range_entry = Entry(stuff_frame, textvariable=spell_range)
+            range_entry = Entry(stuff_frame, textvariable=spell_range, width=4)
             range_entry.grid(column=1, row=3, sticky='e')
-            range_entry.config(width=4)
 
             exp_label = Label(stuff_frame, text='EXP to Rank:')
             exp_label.grid(column=0, row=4, sticky='e')
-            exp_entry = Entry(stuff_frame, textvariable=exp)
+            exp_entry = Entry(stuff_frame, textvariable=exp, width=4)
             exp_entry.grid(column=1, row=4, sticky='e')
-            exp_entry.config(width=4)
-            exp_label2 = Label(stuff_frame, text='(there is some unknown \nformula involved with EXP)')
+            exp_label2 = Label(stuff_frame, text='(there is some unknown \nformula involved with EXP)', font=(None, 8))
             exp_label2.grid(row=5, columnspan=2, rowspan=2, sticky='ew')
-            exp_label2.config(font=(None, 8))
 
             another_frame = Frame(win)
             another_frame.grid(column=1, row=1)
-            save = Button(win, text='Save', command=write)
+            save = Button(win, text='Save', command=write, width=8)
             save.grid(column=1, row=0)
-            save.config(width=8)
+
             ingredient_frame = LabelFrame(another_frame, text='Ingredient')
             ingredient_frame.grid(column=0, row=0)
-            ingredient_menu = Combobox(ingredient_frame, textvariable=ingredient, values=list(SPELL_INGREDIENTS.keys()))
+            ingredient_menu = Combobox(ingredient_frame, textvariable=ingredient, width=10,
+                                       values=list(SPELL_INGREDIENTS.keys()))
             ingredient_menu.grid(column=0, row=0)
-            ingredient_menu.config(width=10)
 
             aspect_frame = LabelFrame(another_frame, text='Aspect')
             aspect_frame.grid(column=0, row=1)
@@ -161,15 +159,15 @@ class SpellEdit:
             target_frame.grid(column=1, row=2)
             target_num_frame = LabelFrame(target_frame, text='Number of targets:')
             target_num_frame.grid(column=0, row=0)
-            target_num_menu = Combobox(target_num_frame, textvariable=target_num, values=list(TARGET_NUM.keys()))
+            target_num_menu = Combobox(target_num_frame, textvariable=target_num, width=23,
+                                       values=list(TARGET_NUM.keys()))
             target_num_menu.grid()
-            target_num_menu.config(width=23)
 
             target_type_frame = LabelFrame(target_frame, text='Who is targeted:')
             target_type_frame.grid(column=0, row=1)
-            target_type_menu = Combobox(target_type_frame, textvariable=target_type, values=list(TARGET_TYPE.keys()))
+            target_type_menu = Combobox(target_type_frame, textvariable=target_type, values=list(TARGET_TYPE.keys()),
+                                        width=23)
             target_type_menu.grid()
-            target_type_menu.config(width=23)
 
         spell = StringVar()
         spell.trace('w', set_defaults)
@@ -193,5 +191,5 @@ class SpellEdit:
         aspect = IntVar()
         ingredient = StringVar()
 
-        spell.set(SPELL_NAMES[0])
+        spell.set(build_lst(filename, SPELL_ADDRESSES, name_length)[0])
         build()

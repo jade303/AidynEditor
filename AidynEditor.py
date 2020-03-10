@@ -1,11 +1,11 @@
 from pathlib import Path
 import shutil
-from tkinter import Tk, LabelFrame, mainloop, Button, PhotoImage, Label, Checkbutton, BooleanVar, IntVar
+from tkinter import Tk, LabelFrame, mainloop, Button, PhotoImage, Label, Checkbutton, BooleanVar
 from tkinter import filedialog
 
 from lib import accessories, armor_shields, characters_enemydrops, spells, wands_scrolls, weapons, trainers_shops
-from lib.variables import PARTY, PARTY_ADDRESSES, ENEMIES, ENEMY_ADDRESSES, ARMOR_NAMES, ARMOR_ADDRESSES, \
-    SHIELD_NAMES, SHIELD_ADDRESSES
+from lib.variables import ARMOR_ADDRESSES, SHIELD_ADDRESSES, PARTY_ADDRESSES, ENEMY_ADDRESSES
+
 
 p = Path()
 background = p / 'images/aidyn.gif'
@@ -26,7 +26,7 @@ def file_dialog():
         browse_frame.destroy()
 
         if backup.get():
-            backup_file = filename + '.bak'
+            backup_file = filename.rstrip('.z64') + ' (backup).z64'
             shutil.copy2(filename, backup_file)
 
         root.configure(background='white')
@@ -36,7 +36,6 @@ def file_dialog():
         party_button = Button(root, text='Party', width=button_width,
                               command=lambda: characters_enemydrops.CharacterEdit(filename,
                                                                                   icon,
-                                                                                  PARTY,
                                                                                   PARTY_ADDRESSES,
                                                                                   party_name_length,
                                                                                   0))
@@ -45,32 +44,29 @@ def file_dialog():
         enemy_button = Button(root, text='Enemy', width=button_width,
                               command=lambda: characters_enemydrops.CharacterEdit(filename,
                                                                                   icon,
-                                                                                  ENEMIES,
                                                                                   ENEMY_ADDRESSES,
                                                                                   enemy_name_length,
                                                                                   1))
         enemy_button.grid(column=1, row=1)
 
+        trainer_button = Button(root, text='Shop / Trainer', width=button_width,
+                                command=lambda: trainers_shops.TrainerEdit(filename, icon))
+        trainer_button.grid(column=1, row=2)
+
         accessory_button = Button(root, text='Accessory', width=button_width,
                                   command=lambda: accessories.AccessoryEdit(filename, icon))
-        accessory_button.grid(column=1, row=2)
+        accessory_button.grid(column=1, row=3)
 
         armor_button = Button(root, text='Armor', width=button_width,
                               command=lambda: armor_shields.ArmorShieldEdit(filename,
                                                                             icon,
-                                                                            ARMOR_NAMES,
                                                                             ARMOR_ADDRESSES,
                                                                             1))
-        armor_button.grid(column=1, row=3)
-
-        wandsscrolls_button = Button(root, text='Wand / Scroll', width=button_width,
-                                     command=lambda: wands_scrolls.WandScrollEdit(filename, icon))
-        wandsscrolls_button.grid(column=1, row=4)
+        armor_button.grid(column=1, row=4)
 
         shield_button = Button(root, text='Shield', width=button_width,
                                command=lambda: armor_shields.ArmorShieldEdit(filename,
                                                                              icon,
-                                                                             SHIELD_NAMES,
                                                                              SHIELD_ADDRESSES,
                                                                              0))
         shield_button.grid(column=1, row=5)
@@ -79,9 +75,9 @@ def file_dialog():
                               command=lambda: spells.SpellEdit(filename, icon))
         spell_button.grid(column=1, row=6)
 
-        trainer_button = Button(root, text='Shop / Trainer', width=button_width,
-                                command=lambda: trainers_shops.TrainerEdit(filename, icon))
-        trainer_button.grid(column=1, row=7)
+        wandsscrolls_button = Button(root, text='Wand / Scroll', width=button_width,
+                                     command=lambda: wands_scrolls.WandScrollEdit(filename, icon))
+        wandsscrolls_button.grid(column=1, row=7)
 
         weapon_button = Button(root, text='Weapon', width=button_width,
                                command=lambda: weapons.WeaponEdit(filename, icon))

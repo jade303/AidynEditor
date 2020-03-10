@@ -3,7 +3,8 @@ from tkinter import Toplevel, StringVar, IntVar, Frame, LabelFrame, Entry, Label
 from tkinter.ttk import Combobox
 
 from lib.limits import limit_name_size, limit, limit_127
-from lib.variables import ACCESSORY_ADDRESSES, ACCESSORY_NAMES, inv_EQUIPMENT_STAT, inv_SKILL_ATTRIBUTE, inv_SPELLS, \
+from lib.list_functions import build_lst
+from lib.variables import ACCESSORY_ADDRESSES, inv_EQUIPMENT_STAT, inv_SKILL_ATTRIBUTE, inv_SPELLS, \
     inv_RESIST, inv_RESIST_AMOUNTS, EQUIPMENT_STAT, SKILL_ATTRIBUTE, SPELLS, RESIST, RESIST_AMOUNTS
 
 
@@ -20,7 +21,7 @@ class AccessoryEdit:
 
         def set_defaults(*args):
             with open(filename, 'rb') as f:
-                address = ACCESSORY_ADDRESSES[ACCESSORY_NAMES.index(item.get())]
+                address = ACCESSORY_ADDRESSES[build_lst(filename, ACCESSORY_ADDRESSES, name_length).index(item.get())]
                 f.seek(address)
                 name.set(f.read(name_length).decode("utf-8"))
 
@@ -53,7 +54,7 @@ class AccessoryEdit:
 
         def write():
             with open(filename, 'rb+') as f:
-                address = ACCESSORY_ADDRESSES[ACCESSORY_NAMES.index(item.get())]
+                address = ACCESSORY_ADDRESSES[build_lst(filename, ACCESSORY_ADDRESSES, name_length).index(item.get())]
 
                 new_name = bytearray(name.get(), 'utf-8')
                 if len(new_name) < name_length:
@@ -106,60 +107,55 @@ class AccessoryEdit:
                     f.write(i.to_bytes(1, byteorder='big'))
 
         def build():
+            def reset_list():
+                default_item_menu['values'] = build_lst(filename, ACCESSORY_ADDRESSES, name_length)
+
             lawfulgood_frame = Frame(win)
             lawfulgood_frame.grid(column=0, row=0)
-            default_item_menu = Combobox(lawfulgood_frame, textvariable=item, values=ACCESSORY_NAMES)
+            default_item_menu = Combobox(lawfulgood_frame, textvariable=item, width=21,
+                                         values=build_lst(filename, ACCESSORY_ADDRESSES, name_length),
+                                         postcommand=reset_list)
             default_item_menu.grid(column=0, row=0)
-            default_item_menu.config(width=21)
-
             new_name_label = LabelFrame(lawfulgood_frame, text='New Name')
             new_name_label.grid(column=0, row=1)
-            new_name_entry = Entry(new_name_label, textvariable=name)
+            new_name_entry = Entry(new_name_label, textvariable=name, width=21)
             new_name_entry.grid()
-            new_name_entry.config(width=21)
 
             lawfulneutral_frame = LabelFrame(win, text='Stats:')
             lawfulneutral_frame.grid(column=0, row=1)
 
             defense_label = Label(lawfulneutral_frame, text='Damage:')
             defense_label.grid(column=0, row=0, sticky='e')
-            defense_entry = Entry(lawfulneutral_frame, textvariable=damage)
+            defense_entry = Entry(lawfulneutral_frame, textvariable=damage, width=4)
             defense_entry.grid(column=1, row=0, stick='e')
-            defense_entry.config(width=4)
 
             protection_label = Label(lawfulneutral_frame, text='Protection:')
             protection_label.grid(column=0, row=1, sticky='e')
-            protection_entry = Entry(lawfulneutral_frame, textvariable=protection)
+            protection_entry = Entry(lawfulneutral_frame, textvariable=protection, width=4)
             protection_entry.grid(column=1, row=1, sticky='e')
-            protection_entry.config(width=4)
 
             dexterity_label = Label(lawfulneutral_frame, text='Strength Required:')
             dexterity_label.grid(column=0, row=2, sticky='e')
-            dexterity_entry = Entry(lawfulneutral_frame, textvariable=str_req)
+            dexterity_entry = Entry(lawfulneutral_frame, textvariable=str_req, width=4)
             dexterity_entry.grid(column=1, row=2, sticky='e')
-            dexterity_entry.config(width=4)
 
             stealth_label = Label(lawfulneutral_frame, text='Intelligence Required:')
             stealth_label.grid(column=0, row=3, sticky='e')
-            stealth_entry = Entry(lawfulneutral_frame, textvariable=int_req)
+            stealth_entry = Entry(lawfulneutral_frame, textvariable=int_req, width=4)
             stealth_entry.grid(column=1, row=3, sticky='e')
-            stealth_entry.config(width=4)
 
             value_label = Label(lawfulneutral_frame, text='Base Value:')
             value_label.grid(column=0, row=4, sticky='e')
-            value_entry = Entry(lawfulneutral_frame, textvariable=value)
+            value_entry = Entry(lawfulneutral_frame, textvariable=value, width=6)
             value_entry.grid(column=1, row=4, sticky='e')
-            value_entry.config(width=6)
-            value_label2 = Label(lawfulneutral_frame, text='Max base value: 65535')
+            value_label2 = Label(lawfulneutral_frame, text='Max base value: 65535', font=(None, 8))
             value_label2.grid(row=5, columnspan=2)
-            value_label2.config(font=(None, 8))
 
             neutralgood_frame = Frame(win)
             neutralgood_frame.grid(column=1, row=0)
 
-            save = Button(neutralgood_frame, text='Save', command=write)
+            save = Button(neutralgood_frame, text='Save', command=write, width=8)
             save.grid(column=0, row=0)
-            save.config(width=8)
 
             aspect_frame = LabelFrame(neutralgood_frame, text='Aspect')
             aspect_frame.grid(column=0, row=1)
@@ -175,48 +171,39 @@ class AccessoryEdit:
 
             stat_frame = LabelFrame(trueneutral_frame, text='Stat')
             stat_frame.grid(column=0, row=0)
-            stat_menu = Combobox(stat_frame, textvariable=stat, values=list(EQUIPMENT_STAT.keys()))
+            stat_menu = Combobox(stat_frame, textvariable=stat, values=list(EQUIPMENT_STAT.keys()), width=16)
             stat_menu.grid(column=0, row=0)
-            stat_menu.config(width=16)
-            stat_entry = Entry(stat_frame, textvariable=stat_amount)
+            stat_entry = Entry(stat_frame, textvariable=stat_amount, width=4)
             stat_entry.grid(column=1, row=0, sticky='e')
-            stat_entry.config(width=4)
 
             ski_att_frame = LabelFrame(trueneutral_frame, text='Skill/Attribute')
             ski_att_frame.grid(column=0, row=1)
-            ski_att_menu = Combobox(ski_att_frame, textvariable=skill, values=list(SKILL_ATTRIBUTE.keys()))
+            ski_att_menu = Combobox(ski_att_frame, textvariable=skill, values=list(SKILL_ATTRIBUTE.keys()), width=16)
             ski_att_menu.grid(column=0, row=0)
-            ski_att_menu.config(width=16)
-            ski_att_amo_entry = Entry(ski_att_frame, textvariable=skill_amount)
+            ski_att_amo_entry = Entry(ski_att_frame, textvariable=skill_amount, width=4)
             ski_att_amo_entry.grid(column=1, row=0)
-            ski_att_amo_entry.config(width=4)
 
             spell_frame = LabelFrame(trueneutral_frame, text='Spell')
             spell_frame.grid(column=0, row=2)
-            spell_menu = Combobox(spell_frame, textvariable=spell, values=list(SPELLS.keys()))
+            spell_menu = Combobox(spell_frame, textvariable=spell, values=list(SPELLS.keys()), width=16)
             spell_menu.grid(column=0, row=0)
-            spell_menu.config(width=16)
-            spell_entry = Entry(spell_frame, textvariable=spell_level)
+            spell_entry = Entry(spell_frame, textvariable=spell_level, width=4)
             spell_entry.grid(column=1, row=0)
-            spell_entry.config(width=4)
 
             magic_frame = LabelFrame(trueneutral_frame, text='Magic')
             magic_frame.grid(column=0, row=3)
-            magic_menu = Combobox(magic_frame, textvariable=magic, values=list(SPELLS.keys()))
+            magic_menu = Combobox(magic_frame, textvariable=magic, values=list(SPELLS.keys()), width=16)
             magic_menu.grid(column=0, row=0)
-            magic_menu.config(width=16)
-            magic_entry = Entry(magic_frame, textvariable=magic_level)
+            magic_entry = Entry(magic_frame, textvariable=magic_level, width=4)
             magic_entry.grid(column=1, row=0)
-            magic_entry.config(width=4)
 
             resist_frame = LabelFrame(win, text='Resist')
             resist_frame.grid(column=1, row=2)
-            resist_menu = Combobox(resist_frame, textvariable=resist, values=list(RESIST.keys()))
+            resist_menu = Combobox(resist_frame, textvariable=resist, values=list(RESIST.keys()), width=16)
             resist_menu.grid(column=0, row=0)
-            resist_menu.config(width=16)
-            resist_amount_menu = Combobox(resist_frame, textvariable=resist_amount, values=list(RESIST_AMOUNTS.keys()))
+            resist_amount_menu = Combobox(resist_frame, textvariable=resist_amount, width=5,
+                                          values=list(RESIST_AMOUNTS.keys()))
             resist_amount_menu.grid(column=1, row=0)
-            resist_amount_menu.config(width=5)
 
         item = StringVar()
         item.trace('w', set_defaults)
@@ -249,5 +236,5 @@ class AccessoryEdit:
         resist = StringVar()
         resist_amount = StringVar()
 
-        item.set(ACCESSORY_NAMES[0])
+        item.set(build_lst(filename, ACCESSORY_ADDRESSES, name_length)[0])
         build()

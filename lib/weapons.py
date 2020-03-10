@@ -3,7 +3,8 @@ from tkinter import Toplevel, Frame, LabelFrame, Entry, Label, Button, Radiobutt
 from tkinter.ttk import Combobox
 
 from lib.limits import limit_name_size, limit, limit_127
-from lib.variables import WEAPON_ADDRESSES, WEAPON_NAMES, inv_WEAPON_TYPE, inv_WEAPON_ANIMATIONS, inv_EQUIPMENT_STAT, \
+from lib.list_functions import build_lst
+from lib.variables import WEAPON_ADDRESSES, inv_WEAPON_TYPE, inv_WEAPON_ANIMATIONS, inv_EQUIPMENT_STAT, \
     inv_SKILL_ATTRIBUTE, inv_SPELLS, inv_RESIST, inv_RESIST_AMOUNTS, WEAPON_TYPE, WEAPON_ANIMATIONS, EQUIPMENT_STAT, \
     SKILL_ATTRIBUTE, SPELLS, RESIST, RESIST_AMOUNTS
 
@@ -21,7 +22,7 @@ class WeaponEdit:
 
         def set_defaults(*args):
             with open(filename, 'rb') as f:
-                address = WEAPON_ADDRESSES[WEAPON_NAMES.index(weapon.get())]
+                address = WEAPON_ADDRESSES[build_lst(filename, WEAPON_ADDRESSES, name_length).index(weapon.get())]
                 f.seek(address)
                 name.set(f.read(name_length).decode("utf-8"))
 
@@ -60,7 +61,8 @@ class WeaponEdit:
 
         def write():
             with open(filename, 'rb+') as f:
-                address = WEAPON_ADDRESSES[WEAPON_NAMES.index(weapon.get())]
+                address = WEAPON_ADDRESSES[build_lst(filename, WEAPON_ADDRESSES, name_length).index(weapon.get())]
+
                 new_name = bytearray(name.get(), 'utf-8')
                 if len(new_name) < name_length:
                     while len(new_name) < name_length:
@@ -116,70 +118,66 @@ class WeaponEdit:
                     f.write(i.to_bytes(1, byteorder='big'))
 
         def build():
+            def reset_list():
+                default_weapon_menu['values'] = build_lst(filename, WEAPON_ADDRESSES, name_length)
+
             lawfulgood_frame = Frame(win)
             lawfulgood_frame.grid(column=0, row=0)
-            default_weapon_menu = Combobox(lawfulgood_frame, textvariable=weapon, values=WEAPON_NAMES)
+            default_weapon_menu = Combobox(lawfulgood_frame, textvariable=weapon, width=21,
+                                           values=build_lst(filename, WEAPON_ADDRESSES, name_length),
+                                           postcommand=reset_list)
             default_weapon_menu.grid(column=0, row=0)
-            default_weapon_menu.config(width=21)
 
             new_name_label = LabelFrame(lawfulgood_frame, text='New Name')
             new_name_label.grid(column=0, row=1)
-            new_name_entry = Entry(new_name_label, textvariable=name)
+            new_name_entry = Entry(new_name_label, textvariable=name, width=21)
             new_name_entry.grid()
-            new_name_entry.config(width=21)
 
-            weapon_type_menu = Combobox(lawfulgood_frame, textvariable=weapon_type, values=list(WEAPON_TYPE.keys()))
+            weapon_type_menu = Combobox(lawfulgood_frame, width=9, textvariable=weapon_type,
+                                        values=list(WEAPON_TYPE.keys()))
             weapon_type_menu.grid(column=0, row=3)
-            weapon_type_menu.config(width=9)
 
             lawfulneutral_frame = LabelFrame(win, text='Stats:')
             lawfulneutral_frame.grid(column=0, row=1)
 
             strength_label = Label(lawfulneutral_frame, text='Str Required:')
             strength_label.grid(column=0, row=0, sticky='e')
-            strength_entry = Entry(lawfulneutral_frame, textvariable=str_req)
+            strength_entry = Entry(lawfulneutral_frame, textvariable=str_req, width=4)
             strength_entry.grid(column=1, row=0, stick='e')
-            strength_entry.config(width=4)
 
             hit_label = Label(lawfulneutral_frame, text='Hit:')
             hit_label.grid(column=0, row=1, sticky='e')
-            hit_entry = Entry(lawfulneutral_frame, textvariable=hit)
+            hit_entry = Entry(lawfulneutral_frame, textvariable=hit, width=4)
             hit_entry.grid(column=1, row=1, sticky='e')
-            hit_entry.config(width=4)
 
             damage_label = Label(lawfulneutral_frame, text='Damage:')
             damage_label.grid(column=0, row=2, sticky='e')
-            damage_entry = Entry(lawfulneutral_frame, textvariable=damage)
+            damage_entry = Entry(lawfulneutral_frame, textvariable=damage, width=4)
             damage_entry.grid(column=1, row=2, sticky='e')
-            damage_entry.config(width=4)
 
             range_label = Label(lawfulneutral_frame, text='Range:')
             range_label.grid(column=0, row=3, sticky='e')
-            range_entry = Entry(lawfulneutral_frame, textvariable=weapon_range)
+            range_entry = Entry(lawfulneutral_frame, textvariable=weapon_range, width=4)
             range_entry.grid(column=1, row=3, sticky='e')
-            range_entry.config(width=4)
 
             value_label = Label(lawfulneutral_frame, text='Base Value:')
             value_label.grid(column=0, row=4, sticky='e')
-            value_entry = Entry(lawfulneutral_frame, textvariable=value)
+            value_entry = Entry(lawfulneutral_frame, textvariable=value, width=6)
             value_entry.grid(column=1, row=4, sticky='e')
-            value_entry.config(width=6)
-            value_label2 = Label(lawfulneutral_frame, text='Max base value: 65535')
+            value_label2 = Label(lawfulneutral_frame, text='Max base value: 65535', font=(None, 8))
             value_label2.grid(row=5, columnspan=2)
-            value_label2.config(font=(None, 8))
 
             animation_frame = LabelFrame(win, text='Animation')
             animation_frame.grid(column=0, row=2)
-            animation_menu = Combobox(animation_frame, textvariable=animation, values=list(WEAPON_ANIMATIONS.keys()))
+            animation_menu = Combobox(animation_frame, textvariable=animation, width=12,
+                                      values=list(WEAPON_ANIMATIONS.keys()))
             animation_menu.grid(column=0, row=0)
-            animation_menu.config(width=12)
 
             neutralgood_frame = Frame(win)
             neutralgood_frame.grid(column=1, row=0)
 
-            save = Button(neutralgood_frame, text='Save', command=write)
+            save = Button(neutralgood_frame, text='Save', command=write, width=8)
             save.grid(column=0, row=0)
-            save.config(width=8)
 
             aspect_frame = LabelFrame(neutralgood_frame, text='Aspect')
             aspect_frame.grid(column=0, row=1)
@@ -195,48 +193,40 @@ class WeaponEdit:
 
             stat_frame = LabelFrame(trueneutral_frame, text='Stat')
             stat_frame.grid(column=0, row=0)
-            stat_menu = Combobox(stat_frame, textvariable=stat, values=list(EQUIPMENT_STAT.keys()))
+            stat_menu = Combobox(stat_frame, textvariable=stat, values=list(EQUIPMENT_STAT.keys()), width=16)
             stat_menu.grid(column=0, row=0)
-            stat_menu.config(width=16)
-            stat_entry = Entry(stat_frame, textvariable=stat_amount)
+            stat_entry = Entry(stat_frame, textvariable=stat_amount, width=4)
             stat_entry.grid(column=1, row=0, sticky='e')
-            stat_entry.config(width=4)
 
             ski_att_frame = LabelFrame(trueneutral_frame, text='Skill/Attribute')
             ski_att_frame.grid(column=0, row=1)
-            ski_att_menu = Combobox(ski_att_frame, textvariable=skill, values=list(SKILL_ATTRIBUTE.keys()))
+            ski_att_menu = Combobox(ski_att_frame, textvariable=skill, width=16,
+                                    values=list(SKILL_ATTRIBUTE.keys()))
             ski_att_menu.grid(column=0, row=0)
-            ski_att_menu.config(width=16)
-            ski_att_amo_entry = Entry(ski_att_frame, textvariable=skill_amount)
+            ski_att_amo_entry = Entry(ski_att_frame, textvariable=skill_amount, width=4)
             ski_att_amo_entry.grid(column=1, row=0)
-            ski_att_amo_entry.config(width=4)
 
             spell_frame = LabelFrame(trueneutral_frame, text='Spell')
             spell_frame.grid(column=0, row=2)
-            spell_menu = Combobox(spell_frame, textvariable=spell, values=list(SPELLS.keys()))
+            spell_menu = Combobox(spell_frame, textvariable=spell, values=list(SPELLS.keys()), width=16)
             spell_menu.grid(column=0, row=0)
-            spell_menu.config(width=16)
-            spell_entry = Entry(spell_frame, textvariable=spell_level)
+            spell_entry = Entry(spell_frame, textvariable=spell_level, width=4)
             spell_entry.grid(column=1, row=0)
-            spell_entry.config(width=4)
 
             magic_frame = LabelFrame(trueneutral_frame, text='Magic')
             magic_frame.grid(column=0, row=3)
-            magic_menu = Combobox(magic_frame, textvariable=magic, values=list(SPELLS.keys()))
+            magic_menu = Combobox(magic_frame, textvariable=magic, values=list(SPELLS.keys()), width=16)
             magic_menu.grid(column=0, row=0)
-            magic_menu.config(width=16)
-            magic_entry = Entry(magic_frame, textvariable=magic_level)
+            magic_entry = Entry(magic_frame, textvariable=magic_level, width=4)
             magic_entry.grid(column=1, row=0)
-            magic_entry.config(width=4)
 
             resist_frame = LabelFrame(win, text='Resist')
             resist_frame.grid(column=1, row=2)
-            resist_menu = Combobox(resist_frame, textvariable=resist, values=list(RESIST.keys()))
+            resist_menu = Combobox(resist_frame, textvariable=resist, values=list(RESIST.keys()), width=16)
             resist_menu.grid(column=0, row=0)
-            resist_menu.config(width=16)
-            resist_amount_menu = Combobox(resist_frame, textvariable=resist_amount, values=list(RESIST_AMOUNTS.keys()))
+            resist_amount_menu = Combobox(resist_frame, textvariable=resist_amount, width=5,
+                                          values=list(RESIST_AMOUNTS.keys()))
             resist_amount_menu.grid(column=1, row=0)
-            resist_amount_menu.config(width=5)
 
         weapon = StringVar()
         weapon.trace('w', set_defaults)
@@ -271,5 +261,5 @@ class WeaponEdit:
         resist = StringVar()
         resist_amount = StringVar()
 
-        weapon.set(WEAPON_NAMES[0])
+        weapon.set(build_lst(filename, WEAPON_ADDRESSES, name_length)[0])
         build()

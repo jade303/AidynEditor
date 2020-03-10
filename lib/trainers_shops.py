@@ -3,8 +3,8 @@ from tkinter import Toplevel, StringVar, Button, LabelFrame, Label, Entry, Frame
 from tkinter.ttk import Combobox
 
 from lib.limits import limit
-from lib.variables import SKILLS, SHOP_SKILLS, SHOPS, SHOP_SHIELD, SHOP_SPELLS, inv_SPELLS, SPELLS, ITEMS, \
-    inv_DROP_ITEMS, SHOP_ITEM_ADDRESSES
+from lib.list_functions import get_major_dic, get_minor_dic
+from lib.variables import SKILLS, SHOP_SKILLS, SHOPS, SHOP_SHIELD, SHOP_SPELLS, SHOP_ITEM_ADDRESSES, SPELL_DIC
 
 
 class TrainerEdit:
@@ -19,6 +19,17 @@ class TrainerEdit:
         spell_read = 16
         NOT = ["Talewok : Dryad", "Talewok : Professor 1", "Talewok : Professor 2", "Talewok : Professor 3"]
 
+        shops = []
+        with open(filename, 'rb') as f:
+            f.seek(0x01FC7EA4)
+            shops = ['Erromon : ' + f.read(9).decode("utf-8").rstrip('\x00')] + SHOPS
+
+        items = get_major_dic(filename)
+        inv_items = {v: k for k, v in items.items()}
+
+        spell_dic = get_minor_dic(filename, SPELL_DIC, 22)
+        inv_spell_dic = {v: k for k, v in spell_dic.items()}
+
         main_win = Frame(win)
         main_win.grid(column=0, row=0)
         shop_win = Frame(win)
@@ -27,7 +38,7 @@ class TrainerEdit:
         def defaults(*args):
             with open(filename, 'rb') as f:
                 # trainer skills + shield
-                address = SHOP_SKILLS[SHOPS.index(trainer.get())]
+                address = SHOP_SKILLS[shops.index(trainer.get())]
                 f.seek(address)
                 d = f.read(skill_read).hex()
 
@@ -38,7 +49,7 @@ class TrainerEdit:
                         sn = ''
                     s.set(sn)
 
-                address = SHOP_SHIELD[SHOPS.index(trainer.get())]
+                address = SHOP_SHIELD[shops.index(trainer.get())]
                 f.seek(address)
                 d = f.read(shield_read).hex()
 
@@ -48,14 +59,14 @@ class TrainerEdit:
                 shield_skill.set(shi)
 
                 # trainer spells
-                address = SHOP_SPELLS[SHOPS.index(trainer.get())]
+                address = SHOP_SPELLS[shops.index(trainer.get())]
                 f.seek(address)
                 d = f.read(spell_read).hex()
 
                 for s in spells:
                     x = (spells.index(s) * 4)
                     y = x + 4
-                    s.set(inv_SPELLS[d[x:y].upper()])
+                    s.set(spell_dic[d[x:y].upper()])
 
                 for s in spell_levels:
                     x = (spell_levels.index(s) * 2) + 22
@@ -68,12 +79,12 @@ class TrainerEdit:
 
                 else:
                     shop_win.grid(column=1, row=0)
-                    address = SHOP_ITEM_ADDRESSES[SHOPS.index(trainer.get())]
+                    address = SHOP_ITEM_ADDRESSES[shops.index(trainer.get())]
                     f.seek(address)
 
                     for item in shop_item:
                         d = f.read(2).hex()
-                        item.set(inv_DROP_ITEMS[d[0:4].upper()])
+                        item.set(items[d[0:4].upper()])
                         if shop_item.index(item) < 20:
                             address += 5
                             f.seek(address)
@@ -84,7 +95,7 @@ class TrainerEdit:
         def write():
             with open(filename, 'rb+') as f:
                 # write skills + shield
-                address = SHOP_SKILLS[SHOPS.index(trainer.get())]
+                address = SHOP_SKILLS[shops.index(trainer.get())]
                 f.seek(address)
 
                 towrite = []
@@ -100,7 +111,7 @@ class TrainerEdit:
 
                 towrite[:] = []
 
-                address = SHOP_SHIELD[SHOPS.index(trainer.get())]
+                address = SHOP_SHIELD[shops.index(trainer.get())]
                 f.seek(address)
 
                 shi = shield_skill.get()
@@ -114,13 +125,13 @@ class TrainerEdit:
 
                 # write spells
                 towrite[:] = []
-                address = SHOP_SPELLS[SHOPS.index(trainer.get())]
+                address = SHOP_SPELLS[shops.index(trainer.get())]
                 f.seek(address)
                 d = f.read(spell_read).hex()
 
                 for i in spells:
-                    towrite.append(int((SPELLS[i.get()])[:2], 16))
-                    towrite.append(int((SPELLS[i.get()])[2:], 16))
+                    towrite.append(int((inv_spell_dic[i.get()])[:2], 16))
+                    towrite.append(int((inv_spell_dic[i.get()])[2:], 16))
 
                 towrite.append(int(d[9] + d[10], 16))
 
@@ -133,28 +144,28 @@ class TrainerEdit:
 
                 towrite[:] = []
                 if trainer.get() not in NOT:
-                    address = SHOP_ITEM_ADDRESSES[SHOPS.index(trainer.get())]
+                    address = SHOP_ITEM_ADDRESSES[shops.index(trainer.get())]
                     f.seek(address)
                     d = f.read(108).hex()
 
                     for item in shop_item:
                         if shop_item.index(item) < 20:
-                            towrite.append(int((ITEMS[item.get()])[:2], 16))
-                            towrite.append(int((ITEMS[item.get()])[2:], 16))
+                            towrite.append(int((inv_items[item.get()])[:2], 16))
+                            towrite.append(int((inv_items[item.get()])[2:], 16))
                             for x in range(5, 11, 2):
                                 towrite.append(int(d[((shop_item.index(item) * 10) + x)] +
                                                    d[((shop_item.index(item) * 10) + (x + 1))], 16))
 
                         else:
-                            towrite.append(int((ITEMS[item.get()])[:2], 16))
-                            towrite.append(int((ITEMS[item.get()])[2:], 16))
+                            towrite.append(int((inv_items[item.get()])[:2], 16))
+                            towrite.append(int((inv_items[item.get()])[2:], 16))
 
                     f.seek(address)
                     for item in towrite:
                         f.write(item.to_bytes(1, byteorder='big'))
 
         def build():
-            default_name_menu = Combobox(main_win, textvariable=trainer, values=SHOPS, width=26)
+            default_name_menu = Combobox(main_win, textvariable=trainer, values=shops, width=26)
             default_name_menu.grid(column=0, row=0)
 
             spell_frame = LabelFrame(main_win, text='Spells and Spell Level')
@@ -162,7 +173,7 @@ class TrainerEdit:
 
             for s in spells:
                 x = spells.index(s)
-                spell = Combobox(spell_frame, textvariable=s, values=list(SPELLS.keys()))
+                spell = Combobox(spell_frame, textvariable=s, values=list(inv_spell_dic.keys()))
                 spell.grid(column=0, row=x)
                 spell.config(width=16)
                 spell_level = Entry(spell_frame, textvariable=spell_levels[spells.index(s)])
@@ -191,7 +202,7 @@ class TrainerEdit:
             item_frame.grid(column=2, row=0, rowspan=23)
 
             for item in shop_item:
-                item_box = Combobox(item_frame, textvariable=item, values=list(ITEMS.keys()), width=28)
+                item_box = Combobox(item_frame, textvariable=item, values=list(inv_items.keys()), width=28)
                 item_box.grid()
 
         trainer = StringVar()
@@ -221,5 +232,5 @@ class TrainerEdit:
             i = StringVar()
             shop_item.append(i)
 
-        trainer.set(SHOPS[0])
+        trainer.set(shops[0])
         build()
