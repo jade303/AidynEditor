@@ -85,7 +85,7 @@ class SpellEdit:
             lawfulgood_frame.grid(column=0, row=0)
             default_spell_menu = Combobox(lawfulgood_frame, textvariable=spell, width=22,
                                           values=build_lst(filename, SPELL_ADDRESSES, name_length),
-                                          postcommand=reset_list)
+                                          postcommand=reset_list, state='readonly')
             default_spell_menu.grid()
 
             new_name_label = LabelFrame(lawfulgood_frame, text='New Name')
@@ -143,7 +143,7 @@ class SpellEdit:
             ingredient_frame = LabelFrame(another_frame, text='Ingredient')
             ingredient_frame.grid(column=0, row=0)
             ingredient_menu = Combobox(ingredient_frame, textvariable=ingredient, width=10,
-                                       values=list(SPELL_INGREDIENTS.keys()))
+                                       values=list(SPELL_INGREDIENTS.keys()), state='readonly')
             ingredient_menu.grid(column=0, row=0)
 
             aspect_frame = LabelFrame(another_frame, text='Aspect')
@@ -160,13 +160,13 @@ class SpellEdit:
             target_num_frame = LabelFrame(target_frame, text='Number of targets:')
             target_num_frame.grid(column=0, row=0)
             target_num_menu = Combobox(target_num_frame, textvariable=target_num, width=23,
-                                       values=list(TARGET_NUM.keys()))
+                                       values=list(TARGET_NUM.keys()), state='readonly')
             target_num_menu.grid()
 
             target_type_frame = LabelFrame(target_frame, text='Who is targeted:')
             target_type_frame.grid(column=0, row=1)
             target_type_menu = Combobox(target_type_frame, textvariable=target_type, values=list(TARGET_TYPE.keys()),
-                                        width=23)
+                                        width=23, state='readonly')
             target_type_menu.grid()
 
         spell = StringVar()

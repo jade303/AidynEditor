@@ -17,10 +17,14 @@ class TrainerEdit:
         skill_read = 23
         shield_read = 1
         spell_read = 16
+        # following list are the trainers that do not provide shop features
         NOT = ["Talewok : Dryad", "Talewok : Professor 1", "Talewok : Professor 2", "Talewok : Professor 3"]
+
 
         shops = []
         with open(filename, 'rb') as f:
+            # function for adding Becan's to the list of shops
+            # this provides his custom name to the editor (if he is given one)
             f.seek(0x01FC7EA4)
             shops = ['Erromon : ' + f.read(9).decode("utf-8").rstrip('\x00')] + SHOPS
 
@@ -37,7 +41,7 @@ class TrainerEdit:
 
         def defaults(*args):
             with open(filename, 'rb') as f:
-                # trainer skills + shield
+                # gets trainer skills + shield
                 address = SHOP_SKILLS[shops.index(trainer.get())]
                 f.seek(address)
                 d = f.read(skill_read).hex()
@@ -72,11 +76,12 @@ class TrainerEdit:
                     x = (spell_levels.index(s) * 2) + 22
                     s.set(int(d[x] + d[x + 1], 16))
 
+                # determines whether the shop part of the widget should show up
+                # 'NOT' is the list of trainers that do not have shop services
                 if trainer.get() in NOT:
                     shop_win.grid_forget()
                     for item in shop_item:
                         item.set('')
-
                 else:
                     shop_win.grid(column=1, row=0)
                     address = SHOP_ITEM_ADDRESSES[shops.index(trainer.get())]
@@ -142,6 +147,7 @@ class TrainerEdit:
                 for item in towrite:
                     f.write(item.to_bytes(1, byteorder='big'))
 
+                # process for writing shop items to file
                 towrite[:] = []
                 if trainer.get() not in NOT:
                     address = SHOP_ITEM_ADDRESSES[shops.index(trainer.get())]
@@ -165,7 +171,7 @@ class TrainerEdit:
                         f.write(item.to_bytes(1, byteorder='big'))
 
         def build():
-            default_name_menu = Combobox(main_win, textvariable=trainer, values=shops, width=26)
+            default_name_menu = Combobox(main_win, textvariable=trainer, values=shops, width=26, state='readonly')
             default_name_menu.grid(column=0, row=0)
 
             spell_frame = LabelFrame(main_win, text='Spells and Spell Level')
@@ -173,7 +179,7 @@ class TrainerEdit:
 
             for s in spells:
                 x = spells.index(s)
-                spell = Combobox(spell_frame, textvariable=s, values=list(inv_spell_dic.keys()))
+                spell = Combobox(spell_frame, textvariable=s, values=list(inv_spell_dic.keys()), state='readonly')
                 spell.grid(column=0, row=x)
                 spell.config(width=16)
                 spell_level = Entry(spell_frame, textvariable=spell_levels[spells.index(s)])
@@ -202,7 +208,8 @@ class TrainerEdit:
             item_frame.grid(column=2, row=0, rowspan=23)
 
             for item in shop_item:
-                item_box = Combobox(item_frame, textvariable=item, values=list(inv_items.keys()), width=28)
+                item_box = Combobox(item_frame, textvariable=item, values=list(inv_items.keys()),
+                                    width=28, state='readonly')
                 item_box.grid()
 
         trainer = StringVar()

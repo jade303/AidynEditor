@@ -19,7 +19,7 @@ class CharacterEdit:
             win.title("Enemy and Loot Edit")
             data_read = 92
             drop_data_read = 34
-            self.max_stats = [255, 255, 255, 255, 255, 255]
+            self.max_stats = [50, 30, 30, 60, 60, 120]  # Pochanargat's max stats
         win.iconbitmap(icon)
         data_seek = 44
 

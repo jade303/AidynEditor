@@ -3,9 +3,9 @@ from tkinter import Toplevel, Label, StringVar, LabelFrame, Entry, Frame, Button
 from tkinter.ttk import Combobox
 
 from lib.limits import limit, limit_127, limit_name_size
-from lib.list_functions import build_lst
-from lib.variables import WAND_ADDRESSES, SCROLL_ADDRESSES, inv_SPELLS, inv_SKILL_ATTRIBUTE, \
-    inv_RESIST, inv_RESIST_AMOUNTS, SPELLS, SKILL_ATTRIBUTE, RESIST, RESIST_AMOUNTS
+from lib.list_functions import build_lst, get_minor_dic
+from lib.variables import WAND_ADDRESSES, SCROLL_ADDRESSES, inv_SKILL_ATTRIBUTE, \
+    inv_RESIST, inv_RESIST_AMOUNTS, SKILL_ATTRIBUTE, RESIST, RESIST_AMOUNTS, SPELL_DIC
 
 
 class WandScrollEdit:
@@ -18,6 +18,9 @@ class WandScrollEdit:
         data_seek = 24
         data_read = 20
         name_length = 18
+
+        spell_dic = get_minor_dic(filename, SPELL_DIC, 22)
+        inv_spell_dic = {v: k for k, v in spell_dic.items()}
 
         def wand_defaults(*args):
             with open(filename, 'rb') as f:
@@ -39,7 +42,7 @@ class WandScrollEdit:
                 if att_amount > 127:
                     att_amount = att_amount - 256
                 wa_skill_amount.set(att_amount)
-                wa_spell.set(inv_SPELLS[(d[22:26]).upper()])
+                wa_spell.set(spell_dic[(d[22:26]).upper()])
                 wa_charges.set(int(d[26] + d[27], 16))
                 wa_spell_level.set(int(d[28] + d[29], 16))
                 wa_resist.set(inv_RESIST[(d[36] + d[37]).upper()])
@@ -55,7 +58,7 @@ class WandScrollEdit:
                 d = f.read(data_read).hex()
 
                 sc_value.set((int(d[10] + d[11], 16) * 256) + int(d[8] + d[9], 16))
-                sc_spell.set(inv_SPELLS[(d[22:26]).upper()])
+                sc_spell.set(spell_dic[(d[22:26]).upper()])
                 sc_cast_level.set(int(d[28] + d[29], 16))
 
         def wand_write():
@@ -93,8 +96,8 @@ class WandScrollEdit:
                     int(d[16] + d[17], 16),
                     int(SKILL_ATTRIBUTE[wa_skill.get()], 16),
                     int(sk),
-                    int((SPELLS[wa_spell.get()])[:2], 16),
-                    int((SPELLS[wa_spell.get()])[2:], 16),
+                    int((inv_spell_dic[wa_spell.get()])[:2], 16),
+                    int((inv_spell_dic[wa_spell.get()])[2:], 16),
                     int(wa_charges.get()),
                     int(wa_spell_level.get()),
                     int(d[30] + d[31], 16),
@@ -139,8 +142,8 @@ class WandScrollEdit:
                 for i in range(12, 22, 2):
                     towrite.append(int(d[i] + d[i+1], 16))
 
-                towrite.append(int((SPELLS[sc_spell.get()])[:2], 16))
-                towrite.append(int((SPELLS[sc_spell.get()])[2:], 16))
+                towrite.append(int((inv_spell_dic[sc_spell.get()])[:2], 16))
+                towrite.append(int((inv_spell_dic[sc_spell.get()])[2:], 16))
                 towrite.append(int(d[26] + d[27], 16))
                 towrite.append(int(sc_cast_level.get()))
 
@@ -160,7 +163,7 @@ class WandScrollEdit:
 
             sc_box = Combobox(sc_fr, textvariable=scroll, width=20,
                               values=build_lst(filename, SCROLL_ADDRESSES, name_length),
-                              postcommand=sc_reset_list)
+                              postcommand=sc_reset_list, state='readonly')
             sc_box.grid(column=0, row=0)
             sc_new_name_label = LabelFrame(sc_fr, text='New Name')
             sc_new_name_label.grid(column=0, row=1)
@@ -168,7 +171,8 @@ class WandScrollEdit:
             sc_new_name_entry.grid(column=0, row=0)
             sc_spell_label = LabelFrame(sc_fr, text='Spell learned/cast')
             sc_spell_label.grid(column=0, row=2)
-            sc_spell_menu = Combobox(sc_spell_label, textvariable=sc_spell, width=20, values=list(SPELLS.keys()))
+            sc_spell_menu = Combobox(sc_spell_label, textvariable=sc_spell, width=20,
+                                     values=list(inv_spell_dic.keys()), state='readonly')
             sc_spell_menu.grid(column=0, row=0)
             sc_other_atts = Frame(sc_fr)
             sc_other_atts.grid(column=0, row=3)
@@ -199,7 +203,8 @@ class WandScrollEdit:
             wa_new_name_entry.grid(column=0, row=0)
             wa_spell_label = LabelFrame(wa_fr, text='Spell Cast')
             wa_spell_label.grid(column=0, row=2)
-            wa_spell_menu = Combobox(wa_spell_label, textvariable=wa_spell, width=20, values=list(SPELLS.keys()))
+            wa_spell_menu = Combobox(wa_spell_label, textvariable=wa_spell, width=20,
+                                     values=list(inv_spell_dic.keys()), state='readonly')
             wa_spell_menu.grid(column=0, row=0)
 
             wa_other_atts = Frame(wa_fr)
@@ -255,17 +260,18 @@ class WandScrollEdit:
             ski_att_frame = LabelFrame(wa_bottom, text='Skill/Attribute')
             ski_att_frame.grid(column=0, row=0)
             ski_att_menu = Combobox(ski_att_frame, textvariable=wa_skill, width=16,
-                                    values=list(SKILL_ATTRIBUTE.keys()))
+                                    values=list(SKILL_ATTRIBUTE.keys()), state='readonly')
             ski_att_menu.grid(column=0, row=0)
             ski_att_amo_entry = Entry(ski_att_frame, textvariable=wa_skill_amount, width=4)
             ski_att_amo_entry.grid(column=1, row=0)
 
             resist_frame = LabelFrame(wa_bottom, text='Resist')
             resist_frame.grid(column=0, row=1)
-            resist_menu = Combobox(resist_frame, textvariable=wa_resist, width=16, values=list(RESIST.keys()))
+            resist_menu = Combobox(resist_frame, textvariable=wa_resist, width=16,
+                                   values=list(RESIST.keys()), state='readonly')
             resist_menu.grid(column=0, row=0)
             resist_amount_menu = Combobox(resist_frame, textvariable=wa_resist_amount, width=5,
-                                          values=list(RESIST_AMOUNTS.keys()))
+                                          values=list(RESIST_AMOUNTS.keys()), state='readonly')
             resist_amount_menu.grid(column=1, row=0)
 
             wa_save = Button(wa_fr, text='Save Wand Edits', command=wand_write)

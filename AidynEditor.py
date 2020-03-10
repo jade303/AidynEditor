@@ -6,6 +6,9 @@ from tkinter import filedialog
 from lib import accessories, armor_shields, characters_enemydrops, spells, wands_scrolls, weapons, trainers_shops
 from lib.variables import ARMOR_ADDRESSES, SHIELD_ADDRESSES, PARTY_ADDRESSES, ENEMY_ADDRESSES
 
+# todo: add comments/documentation
+# todo: test exp stat / enemy vulnerabilities
+# todo: giant bat vulnerable to solar and alchemist? 170 max hp lvl 40 with Pochangaret's stats (160 hp at lvl 30)
 
 p = Path()
 background = p / 'images/aidyn.gif'
@@ -13,7 +16,8 @@ icon = p / 'images/aidyn.ico'
 
 
 def file_dialog():
-    # Searching function for the Browse button
+    # function that searches for 'filename' and creates the links to the
+    # different editing windows
     party_name_length = 9
     enemy_name_length = 17
     button_width = 10
@@ -25,7 +29,7 @@ def file_dialog():
     if filename != '':
         browse_frame.destroy()
 
-        if backup.get():
+        if backup.get():  # creates a backup of the ROM file before editing
             backup_file = filename.rstrip('.z64') + ' (backup).z64'
             shutil.copy2(filename, backup_file)
 
@@ -38,9 +42,9 @@ def file_dialog():
                                                                                   icon,
                                                                                   PARTY_ADDRESSES,
                                                                                   party_name_length,
-                                                                                  0))
-        party_button.grid(column=1, row=0, sticky='ew')
-
+                                                                                  0))  # this number provides
+        party_button.grid(column=1, row=0, sticky='ew')                                # the type of window
+                                                                                       # i.e. 0 = party, 1 = enemy
         enemy_button = Button(root, text='Enemy', width=button_width,
                               command=lambda: characters_enemydrops.CharacterEdit(filename,
                                                                                   icon,
@@ -90,7 +94,7 @@ root.title('Aidyn Editor')
 root.iconbitmap(icon)
 image = PhotoImage(file=background)
 backup = BooleanVar()
-backup.set(True)
+backup.set(True)  # sets default mode to create a backup (False would be default no)
 
 browse_frame = LabelFrame(root, text='Aidyn Chronicles ROM')
 browse_frame.pack()

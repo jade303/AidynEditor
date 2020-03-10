@@ -3,10 +3,10 @@ from tkinter import Toplevel, Frame, LabelFrame, Entry, Label, Button, Radiobutt
 from tkinter.ttk import Combobox
 
 from lib.limits import limit_name_size, limit, limit_127
-from lib.list_functions import build_lst
+from lib.list_functions import build_lst, get_minor_dic
 from lib.variables import WEAPON_ADDRESSES, inv_WEAPON_TYPE, inv_WEAPON_ANIMATIONS, inv_EQUIPMENT_STAT, \
-    inv_SKILL_ATTRIBUTE, inv_SPELLS, inv_RESIST, inv_RESIST_AMOUNTS, WEAPON_TYPE, WEAPON_ANIMATIONS, EQUIPMENT_STAT, \
-    SKILL_ATTRIBUTE, SPELLS, RESIST, RESIST_AMOUNTS
+    inv_SKILL_ATTRIBUTE, inv_RESIST, inv_RESIST_AMOUNTS, WEAPON_TYPE, WEAPON_ANIMATIONS, EQUIPMENT_STAT, \
+    SKILL_ATTRIBUTE, RESIST, RESIST_AMOUNTS, SPELL_DIC
 
 
 class WeaponEdit:
@@ -19,6 +19,9 @@ class WeaponEdit:
         data_seek = 23
         data_read = 25
         name_length = 21
+
+        spell_dic = get_minor_dic(filename, SPELL_DIC, 22)
+        inv_spell_dic = {v: k for k, v in spell_dic.items()}
 
         def set_defaults(*args):
             with open(filename, 'rb') as f:
@@ -50,10 +53,10 @@ class WeaponEdit:
                     att_amount = att_amount - 256
                 skill_amount.set(att_amount)
 
-                spell.set(inv_SPELLS[(d[32:36]).upper()])
+                spell.set(spell_dic[(d[32:36]).upper()])
                 spell_level.set(int(d[36] + d[37], 16))
 
-                magic.set(inv_SPELLS[(d[40:44]).upper()])
+                magic.set(spell_dic[(d[40:44]).upper()])
                 magic_level.set(int(d[44] + d[45], 16))
 
                 resist.set(inv_RESIST[(d[46] + d[47]).upper()])
@@ -102,12 +105,12 @@ class WeaponEdit:
                     int(st),
                     int(SKILL_ATTRIBUTE[skill.get()], 16),
                     int(sk),
-                    int((SPELLS[spell.get()])[:2], 16),
-                    int((SPELLS[spell.get()])[2:], 16),
+                    int((inv_spell_dic[spell.get()])[:2], 16),
+                    int((inv_spell_dic[spell.get()])[2:], 16),
                     int(spell_level.get()),
                     int(d[38] + d[39], 16),
-                    int((SPELLS[magic.get()])[:2], 16),
-                    int((SPELLS[magic.get()])[2:], 16),
+                    int((inv_spell_dic[magic.get()])[:2], 16),
+                    int((inv_spell_dic[magic.get()])[2:], 16),
                     int(magic_level.get()),
                     int(RESIST[resist.get()], 16),
                     int(RESIST_AMOUNTS[resist_amount.get()], 16)
@@ -125,7 +128,7 @@ class WeaponEdit:
             lawfulgood_frame.grid(column=0, row=0)
             default_weapon_menu = Combobox(lawfulgood_frame, textvariable=weapon, width=21,
                                            values=build_lst(filename, WEAPON_ADDRESSES, name_length),
-                                           postcommand=reset_list)
+                                           postcommand=reset_list, state='readonly')
             default_weapon_menu.grid(column=0, row=0)
 
             new_name_label = LabelFrame(lawfulgood_frame, text='New Name')
@@ -134,7 +137,7 @@ class WeaponEdit:
             new_name_entry.grid()
 
             weapon_type_menu = Combobox(lawfulgood_frame, width=9, textvariable=weapon_type,
-                                        values=list(WEAPON_TYPE.keys()))
+                                        values=list(WEAPON_TYPE.keys()), state='readonly')
             weapon_type_menu.grid(column=0, row=3)
 
             lawfulneutral_frame = LabelFrame(win, text='Stats:')
@@ -170,7 +173,7 @@ class WeaponEdit:
             animation_frame = LabelFrame(win, text='Animation')
             animation_frame.grid(column=0, row=2)
             animation_menu = Combobox(animation_frame, textvariable=animation, width=12,
-                                      values=list(WEAPON_ANIMATIONS.keys()))
+                                      values=list(WEAPON_ANIMATIONS.keys()), state='readonly')
             animation_menu.grid(column=0, row=0)
 
             neutralgood_frame = Frame(win)
@@ -193,7 +196,8 @@ class WeaponEdit:
 
             stat_frame = LabelFrame(trueneutral_frame, text='Stat')
             stat_frame.grid(column=0, row=0)
-            stat_menu = Combobox(stat_frame, textvariable=stat, values=list(EQUIPMENT_STAT.keys()), width=16)
+            stat_menu = Combobox(stat_frame, textvariable=stat, values=list(EQUIPMENT_STAT.keys()),
+                                 width=16, state='readonly')
             stat_menu.grid(column=0, row=0)
             stat_entry = Entry(stat_frame, textvariable=stat_amount, width=4)
             stat_entry.grid(column=1, row=0, sticky='e')
@@ -201,31 +205,34 @@ class WeaponEdit:
             ski_att_frame = LabelFrame(trueneutral_frame, text='Skill/Attribute')
             ski_att_frame.grid(column=0, row=1)
             ski_att_menu = Combobox(ski_att_frame, textvariable=skill, width=16,
-                                    values=list(SKILL_ATTRIBUTE.keys()))
+                                    values=list(SKILL_ATTRIBUTE.keys()), state='readonly')
             ski_att_menu.grid(column=0, row=0)
             ski_att_amo_entry = Entry(ski_att_frame, textvariable=skill_amount, width=4)
             ski_att_amo_entry.grid(column=1, row=0)
 
             spell_frame = LabelFrame(trueneutral_frame, text='Spell')
             spell_frame.grid(column=0, row=2)
-            spell_menu = Combobox(spell_frame, textvariable=spell, values=list(SPELLS.keys()), width=16)
+            spell_menu = Combobox(spell_frame, textvariable=spell, values=list(inv_spell_dic.keys()),
+                                  width=16, state='readonly')
             spell_menu.grid(column=0, row=0)
             spell_entry = Entry(spell_frame, textvariable=spell_level, width=4)
             spell_entry.grid(column=1, row=0)
 
             magic_frame = LabelFrame(trueneutral_frame, text='Magic')
             magic_frame.grid(column=0, row=3)
-            magic_menu = Combobox(magic_frame, textvariable=magic, values=list(SPELLS.keys()), width=16)
+            magic_menu = Combobox(magic_frame, textvariable=magic, values=list(inv_spell_dic.keys()),
+                                  width=16, state='readonly')
             magic_menu.grid(column=0, row=0)
             magic_entry = Entry(magic_frame, textvariable=magic_level, width=4)
             magic_entry.grid(column=1, row=0)
 
             resist_frame = LabelFrame(win, text='Resist')
             resist_frame.grid(column=1, row=2)
-            resist_menu = Combobox(resist_frame, textvariable=resist, values=list(RESIST.keys()), width=16)
+            resist_menu = Combobox(resist_frame, textvariable=resist, values=list(RESIST.keys()),
+                                   width=16, state='readonly')
             resist_menu.grid(column=0, row=0)
             resist_amount_menu = Combobox(resist_frame, textvariable=resist_amount, width=5,
-                                          values=list(RESIST_AMOUNTS.keys()))
+                                          values=list(RESIST_AMOUNTS.keys()), state='readonly')
             resist_amount_menu.grid(column=1, row=0)
 
         weapon = StringVar()
