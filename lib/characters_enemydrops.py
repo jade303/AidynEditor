@@ -266,7 +266,7 @@ class CharacterEdit:
                 if char_type == 1:
                     for i in range(148, 181, 2):
                         towrite.append(int(d[i] + d[i + 1], 16))
-                        towrite.append(int((DROP_CAT[enemy_drop_cat.get()]), 16))
+                    towrite.append(int((DROP_CAT[enemy_drop_cat.get()]), 16))
 
                 f.seek(address + data_seek)
                 for i in towrite:
