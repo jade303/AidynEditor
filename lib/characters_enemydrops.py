@@ -422,7 +422,7 @@ class CharacterEdit:
                 exp_label = Label(exp_frame, text='75 X ')
                 exp_label.grid(column=0, row=0, sticky='e')
                 exp_entry = Entry(exp_frame, textvariable=exp, width=4)
-                exp_entry.grid(column=1, row=0, sticky='e')
+                exp_entry.grid(column=1, row=0, sticky='w')
                 #exp_total = Label(exp_frame, text=' = '+str(75 * int(exp.get())))
                 #exp_total.grid(column=2, row=0, sticky='w')
                 exp_note = Label(exp_frame, text='(EXP is 75 multiplied \n by some number)',
