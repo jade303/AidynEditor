@@ -4,23 +4,25 @@ from tkinter.ttk import Combobox
 
 from lib.limits import limit_name_size, limit
 from lib.list_functions import build_lst, get_major_dic, get_minor_dic
-from lib.variables import ATTRIBUTES, SKILLS, DROP_CAT, inv_DROP_CAT, DROP_CAT_ADDRESSES, SPELL_DIC
+from lib.variables import ATTRIBUTES, SKILLS, DROP_CAT, inv_DROP_CAT, DROP_CAT_ADDRESSES, SPELL_DIC, RESIST, \
+    RESIST_AMOUNTS, inv_RESIST, inv_RESIST_AMOUNTS
 
 
 class CharacterEdit:
     def __init__(self, filename, icon, characters, name_length, char_type):
         win = Toplevel()
         win.resizable(False, False)
+        win.geometry('+200+30')
         if char_type == 0:
             win.title("Party Edit -- Edits are NEW GAME only")
-            data_read = 74
+            data_read = 78
             self.max_stats = [30, 30, 30, 40, 30, 90]
         elif char_type == 1:
             win.title("Enemy and Loot Edit")
             data_read = 92
             drop_data_read = 34
-            self.max_stats = [50, 30, 30, 60, 60, 120]  # Pochanargat's max stats
-        win.iconbitmap(icon)
+            self.max_stats = [50, 30, 30, 60, 70, 120]  # Highest max stats found among enemies
+        win.iconbitmap(icon)                            # Need to do more testing with max enemy stats
         data_seek = 44
 
         self.character_lst = build_lst(filename, characters, name_length)
@@ -102,11 +104,15 @@ class CharacterEdit:
                 for s in spell_levels:
                     s.set(int(d[((spell_levels.index(s) * 2) + 108)] + d[((spell_levels.index(s) * 2) + 108) + 1], 16))
 
-                # set exp
-                # exp.set(int(d[180] + d[181], 16))
+                # resists
+                resist1.set(inv_RESIST[(d[148] + d[149]).upper()])
+                resist1A.set(inv_RESIST_AMOUNTS[(d[150] + d[151]).upper()])
+                resist2.set(inv_RESIST[(d[152] + d[153]).upper()])
+                resist2A.set(inv_RESIST_AMOUNTS[(d[154] + d[155]).upper()])
 
                 # enemy drop
                 if char_type == 1:
+                    exp.set(int(d[180] + d[181], 16))
                     enemy_drop_cat.set(inv_DROP_CAT[(d[182] + d[183]).upper()])
                     drop_cat.set(inv_DROP_CAT[(d[182] + d[183]).upper()])
 
@@ -200,8 +206,8 @@ class CharacterEdit:
                 f.seek(address + data_seek)
                 d = f.read(data_read).hex()
 
-                towrite = [aspect.get(), int(d[3] + d[4], 16),
-                           int(d[5] + d[6], 16)]
+                towrite = [aspect.get(), int(d[2] + d[3], 16),
+                           int(d[4] + d[5], 16)]
                 for i in skills:
                     j = i.get()
                     if j == '':
@@ -237,7 +243,7 @@ class CharacterEdit:
                 for i in spell_levels:
                     towrite.append(int(i.get()))
 
-                for i in range(118, 135, 2):
+                for i in range(118, 136, 2):
                     towrite.append(int(d[i] + d[i + 1], 16))
 
                 a = armor.get()
@@ -263,9 +269,15 @@ class CharacterEdit:
                     shi = 255
                 towrite.append(int(shi))
 
+                towrite.append(int(RESIST[resist1.get()], 16))
+                towrite.append(int(RESIST_AMOUNTS[resist1A.get()], 16))
+                towrite.append(int(RESIST[resist2.get()], 16))
+                towrite.append(int(RESIST_AMOUNTS[resist2A.get()], 16))
+
                 if char_type == 1:
-                    for i in range(148, 181, 2):
+                    for i in range(156, 179, 2):
                         towrite.append(int(d[i] + d[i + 1], 16))
+                    towrite.append(int(exp.get()))
                     towrite.append(int((DROP_CAT[enemy_drop_cat.get()]), 16))
 
                 f.seek(address + data_seek)
@@ -361,7 +373,10 @@ class CharacterEdit:
 
             # column 1, row all
             neutralgood_frame = LabelFrame(box, text='Skills\n(blank = cannot learn)')
-            neutralgood_frame.grid(column=1, row=0, rowspan=23)
+            if char_type == 0:
+                neutralgood_frame.grid(column=1, row=0, rowspan=23)
+            elif char_type == 1:
+                neutralgood_frame.grid(column=1, row=1, rowspan=23)
 
             for skill in SKILLS:
                 x = SKILLS.index(skill)
@@ -385,26 +400,44 @@ class CharacterEdit:
                 spell_level = Entry(chaoticgood_frame, textvariable=spell_levels[spells.index(s)], width=4)
                 spell_level.grid(column=1, row=x)
 
+            # column 2 of box
+            resist_frame = LabelFrame(box, text='Resists')
+            resist_frame.grid(column=0, row=4)
+            resist_menu = Combobox(resist_frame, textvariable=resist1, values=list(RESIST.keys()),
+                                   width=16, state='readonly')
+            resist_menu.grid(column=0, row=0)
+            resist_amount_menu = Combobox(resist_frame, textvariable=resist1A, width=5,
+                                          values=list(RESIST_AMOUNTS.keys()), state='readonly')
+            resist_amount_menu.grid(column=1, row=0)
+            resist_menu2 = Combobox(resist_frame, textvariable=resist2, values=list(RESIST.keys()),
+                                    width=16, state='readonly')
+            resist_menu2.grid(column=0, row=1)
+            resist_amount_menu2 = Combobox(resist_frame, textvariable=resist2A, width=5,
+                                           values=list(RESIST_AMOUNTS.keys()), state='readonly')
+            resist_amount_menu2.grid(column=1, row=1)
+
             if char_type == 1:
-                """
-                exp_frame = LabelFrame(win, text='EXP given')
-                exp_frame.grid(column=0, row=4)
-                exp_entry = Entry(exp_frame, textvariable=exp)
-                exp_entry.grid(column=0, row=0)
-                exp_note = Label(exp_frame, text='(there is some unknown \nformula involved with EXP)')
-                exp_note.grid(column=0, row=1)
-                exp_note.config(font=(None, 8))
-                """
+                exp_frame = LabelFrame(box, text='EXP given')
+                exp_frame.grid(column=1, row=0)
+                exp_label = Label(exp_frame, text='75 X ')
+                exp_label.grid(column=0, row=0, sticky='e')
+                exp_entry = Entry(exp_frame, textvariable=exp, width=4)
+                exp_entry.grid(column=1, row=0, sticky='e')
+                exp_total = Label(exp_frame, text=' = '+str(75 * int(exp.get())))
+                exp_total.grid(column=2, row=0, sticky='w')
+                exp_note = Label(exp_frame, text='(EXP is 75 multiplied \n by some number)',
+                                 font=(None, 8))
+                exp_note.grid(column=0, row=1, columnspan=3)
 
                 enemy_drop_cat_label = LabelFrame(box, text='Current Enemy Loot Type')
-                enemy_drop_cat_label.grid(row=4, column=0, pady=12)
+                enemy_drop_cat_label.grid(column=0, row=5, pady=12)
                 enemy_drop_cat_box = Combobox(enemy_drop_cat_label, textvariable=enemy_drop_cat,
                                               values=list(DROP_CAT.keys()),
                                               state='readonly')
                 enemy_drop_cat_box.grid(column=0, row=0)
 
                 drop_frame = LabelFrame(win, text='Loot Editing:', bd=4)
-                drop_frame.grid(column=2, row=0)
+                drop_frame.grid(column=3, row=0)
 
                 drop_box_label = Label(drop_frame, text='Loot Category:')
                 drop_box_label.grid(column=0, row=0, sticky='e')
@@ -486,7 +519,8 @@ class CharacterEdit:
                 for i in other_items:
                     other_item_frame = LabelFrame(item_more, text=('Item' + str(other_items.index(i) + 3)))
                     other_item_frame.grid(column=0, row=other_items.index(i))
-                    other_item_box = Combobox(other_item_frame, textvariable=i, values=list(major_dic.values()), width=28,
+                    other_item_box = Combobox(other_item_frame, textvariable=i, values=list(major_dic.values()),
+                                              width=28,
                                               state='readonly')
                     other_item_box.grid(column=0, row=0, columnspan=2)
                     other_item_chance_label = Label(other_item_frame, text='% chance to drop item:')
@@ -497,6 +531,8 @@ class CharacterEdit:
 
         # initial declaration of variables
         if char_type == 1:
+            exp = StringVar()
+            exp.trace('w', partial(limit, exp, 255))
             enemy_drop_cat = StringVar()
             drop_cat = StringVar()
             drop_cat.trace('w', set_drop_defaults)
@@ -574,7 +610,10 @@ class CharacterEdit:
             spell_levels.append(i)
         armor = StringVar()
         shield = StringVar()
-        # exp = StringVar()
+        resist1 = StringVar()
+        resist1A = StringVar()
+        resist2 = StringVar()
+        resist2A = StringVar()
 
         self.character.set(self.character_lst[0])
         build()
