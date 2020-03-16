@@ -38,6 +38,10 @@ class CharacterEdit:
 
         def set_defaults(*args):
             with open(filename, 'rb') as f:
+                # self.default_name_menu.current() == -1
+                # Unknown why. This starts starts the list
+                # at the bottom, but reads data from top character
+                # this fixes the idx problem
                 idx = self.default_name_menu.current()
                 if idx == -1:
                     idx = 0
