@@ -5,7 +5,7 @@ from tkinter import filedialog
 
 from lib import accessories, armor_shields, characters_enemydrops, spells, wands_scrolls, weapons, trainers_shops
 from lib.variables import ARMOR_ADDRESSES, SHIELD_ADDRESSES, PARTY_ADDRESSES, ENEMY_ADDRESSES
-
+# this change
 
 p = Path()
 background = p / 'images/aidyn.gif'
