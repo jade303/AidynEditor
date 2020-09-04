@@ -628,10 +628,12 @@ inv_SKILL_ATTRIBUTE = {v: k for k, v in SKILL_ATTRIBUTE.items()}
 RESIST = {
     "NONE": "00",
     "Air": "0A",
+    "Chaos": "0D",
     "Cutting": "0E",
     "Earth": "01",
     "Elemental": "0C",
     "Fire": "05",
+    "Holy": "10",
     "Lunar": "06",
     "Magic": "09",
     "Naming": "07",
@@ -640,7 +642,7 @@ RESIST = {
     "Smashing": "0F",
     "Solar": "02",
     "Star": "0B",
-    "Water": "08",
+    "Water": "08"
 }
 
 inv_RESIST = {v: k for k, v in RESIST.items()}
