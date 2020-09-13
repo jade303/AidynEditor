@@ -4,8 +4,8 @@ from tkinter import Toplevel, Frame, LabelFrame, Entry, Button, Radiobutton, Lab
 from tkinter.ttk import Combobox
 
 from lib.limits import limit_name_size, limit, limit_127
-from lib.list_functions import build_lst, get_major_item_dic, get_minor_dic, get_major_loot_lists, get_major_name_lists
-from lib.variables import ATTRIBUTES, SKILLS, DROP_CAT, DROP_CAT_ADDRESSES, SPELL_DIC, RESIST, \
+from lib.list_functions import get_major_item_dic, get_minor_dic, get_major_loot_lists, get_major_name_lists
+from lib.variables import ATTRIBUTES, SKILLS, DROP_CAT, SPELL_DIC, RESIST, \
     RESIST_AMOUNTS, inv_RESIST, inv_RESIST_AMOUNTS, SCHOOL, inv_SCHOOL
 
 
@@ -126,8 +126,8 @@ class CharacterEdit:
                 if char_type == 1:
                     exp.set(int(d[180] + d[181], 16))
                     edc = self.loot_code_list.index((d[182] + d[183]).upper())
-                    enemy_drop_cat.set(self.loot_name_list[edc])
                     drop_cat.set(self.loot_name_list[edc])
+                    enemy_drop_cat.set(drop_cat.get())
 
                 """f.seek(0x0E3BE7)
                 check = f.read(1).hex().upper()
@@ -225,7 +225,7 @@ class CharacterEdit:
 
                 f.seek(address)
                 drop_cat.set(f.read(self.loot_name_length).decode("utf-8"))
-                enemy_drop_cat.set(f.read(self.loot_name_length).decode("utf-8"))
+                enemy_drop_cat.set(drop_cat.get())
             reset_loot_list()
 
         def write():
