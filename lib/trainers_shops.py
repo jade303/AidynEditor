@@ -3,7 +3,7 @@ from tkinter import Toplevel, StringVar, Button, LabelFrame, Label, Entry, Frame
 from tkinter.ttk import Combobox
 
 from lib.limits import limit
-from lib.list_functions import get_major_dic, get_minor_dic
+from lib.list_functions import get_major_item_dic, get_minor_dic
 from lib.variables import SKILLS, SHOP_SKILLS, SHOPS, SHOP_SHIELD, SHOP_SPELLS, SHOP_ITEM_ADDRESSES, SPELL_DIC
 
 
@@ -20,7 +20,6 @@ class TrainerEdit:
         # following list are the trainers that do not provide shop features
         NOT = ["Talewok : Dryad", "Talewok : Professor 1", "Talewok : Professor 2", "Talewok : Professor 3"]
 
-
         shops = []
         with open(filename, 'rb') as f:
             # function for adding Becan's to the list of shops
@@ -28,16 +27,16 @@ class TrainerEdit:
             f.seek(0x01FC7EA4)
             shops = ['Erromon : ' + f.read(9).decode("utf-8").rstrip('\x00')] + SHOPS
 
-        items = get_major_dic(filename)
+        items = get_major_item_dic(filename)
         inv_items = {v: k for k, v in items.items()}
 
         spell_dic = get_minor_dic(filename, SPELL_DIC, 22)
         inv_spell_dic = {v: k for k, v in spell_dic.items()}
 
         main_win = Frame(win)
-        main_win.grid(column=0, row=0)
-        shop_win = Frame(win)
-        shop_win.grid(column=1, row=0)
+        main_win.grid(column=0, row=0, pady=5, padx=(5, 0))
+        shop_win = LabelFrame(win, text='Shop Items')
+        shop_win.grid(column=1, row=0, pady=5, padx=(0, 5), sticky='n')
 
         def defaults(*args):
             with open(filename, 'rb') as f:
@@ -47,8 +46,7 @@ class TrainerEdit:
                 d = f.read(skill_read).hex()
 
                 for s in skills:
-                    sa = skills.index(s) * 2
-                    sn = int(d[sa] + d[sa + 1], 16)
+                    sn = int(d[skills.index(s) * 2] + d[(skills.index(s) * 2) + 1], 16)
                     if sn == 255:
                         sn = ''
                     s.set(sn)
@@ -83,7 +81,7 @@ class TrainerEdit:
                     for item in shop_item:
                         item.set('')
                 else:
-                    shop_win.grid(column=1, row=0)
+                    shop_win.grid(column=1, row=0, pady=5, padx=(0, 5), sticky='n')
                     address = SHOP_ITEM_ADDRESSES[shops.index(trainer.get())]
                     f.seek(address)
 
@@ -174,8 +172,12 @@ class TrainerEdit:
             default_name_menu = Combobox(main_win, textvariable=trainer, values=shops, width=26, state='readonly')
             default_name_menu.grid(column=0, row=0)
 
+            save = Button(main_win, text="Save", command=write)
+            save.grid(column=0, row=1)
+            save.config(width=8)
+
             spell_frame = LabelFrame(main_win, text='Spells and Spell Level')
-            spell_frame.grid(column=0, row=1)
+            spell_frame.grid(column=0, row=2)
 
             for s in spells:
                 x = spells.index(s)
@@ -186,12 +188,8 @@ class TrainerEdit:
                 spell_level.grid(column=1, row=x)
                 spell_level.config(width=4)
 
-            save = Button(main_win, text="Save", command=write)
-            save.grid(column=0, row=3)
-            save.config(width=8)
-
-            skill_frame = LabelFrame(main_win, text='Skills\n(blank = cannot learn)')
-            skill_frame.grid(column=1, row=0, rowspan=23)
+            skill_frame = LabelFrame(main_win, text='Skills')
+            skill_frame.grid(column=1, row=0, rowspan=24, padx=(2, 5))
 
             for skill in SKILLS:
                 x = SKILLS.index(skill)
@@ -204,11 +202,18 @@ class TrainerEdit:
             shield_num = Entry(skill_frame, textvariable=shield_skill, width=4)
             shield_num.grid(column=1, row=23)
 
-            item_frame = LabelFrame(shop_win, text='Shop Items')
-            item_frame.grid(column=2, row=0, rowspan=23)
+            note_box = LabelFrame(main_win, text='Notes on skills')
+            noteA = Label(note_box, anchor='w', width=30, font=(None, 8),
+                          text='* ' + shops[0][10:] + ' edits affect the party version\nof his character\n'
+                                                      '- So blank means he can\'t learn')
+            noteC = Label(note_box, anchor='w', width=30, font=(None, 8),
+                          text='* Blank and 0 mean those particular\nskills are not taught')
+            note_box.grid(column=0, row=3)
+            noteA.grid()
+            noteC.grid()
 
             for item in shop_item:
-                item_box = Combobox(item_frame, textvariable=item, values=list(inv_items.keys()),
+                item_box = Combobox(shop_win, textvariable=item, values=list(inv_items.keys()),
                                     width=28, state='readonly')
                 item_box.grid()
 

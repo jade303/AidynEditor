@@ -134,13 +134,13 @@ class WandScrollEdit:
                 towrite = []
 
                 for i in range(0, 8, 2):
-                    towrite.append(int(d[i] + d[i+1], 16))
+                    towrite.append(int(d[i] + d[i + 1], 16))
 
                 towrite.append(int(v1))
                 towrite.append(int(v2))
 
                 for i in range(12, 22, 2):
-                    towrite.append(int(d[i] + d[i+1], 16))
+                    towrite.append(int(d[i] + d[i + 1], 16))
 
                 towrite.append(int((inv_spell_dic[sc_spell.get()])[:2], 16))
                 towrite.append(int((inv_spell_dic[sc_spell.get()])[2:], 16))
@@ -155,98 +155,97 @@ class WandScrollEdit:
                     f.write(i.to_bytes(1, byteorder='big'))
 
         def build():
-            sc_fr = LabelFrame(win, text='Scrolls:', bd=6)
-            sc_fr.grid(column=0, row=0, sticky='n')
+            box = Frame(win)
+            box.grid(padx=5, pady=5)
+
+            sc_box = LabelFrame(box, text='Scrolls:', bd=6)
+            sc_box.grid(column=0, row=0, sticky='n')
 
             def sc_reset_list():
-                sc_box['values'] = build_lst(filename, SCROLL_ADDRESSES, name_length)
+                sc_menu['values'] = build_lst(filename, SCROLL_ADDRESSES, name_length)
 
-            sc_box = Combobox(sc_fr, textvariable=scroll, width=20,
-                              values=build_lst(filename, SCROLL_ADDRESSES, name_length),
-                              postcommand=sc_reset_list, state='readonly')
-            sc_box.grid(column=0, row=0)
-            sc_new_name_label = LabelFrame(sc_fr, text='New Name')
-            sc_new_name_label.grid(column=0, row=1)
+            sc_menu = Combobox(sc_box, textvariable=scroll, width=20,
+                               values=build_lst(filename, SCROLL_ADDRESSES, name_length),
+                               postcommand=sc_reset_list, state='readonly')
+            sc_menu.grid(column=0, row=0, columnspan=2)
+            sc_new_name_label = LabelFrame(sc_box, text='New Name')
+            sc_new_name_label.grid(column=0, row=1, columnspan=2)
             sc_new_name_entry = Entry(sc_new_name_label, textvariable=sc_name, width=20)
             sc_new_name_entry.grid(column=0, row=0)
-            sc_spell_label = LabelFrame(sc_fr, text='Spell learned/cast')
-            sc_spell_label.grid(column=0, row=2)
+            sc_spell_label = LabelFrame(sc_box, text='Spell learned/cast')
+            sc_spell_label.grid(column=0, row=2, columnspan=2)
             sc_spell_menu = Combobox(sc_spell_label, textvariable=sc_spell, width=20,
                                      values=list(inv_spell_dic.keys()), state='readonly')
             sc_spell_menu.grid(column=0, row=0)
-            sc_other_atts = Frame(sc_fr)
-            sc_other_atts.grid(column=0, row=3)
-            sc_spell_label = Label(sc_other_atts, text='Cast Level')
-            sc_spell_label.grid(column=0, row=0, sticky='e')
-            sc_spell_entry = Entry(sc_other_atts, textvariable=sc_cast_level, width=4)
-            sc_spell_entry.grid(column=1, row=0, sticky='e')
-            sc_value_label = Label(sc_other_atts, text='Base Value')
-            sc_value_label.grid(column=0, row=1, sticky='e')
-            sc_value_entry = Entry(sc_other_atts, textvariable=sc_value, width=6)
-            sc_value_entry.grid(column=1, row=1, sticky='e')
-            sc_save = Button(sc_fr, text='Save Scroll Edits', command=scroll_write)
-            sc_save.grid(column=0, row=4)
 
-            wa_fr = LabelFrame(win, text='Wands', bd=6)
-            wa_fr.grid(column=1, row=0)
+            sc_spell_label = Label(sc_box, text='Cast Level')
+            sc_spell_label.grid(column=0, row=3, sticky='e')
+            sc_spell_entry = Entry(sc_box, textvariable=sc_cast_level, width=4)
+            sc_spell_entry.grid(column=1, row=3, sticky='w')
+            sc_value_label = Label(sc_box, text='Base Value')
+            sc_value_label.grid(column=0, row=4, sticky='e')
+            sc_value_entry = Entry(sc_box, textvariable=sc_value, width=6)
+            sc_value_entry.grid(column=1, row=4, sticky='w')
+            sc_save = Button(sc_box, text='Save Scroll Edits', command=scroll_write)
+            sc_save.grid(column=0, row=5, columnspan=2)
+
+            wa_box = LabelFrame(box, text='Wands', bd=6)
+            wa_box.grid(column=1, row=0)
 
             def wa_reset_list():
-                wa_box['values'] = build_lst(filename, WAND_ADDRESSES, name_length)
+                wa_menu['values'] = build_lst(filename, WAND_ADDRESSES, name_length)
 
-            wa_box = Combobox(wa_fr, textvariable=wand, width=20,
-                              values=build_lst(filename, WAND_ADDRESSES, name_length),
-                              postcommand=wa_reset_list)
-            wa_box.grid(column=0, row=0)
-            wa_new_name_label = LabelFrame(wa_fr, text='New Name')
-            wa_new_name_label.grid(column=0, row=1)
+            wa_menu = Combobox(wa_box, textvariable=wand, width=20,
+                               values=build_lst(filename, WAND_ADDRESSES, name_length),
+                               postcommand=wa_reset_list)
+            wa_menu.grid(column=0, row=0, columnspan=2)
+            wa_new_name_label = LabelFrame(wa_box, text='New Name')
+            wa_new_name_label.grid(column=0, row=1, columnspan=2)
             wa_new_name_entry = Entry(wa_new_name_label, textvariable=wa_name, width=20)
             wa_new_name_entry.grid(column=0, row=0)
-            wa_spell_label = LabelFrame(wa_fr, text='Spell Cast')
-            wa_spell_label.grid(column=0, row=2)
+            wa_spell_label = LabelFrame(wa_box, text='Spell Cast')
+            wa_spell_label.grid(column=0, row=2, columnspan=2)
             wa_spell_menu = Combobox(wa_spell_label, textvariable=wa_spell, width=20,
                                      values=list(inv_spell_dic.keys()), state='readonly')
             wa_spell_menu.grid(column=0, row=0)
 
-            wa_other_atts = Frame(wa_fr)
-            wa_other_atts.grid(column=0, row=3)
+            wa_level_label = Label(wa_box, text='Spell Level')
+            wa_level_label.grid(column=0, row=3, sticky='e')
+            wa_level_entry = Entry(wa_box, textvariable=wa_spell_level, width=4)
+            wa_level_entry.grid(column=1, row=3, sticky='w')
 
-            wa_level_label = Label(wa_other_atts, text='Spell Level')
-            wa_level_label.grid(column=0, row=0, sticky='e')
-            wa_level_entry = Entry(wa_other_atts, textvariable=wa_spell_level, width=4)
-            wa_level_entry.grid(column=1, row=0, sticky='e')
+            wa_charges_label = Label(wa_box, text='Charges')
+            wa_charges_label.grid(column=0, row=4, sticky='e')
+            wa_charges_entry = Entry(wa_box, textvariable=wa_charges, width=4)
+            wa_charges_entry.grid(column=1, row=4, sticky='w')
 
-            wa_charges_label = Label(wa_other_atts, text='Charges')
-            wa_charges_label.grid(column=0, row=1, sticky='e')
-            wa_charges_entry = Entry(wa_other_atts, textvariable=wa_charges, width=4)
-            wa_charges_entry.grid(column=1, row=1, sticky='e')
+            wa_damage_label = Label(wa_box, text='Damage')
+            wa_damage_label.grid(column=0, row=5, sticky='e')
+            wa_damage_entry = Entry(wa_box, textvariable=wa_damage, width=4)
+            wa_damage_entry.grid(column=1, row=5, sticky='w')
 
-            wa_damage_label = Label(wa_other_atts, text='Damage')
-            wa_damage_label.grid(column=0, row=2, sticky='e')
-            wa_damage_entry = Entry(wa_other_atts, textvariable=wa_damage, width=4)
-            wa_damage_entry.grid(column=1, row=2, sticky='e')
+            wa_protection_label = Label(wa_box, text='Protection')
+            wa_protection_label.grid(column=0, row=6, sticky='e')
+            wa_protection_entry = Entry(wa_box, textvariable=wa_protection, width=4)
+            wa_protection_entry.grid(column=1, row=6, sticky='w')
 
-            wa_protection_label = Label(wa_other_atts, text='Protection')
-            wa_protection_label.grid(column=0, row=3, sticky='e')
-            wa_protection_entry = Entry(wa_other_atts, textvariable=wa_protection, width=4)
-            wa_protection_entry.grid(column=1, row=3, sticky='e')
+            wa_str_label = Label(wa_box, text='Str Req')
+            wa_str_label.grid(column=0, row=7, sticky='e')
+            wa_str_entry = Entry(wa_box, textvariable=wa_str_req, width=4)
+            wa_str_entry.grid(column=1, row=7, sticky='w')
 
-            wa_str_label = Label(wa_other_atts, text='Str Req')
-            wa_str_label.grid(column=0, row=4, sticky='e')
-            wa_str_entry = Entry(wa_other_atts, textvariable=wa_str_req, width=4)
-            wa_str_entry.grid(column=1, row=4, sticky='e')
+            wa_int_label = Label(wa_box, text='Int Req')
+            wa_int_label.grid(column=0, row=8, sticky='e')
+            wa_int_entry = Entry(wa_box, textvariable=wa_int_req, width=4)
+            wa_int_entry.grid(column=1, row=8, sticky='w')
 
-            wa_int_label = Label(wa_other_atts, text='Int Req')
-            wa_int_label.grid(column=0, row=5, sticky='e')
-            wa_int_entry = Entry(wa_other_atts, textvariable=wa_int_req, width=4)
-            wa_int_entry.grid(column=1, row=5, sticky='e')
+            wa_value_label = Label(wa_box, text='Base Value')
+            wa_value_label.grid(column=0, row=9, sticky='e')
+            wa_value_entry = Entry(wa_box, textvariable=wa_value, width=6)
+            wa_value_entry.grid(column=1, row=9, sticky='w')
 
-            wa_value_label = Label(wa_other_atts, text='Base Value')
-            wa_value_label.grid(column=0, row=6, sticky='e')
-            wa_value_entry = Entry(wa_other_atts, textvariable=wa_value, width=6)
-            wa_value_entry.grid(column=1, row=6, sticky='e')
-
-            aspect_frame = LabelFrame(wa_fr, text='Aspect')
-            aspect_frame.grid(column=0, row=4)
+            aspect_frame = LabelFrame(wa_box, text='Aspect')
+            aspect_frame.grid(column=0, row=10, columnspan=2)
             none_radio = Radiobutton(aspect_frame, text='NONE', variable=wa_aspect, value=0)
             none_radio.grid(column=0, row=0)
             solar_radio = Radiobutton(aspect_frame, text="Solar", variable=wa_aspect, value=2)
@@ -254,19 +253,16 @@ class WandScrollEdit:
             lunar_radio = Radiobutton(aspect_frame, text='Lunar', variable=wa_aspect, value=1)
             lunar_radio.grid(column=2, row=0)
 
-            wa_bottom = Frame(wa_fr)
-            wa_bottom.grid(column=0, row=5)
-
-            ski_att_frame = LabelFrame(wa_bottom, text='Skill/Attribute')
-            ski_att_frame.grid(column=0, row=0)
+            ski_att_frame = LabelFrame(wa_box, text='Skill/Attribute')
+            ski_att_frame.grid(column=0, row=11, columnspan=2)
             ski_att_menu = Combobox(ski_att_frame, textvariable=wa_skill, width=16,
                                     values=list(SKILL_ATTRIBUTE.keys()), state='readonly')
             ski_att_menu.grid(column=0, row=0)
             ski_att_amo_entry = Entry(ski_att_frame, textvariable=wa_skill_amount, width=4)
             ski_att_amo_entry.grid(column=1, row=0)
 
-            resist_frame = LabelFrame(wa_bottom, text='Resist')
-            resist_frame.grid(column=0, row=1)
+            resist_frame = LabelFrame(wa_box, text='Resist')
+            resist_frame.grid(column=0, row=12, columnspan=2)
             resist_menu = Combobox(resist_frame, textvariable=wa_resist, width=16,
                                    values=list(RESIST.keys()), state='readonly')
             resist_menu.grid(column=0, row=0)
@@ -274,8 +270,8 @@ class WandScrollEdit:
                                           values=list(RESIST_AMOUNTS.keys()), state='readonly')
             resist_amount_menu.grid(column=1, row=0)
 
-            wa_save = Button(wa_fr, text='Save Wand Edits', command=wand_write)
-            wa_save.grid(column=0, row=6)
+            wa_save = Button(wa_box, text='Save Wand Edits', command=wand_write)
+            wa_save.grid(column=0, row=13, columnspan=2)
 
         wand = StringVar()
         wand.trace('w', wand_defaults)

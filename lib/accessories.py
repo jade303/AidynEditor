@@ -113,55 +113,52 @@ class AccessoryEdit:
             def reset_list():
                 default_item_menu['values'] = build_lst(filename, ACCESSORY_ADDRESSES, name_length)
 
-            lawfulgood_frame = Frame(win)
-            lawfulgood_frame.grid(column=0, row=0)
-            default_item_menu = Combobox(lawfulgood_frame, textvariable=item, width=21,
+            box = Frame(win)
+            box.grid(column=0, row=0, pady=5, padx=5)
+            default_item_menu = Combobox(box, textvariable=item, width=21,
                                          values=build_lst(filename, ACCESSORY_ADDRESSES, name_length),
                                          postcommand=reset_list, state='readonly')
             default_item_menu.grid(column=0, row=0)
-            new_name_label = LabelFrame(lawfulgood_frame, text='New Name')
+            new_name_label = LabelFrame(box, text='New Name')
             new_name_label.grid(column=0, row=1)
             new_name_entry = Entry(new_name_label, textvariable=name, width=21)
             new_name_entry.grid()
 
-            lawfulneutral_frame = LabelFrame(win, text='Stats:')
-            lawfulneutral_frame.grid(column=0, row=1)
+            stat_frame = LabelFrame(box, text='Stats:')
+            stat_frame.grid(column=0, row=2, rowspan=4)
 
-            defense_label = Label(lawfulneutral_frame, text='Damage:')
+            defense_label = Label(stat_frame, text='Damage:')
             defense_label.grid(column=0, row=0, sticky='e')
-            defense_entry = Entry(lawfulneutral_frame, textvariable=damage, width=4)
-            defense_entry.grid(column=1, row=0, stick='e')
+            defense_entry = Entry(stat_frame, textvariable=damage, width=4)
+            defense_entry.grid(column=1, row=0, stick='w')
 
-            protection_label = Label(lawfulneutral_frame, text='Protection:')
+            protection_label = Label(stat_frame, text='Protection:')
             protection_label.grid(column=0, row=1, sticky='e')
-            protection_entry = Entry(lawfulneutral_frame, textvariable=protection, width=4)
-            protection_entry.grid(column=1, row=1, sticky='e')
+            protection_entry = Entry(stat_frame, textvariable=protection, width=4)
+            protection_entry.grid(column=1, row=1, sticky='w')
 
-            dexterity_label = Label(lawfulneutral_frame, text='Strength Required:')
+            dexterity_label = Label(stat_frame, text='Strength Required:')
             dexterity_label.grid(column=0, row=2, sticky='e')
-            dexterity_entry = Entry(lawfulneutral_frame, textvariable=str_req, width=4)
-            dexterity_entry.grid(column=1, row=2, sticky='e')
+            dexterity_entry = Entry(stat_frame, textvariable=str_req, width=4)
+            dexterity_entry.grid(column=1, row=2, sticky='w')
 
-            stealth_label = Label(lawfulneutral_frame, text='Intelligence Required:')
+            stealth_label = Label(stat_frame, text='Intelligence Required:')
             stealth_label.grid(column=0, row=3, sticky='e')
-            stealth_entry = Entry(lawfulneutral_frame, textvariable=int_req, width=4)
-            stealth_entry.grid(column=1, row=3, sticky='e')
+            stealth_entry = Entry(stat_frame, textvariable=int_req, width=4)
+            stealth_entry.grid(column=1, row=3, sticky='w')
 
-            value_label = Label(lawfulneutral_frame, text='Base Value:')
+            value_label = Label(stat_frame, text='Base Value:')
             value_label.grid(column=0, row=4, sticky='e')
-            value_entry = Entry(lawfulneutral_frame, textvariable=value, width=6)
-            value_entry.grid(column=1, row=4, sticky='e')
-            value_label2 = Label(lawfulneutral_frame, text='Max base value: 65535', font=(None, 8))
+            value_entry = Entry(stat_frame, textvariable=value, width=6)
+            value_entry.grid(column=1, row=4, sticky='w')
+            value_label2 = Label(stat_frame, text='Max base value: 65535', font=(None, 8))
             value_label2.grid(row=5, columnspan=2)
 
-            neutralgood_frame = Frame(win)
-            neutralgood_frame.grid(column=1, row=0)
+            save = Button(box, text='Save', command=write, width=8)
+            save.grid(column=1, row=0)
 
-            save = Button(neutralgood_frame, text='Save', command=write, width=8)
-            save.grid(column=0, row=0)
-
-            aspect_frame = LabelFrame(neutralgood_frame, text='Aspect')
-            aspect_frame.grid(column=0, row=1)
+            aspect_frame = LabelFrame(box, text='Aspect')
+            aspect_frame.grid(column=1, row=1)
             none_radio = Radiobutton(aspect_frame, text='NONE', variable=aspect, value=0)
             none_radio.grid(column=0, row=0)
             solar_radio = Radiobutton(aspect_frame, text="Solar", variable=aspect, value=2)
@@ -169,43 +166,40 @@ class AccessoryEdit:
             lunar_radio = Radiobutton(aspect_frame, text='Lunar', variable=aspect, value=1)
             lunar_radio.grid(column=2, row=0)
 
-            trueneutral_frame = Frame(win)
-            trueneutral_frame.grid(column=1, row=1)
+            att_frame = LabelFrame(box, text='Attribute')
+            att_frame.grid(column=1, row=2)
+            att_menu = Combobox(att_frame, textvariable=stat, values=list(EQUIPMENT_STAT.keys()),
+                                width=16, state='readonly')
+            att_menu.grid(column=0, row=0)
+            att_entry = Entry(att_frame, textvariable=stat_amount, width=4)
+            att_entry.grid(column=1, row=0, sticky='e')
 
-            stat_frame = LabelFrame(trueneutral_frame, text='Stat')
-            stat_frame.grid(column=0, row=0)
-            stat_menu = Combobox(stat_frame, textvariable=stat, values=list(EQUIPMENT_STAT.keys()),
-                                 width=16, state='readonly')
-            stat_menu.grid(column=0, row=0)
-            stat_entry = Entry(stat_frame, textvariable=stat_amount, width=4)
-            stat_entry.grid(column=1, row=0, sticky='e')
-
-            ski_att_frame = LabelFrame(trueneutral_frame, text='Skill/Attribute')
-            ski_att_frame.grid(column=0, row=1)
+            ski_att_frame = LabelFrame(box, text='Skill/Attribute')
+            ski_att_frame.grid(column=1, row=3)
             ski_att_menu = Combobox(ski_att_frame, textvariable=skill, values=list(SKILL_ATTRIBUTE.keys()),
                                     width=16, state='readonly')
             ski_att_menu.grid(column=0, row=0)
             ski_att_amo_entry = Entry(ski_att_frame, textvariable=skill_amount, width=4)
             ski_att_amo_entry.grid(column=1, row=0)
 
-            spell_frame = LabelFrame(trueneutral_frame, text='Spell')
-            spell_frame.grid(column=0, row=2)
+            spell_frame = LabelFrame(box, text='Spell')
+            spell_frame.grid(column=1, row=4)
             spell_menu = Combobox(spell_frame, textvariable=spell, values=list(inv_spell_dic.keys()),
                                   width=16, state='readonly')
             spell_menu.grid(column=0, row=0)
             spell_entry = Entry(spell_frame, textvariable=spell_level, width=4)
             spell_entry.grid(column=1, row=0)
 
-            magic_frame = LabelFrame(trueneutral_frame, text='Magic')
-            magic_frame.grid(column=0, row=3)
+            magic_frame = LabelFrame(box, text='Magic')
+            magic_frame.grid(column=1, row=5)
             magic_menu = Combobox(magic_frame, textvariable=magic, values=list(inv_spell_dic.keys()),
                                   width=16, state='readonly')
             magic_menu.grid(column=0, row=0)
             magic_entry = Entry(magic_frame, textvariable=magic_level, width=4)
             magic_entry.grid(column=1, row=0)
 
-            resist_frame = LabelFrame(win, text='Resist')
-            resist_frame.grid(column=1, row=2)
+            resist_frame = LabelFrame(box, text='Resist')
+            resist_frame.grid(column=1, row=6)
             resist_menu = Combobox(resist_frame, textvariable=resist, values=list(RESIST.keys()),
                                    width=16, state='readonly')
             resist_menu.grid(column=0, row=0)

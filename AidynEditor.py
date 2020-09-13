@@ -3,7 +3,7 @@ import shutil
 from tkinter import Tk, LabelFrame, mainloop, Button, PhotoImage, Label, Checkbutton, BooleanVar
 from tkinter import filedialog
 
-from lib import accessories, armor_shields, characters_enemydrops, spells, wands_scrolls, weapons, trainers_shops
+from lib import armor_shield, characters_enemydrops, spells, wands_scrolls, weapons, trainers_shops, accessories
 from lib.variables import ARMOR_ADDRESSES, SHIELD_ADDRESSES, PARTY_ADDRESSES, ENEMY_ADDRESSES
 
 p = Path()
@@ -58,17 +58,17 @@ def file_dialog():
         accessory_button.grid(column=1, row=3)
 
         armor_button = Button(root, text='Armor', width=button_width,
-                              command=lambda: armor_shields.ArmorShieldEdit(filename,
-                                                                            icon,
-                                                                            ARMOR_ADDRESSES,
-                                                                            1))
+                              command=lambda: armor_shield.ArmorShield(filename,
+                                                                       icon,
+                                                                       ARMOR_ADDRESSES,
+                                                                       0))
         armor_button.grid(column=1, row=4)
 
         shield_button = Button(root, text='Shield', width=button_width,
-                               command=lambda: armor_shields.ArmorShieldEdit(filename,
-                                                                             icon,
-                                                                             SHIELD_ADDRESSES,
-                                                                             0))
+                               command=lambda: armor_shield.ArmorShield(filename,
+                                                                        icon,
+                                                                        SHIELD_ADDRESSES,
+                                                                        1))
         shield_button.grid(column=1, row=5)
 
         spell_button = Button(root, text='Spell', width=button_width,
@@ -85,12 +85,13 @@ def file_dialog():
 
 
 root = Tk()
+root.geometry('+300+150')
 root.resizable(False, False)
 root.title('Aidyn Editor')
 root.iconbitmap(icon)
 image = PhotoImage(file=background)
 backup = BooleanVar()
-backup.set(True)  # sets default mode to create a backup (False would be default no)
+backup.set(False)  # sets default mode to create a backup (False would be default no backup)
 
 browse_frame = LabelFrame(root, text='Aidyn Chronicles ROM')
 browse_frame.pack()

@@ -1,4 +1,7 @@
 # limits the same size
+from tkinter import END
+
+
 def limit_name_size(name, name_length, *args):
     n = name.get()
     if len(n) > name_length:
@@ -6,7 +9,11 @@ def limit_name_size(name, name_length, *args):
 
 
 # sets appropriate limits
+# 'i' is what is being limited
+# 'x' is the MAX value
 def limit(i, x, *args):
+    if i.get() == '00':
+        i.set('0')
     val = i.get()
     if not val.isnumeric():
         val = ''.join(filter(str.isnumeric, val))
@@ -20,6 +27,8 @@ def limit(i, x, *args):
 
 # check for neg/pos 127
 def limit_127(i, *args):
+    if i.get() == '00':
+        i.set('0')
     val = i.get()
     if len(val) > 0 and val[0] == '-':
         if val == '-':
@@ -31,7 +40,7 @@ def limit_127(i, *args):
             i.set(int(val) * -1)
         elif val.isnumeric():
             if int(val) > 127:
-                i.set('-127')
+                i.set('-128')
             else:
                 i.set(int(val) * -1)
     else:
