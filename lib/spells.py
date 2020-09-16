@@ -3,7 +3,7 @@ from tkinter import Toplevel, Frame, LabelFrame, Entry, Radiobutton, Label, Butt
 from tkinter.ttk import Combobox
 
 from lib.limits import limit_name_size, limit
-from lib.list_functions import build_lst
+from lib.list_functions import get_major_name_lists
 from lib.variables import SPELL_ADDRESSES, inv_TARGET_NUM, inv_TARGET_TYPE, inv_SPELL_INGREDIENTS, \
     TARGET_NUM, TARGET_TYPE, SPELL_INGREDIENTS, SCHOOL, inv_SCHOOL
 
@@ -19,9 +19,12 @@ class SpellEdit:
         data_read = 11
         name_length = 22
 
+        self.spell_list, self.spell_addresses = get_major_name_lists(filename, SPELL_ADDRESSES, name_length)
+        self.default_spell_menu = Combobox()
+
         def set_defaults(*args):
             with open(filename, 'rb') as f:
-                address = SPELL_ADDRESSES[build_lst(filename, SPELL_ADDRESSES, name_length).index(spell.get())]
+                address = self.spell_addresses[self.default_spell_menu.current()]
 
                 # get name that can be changed
                 f.seek(address)
@@ -48,7 +51,8 @@ class SpellEdit:
 
         def write():
             with open(filename, 'rb+') as f:
-                address = SPELL_ADDRESSES[build_lst(filename, SPELL_ADDRESSES, name_length).index(spell.get())]
+                address = self.spell_addresses[self.default_spell_menu.current()]
+
                 new_name = bytearray(name.get(), 'utf-8')
                 if len(new_name) < name_length:
                     while len(new_name) < name_length:
@@ -77,17 +81,18 @@ class SpellEdit:
                 for item in towrite:
                     f.write(item.to_bytes(1, byteorder='big'))
 
-        def build():
-            def reset_list():
-                default_spell_menu['values'] = build_lst(filename, SPELL_ADDRESSES, name_length)
+                reset_list()
+                self.spell.set(self.spell_list[self.spell_list.index(name.get().rstrip('\x00'))])
+            set_defaults()
 
+        def build():
             box = Frame(win)
             box.grid(column=0, row=0, pady=5, padx=5)
 
-            default_spell_menu = Combobox(box, textvariable=spell, width=22,
-                                          values=build_lst(filename, SPELL_ADDRESSES, name_length),
-                                          postcommand=reset_list, state='readonly')
-            default_spell_menu.grid(column=0, row=0)
+            self.default_spell_menu = Combobox(box, textvariable=self.spell, width=22,
+                                               values=self.spell_list,
+                                               postcommand=reset_list, state='readonly')
+            self.default_spell_menu.grid(column=0, row=0)
 
             new_name_label = LabelFrame(box, text='New Name')
             new_name_label.grid(column=0, row=1)
@@ -159,8 +164,14 @@ class SpellEdit:
                                         width=23, state='readonly')
             target_type_menu.grid()
 
-        spell = StringVar()
-        spell.trace('w', set_defaults)
+        def reset_list():
+            self.spell_list[:] = []
+            self.spell_addresses[:] = []
+            self.spell_list, self.spell_addresses = get_major_name_lists(filename, SPELL_ADDRESSES, name_length)
+            self.default_spell_menu['values'] = self.spell_list
+
+        self.spell = StringVar()
+        self.spell.trace('w', set_defaults)
         name = StringVar()
         name.trace('w', partial(limit_name_size, name, name_length))
 
@@ -181,5 +192,5 @@ class SpellEdit:
         aspect = IntVar()
         ingredient = StringVar()
 
-        spell.set(build_lst(filename, SPELL_ADDRESSES, name_length)[0])
         build()
+        self.spell.set(self.spell_list[0])

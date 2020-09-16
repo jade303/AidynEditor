@@ -4,7 +4,7 @@ from tkinter import Tk, LabelFrame, mainloop, Button, PhotoImage, Label, Checkbu
 from tkinter import filedialog
 
 from lib import armor_shield, characters_enemydrops, spells, wands_scrolls, weapons, trainers_shops, accessories
-from lib.variables import ARMOR_ADDRESSES, SHIELD_ADDRESSES, PARTY_ADDRESSES, ENEMY_ADDRESSES
+from lib.variables import ARMOR_ADDRESSES, SHIELD_ADDRESSES, PARTY_ADDRESSES, ENEMY_ADDRESSES, WEAPON_ADDRESSES
 
 p = Path()
 background = p / 'images/aidyn.gif'
@@ -80,7 +80,7 @@ def file_dialog():
         wandsscrolls_button.grid(column=1, row=7)
 
         weapon_button = Button(root, text='Weapon', width=button_width,
-                               command=lambda: weapons.WeaponEdit(filename, icon))
+                               command=lambda: weapons.WeaponEdit(filename, icon, WEAPON_ADDRESSES))
         weapon_button.grid(column=1, row=8)
 
 

@@ -13,7 +13,7 @@ class CharacterEdit:
     def __init__(self, filename, icon, characters, name_length, char_type):
         win = Toplevel()
         win.resizable(False, False)
-        win.geometry('+200+20')
+        win.geometry('+200+10')
         if char_type == 0:
             win.title("Party Edit -- Edits are NEW GAME only")
             data_read = 78
@@ -28,7 +28,7 @@ class CharacterEdit:
             self.drop_box = Combobox()
             self.enemy_drop_cat_box = Combobox()
             self.max_stats = [50, 30, 30, 60, 70, 120]  # Highest max stats found among enemies
-        win.iconbitmap(icon)  # Need to do more testing with max enemy stats
+        win.iconbitmap(icon)                            # Need to do more testing with max enemy stats
         data_seek = 44
 
         self.character_list, self.character_addresses = get_major_name_lists(filename, characters, name_length)
@@ -45,13 +45,7 @@ class CharacterEdit:
 
         def set_defaults(*args):
             with open(filename, 'rb') as f:
-                # self.default_name_menu.current() == -1
-                # I don't know why
-                # this fixes the idx problem
-                idx = self.default_name_menu.current()
-                if idx == -1:
-                    idx = 0
-                address = self.character_addresses[idx]
+                address = self.character_addresses[self.default_name_menu.current()]
 
                 # get name that can be changed
                 f.seek(address)
@@ -125,8 +119,7 @@ class CharacterEdit:
                 # enemy drop
                 if char_type == 1:
                     exp.set(int(d[180] + d[181], 16))
-                    edc = self.loot_code_list.index((d[182] + d[183]).upper())
-                    drop_cat.set(self.loot_name_list[edc])
+                    drop_cat.set(self.loot_name_list[self.loot_code_list.index((d[182] + d[183]).upper())])
                     enemy_drop_cat.set(drop_cat.get())
 
                 """f.seek(0x0E3BE7)
@@ -138,8 +131,7 @@ class CharacterEdit:
 
         def set_drop_defaults(*args):
             with open(filename, 'rb') as f:
-                idx = self.drop_box.current()
-                address = self.loot_address_list[idx]
+                address = self.loot_address_list[self.drop_box.current()]
 
                 f.seek(address)
                 loot_name.set(f.read(self.loot_name_length).decode("utf-8"))
@@ -170,10 +162,7 @@ class CharacterEdit:
 
         def write_drop():
             with open(filename, 'rb+') as f:
-                idx = self.drop_box.current()
-                if idx == -1:
-                    idx = 0
-                address = self.loot_address_list[idx]
+                address = self.loot_address_list[self.drop_box.current()]
 
                 new_loot_name = bytearray(loot_name.get(), 'utf-8')
                 if len(new_loot_name) < self.loot_name_length:
@@ -223,17 +212,18 @@ class CharacterEdit:
                 for i in towrite:
                     f.write(i.to_bytes(1, byteorder='big'))
 
-                f.seek(address)
-                drop_cat.set(f.read(self.loot_name_length).decode("utf-8"))
-                enemy_drop_cat.set(drop_cat.get())
-            reset_loot_list()
+                reset_loot_list()
+                if drop_cat.get() == enemy_drop_cat.get():
+                    drop_cat.set(self.loot_name_list[self.loot_name_list.index(loot_name.get().rstrip('\x00'))])
+                    enemy_drop_cat.set(drop_cat.get())
+                else:
+                    drop_cat.set(self.loot_name_list[self.loot_name_list.index(loot_name.get().rstrip('\x00'))])
+            set_drop_defaults()
 
         def write():
             with open(filename, 'rb+') as f:
-                idx = self.default_name_menu.current()
-                if idx == -1:
-                    idx = 0
-                address = self.character_addresses[idx]
+                towrite = []
+                address = self.character_addresses[self.default_name_menu.current()]
                 # write new name to file
                 new_name = bytearray(name.get(), 'utf-8')
                 if len(new_name) < name_length:
@@ -345,9 +335,9 @@ class CharacterEdit:
                     modded_stat_address += 4
                     f.seek(modded_stat_address)"""
 
-                f.seek(address)
-                self.character.set(f.read(name_length).decode("utf-8"))
-            reset_character_list()
+                reset_character_list()
+                self.character.set(self.character_list[self.character_list.index(name.get().rstrip('\x00'))])
+            set_defaults()
 
         def build():
             box = Frame(win)
@@ -600,12 +590,8 @@ class CharacterEdit:
             self.default_name_menu['values'] = self.character_list
 
         if char_type == 1:
-            exp = StringVar()
-            exp.trace('w', partial(limit, exp, 255))
-
             def update_exp(*args):
-                val = exp.get()
-                if val == '':
+                if exp.get() == '':
                     self.exp_total.configure(text=' = ')
                 else:
                     self.exp_total.configure(text=' = ' + str(75 * int(exp.get())))
@@ -619,7 +605,10 @@ class CharacterEdit:
                 self.drop_box['values'] = self.loot_name_list
                 self.enemy_drop_cat_box['values'] = self.loot_name_list
 
-            exp.trace('w', partial(update_exp, exp, 255))
+            exp = StringVar()
+            exp.set(0)
+            exp.trace('w', partial(limit, exp, 255))
+            exp.trace('w', update_exp)
             enemy_drop_cat = StringVar()
             drop_cat = StringVar()
             drop_cat.trace('w', set_drop_defaults)
@@ -708,5 +697,5 @@ class CharacterEdit:
 
         # break_limit = BooleanVar()
 
-        self.character.set(self.character_list[0])
         build()
+        self.character.set(self.character_list[0])

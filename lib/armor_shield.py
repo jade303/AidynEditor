@@ -3,7 +3,7 @@ from tkinter import Toplevel, StringVar, IntVar, LabelFrame, Frame, Entry, Label
 from tkinter.ttk import Combobox
 
 from lib.limits import limit_name_size, limit_127, limit
-from lib.list_functions import build_lst, get_minor_dic
+from lib.list_functions import get_minor_dic, get_major_name_lists
 from lib.variables import inv_EQUIPMENT_STAT, inv_SKILL_ATTRIBUTE, inv_RESIST, inv_RESIST_AMOUNTS, \
     EQUIPMENT_STAT, SKILL_ATTRIBUTE, RESIST, RESIST_AMOUNTS, SPELL_DIC
 
@@ -12,22 +12,27 @@ class ArmorShield:
     def __init__(self, filename, icon, addresses, title):
         win = Toplevel()
         win.resizable(False, False)
-        if title == 0:
+        if title == 5:
             win.title("Armor Edit")
-        elif title == 1:
+        elif title == 6:
             win.title("Shield Edit")
+        elif title == 7:
+            win.title("Weapon Edit")
         win.iconbitmap(icon)
         filename = filename
         data_seek = 26
         data_read = 25
         name_length = 22
 
+        self.item_list, self.item_addresses = get_major_name_lists(filename, addresses, name_length)
+        self.default_item_menu = Combobox()
+
         spell_dic = get_minor_dic(filename, SPELL_DIC, 22)
         inv_spell_dic = {v: k for k, v in spell_dic.items()}
 
         def set_defaults(*args):
             with open(filename, 'rb') as f:
-                address = addresses[build_lst(filename, addresses, name_length).index(item.get())]
+                address = self.item_addresses[self.default_item_menu.current()]
                 f.seek(address)
                 name.set(f.read(name_length).decode("utf-8"))
 
@@ -68,7 +73,7 @@ class ArmorShield:
 
         def write():
             with open(filename, 'rb+') as f:
-                address = addresses[build_lst(filename, addresses, name_length).index(item.get())]
+                address = self.item_addresses[self.item_list.index(self.default_item_menu.get())]
 
                 new_name = bytearray(name.get(), 'utf-8')
                 if len(new_name) < name_length:
@@ -130,16 +135,17 @@ class ArmorShield:
                 for i in towrite:
                     f.write(i.to_bytes(1, byteorder='big'))
 
-        def build():
-            def reset_list():
-                default_item_menu['values'] = build_lst(filename, addresses, name_length)
+                reset_list()
+                self.item.set(self.item_list[self.item_list.index(name.get().rstrip('\x00'))])
+            set_defaults()
 
+        def build():
             box = Frame(win)
             box.grid(column=0, row=0, pady=5, padx=5)
-            default_item_menu = Combobox(box, textvariable=item, width=21,
-                                         values=build_lst(filename, addresses, name_length),
-                                         postcommand=reset_list, state='readonly')
-            default_item_menu.grid(column=0, row=0)
+            self.default_item_menu = Combobox(box, textvariable=self.item, width=21,
+                                              values=self.item_list,
+                                              postcommand=reset_list, state='readonly')
+            self.default_item_menu.grid(column=0, row=0)
 
             new_name_label = LabelFrame(box, text='New Name')
             new_name_label.grid(column=0, row=1)
@@ -229,8 +235,14 @@ class ArmorShield:
                                           values=list(RESIST_AMOUNTS.keys()), state='readonly')
             resist_amount_menu.grid(column=1, row=0)
 
-        item = StringVar()
-        item.trace('w', set_defaults)
+        def reset_list():
+            self.item_list[:] = []
+            self.item_addresses[:] = []
+            self.item_list, self.item_addresses = get_major_name_lists(filename, addresses, name_length)
+            self.default_item_menu['values'] = self.item_list
+
+        self.item = StringVar()
+        self.item.trace('w', set_defaults)
         name = StringVar()
         name.trace('w', partial(limit_name_size, name, name_length))
 
@@ -260,5 +272,5 @@ class ArmorShield:
         resist = StringVar()
         resist_amount = StringVar()
 
-        item.set(build_lst(filename, addresses, name_length)[0])
         build()
+        self.item.set(self.item_list[0])

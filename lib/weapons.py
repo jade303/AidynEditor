@@ -3,14 +3,14 @@ from tkinter import Toplevel, Frame, LabelFrame, Entry, Label, Button, Radiobutt
 from tkinter.ttk import Combobox
 
 from lib.limits import limit_name_size, limit, limit_127
-from lib.list_functions import build_lst, get_minor_dic
-from lib.variables import WEAPON_ADDRESSES, inv_WEAPON_TYPE, inv_WEAPON_ANIMATIONS, inv_EQUIPMENT_STAT, \
+from lib.list_functions import get_minor_dic, get_major_name_lists
+from lib.variables import inv_WEAPON_TYPE, inv_WEAPON_ANIMATIONS, inv_EQUIPMENT_STAT, \
     inv_SKILL_ATTRIBUTE, inv_RESIST, inv_RESIST_AMOUNTS, WEAPON_TYPE, WEAPON_ANIMATIONS, EQUIPMENT_STAT, \
     SKILL_ATTRIBUTE, RESIST, RESIST_AMOUNTS, SPELL_DIC
 
 
 class WeaponEdit:
-    def __init__(self, filename, icon):
+    def __init__(self, filename, icon, addresses):
         win = Toplevel()
         win.resizable(False, False)
         win.title('Weapon Edit')
@@ -20,12 +20,15 @@ class WeaponEdit:
         data_read = 25
         name_length = 21
 
+        self.item_list, self.item_addresses = get_major_name_lists(filename, addresses, name_length)
+        self.default_item_menu = Combobox()
+
         spell_dic = get_minor_dic(filename, SPELL_DIC, 22)
         inv_spell_dic = {v: k for k, v in spell_dic.items()}
 
         def set_defaults(*args):
             with open(filename, 'rb') as f:
-                address = WEAPON_ADDRESSES[build_lst(filename, WEAPON_ADDRESSES, name_length).index(weapon.get())]
+                address = self.item_addresses[self.default_item_menu.current()]
                 f.seek(address)
                 name.set(f.read(name_length).decode("utf-8"))
 
@@ -65,8 +68,7 @@ class WeaponEdit:
 
         def write():
             with open(filename, 'rb+') as f:
-                address = WEAPON_ADDRESSES[build_lst(filename, WEAPON_ADDRESSES, name_length).index(weapon.get())]
-
+                address = self.item_addresses[self.default_item_menu.current()]
                 new_name = bytearray(name.get(), 'utf-8')
                 if len(new_name) < name_length:
                     while len(new_name) < name_length:
@@ -122,16 +124,17 @@ class WeaponEdit:
                 for i in towrite:
                     f.write(i.to_bytes(1, byteorder='big'))
 
-        def build():
-            def reset_list():
-                default_weapon_menu['values'] = build_lst(filename, WEAPON_ADDRESSES, name_length)
+                reset_list()
+                self.item.set(self.item_list[self.item_list.index(name.get().rstrip('\x00'))])
+            set_defaults()
 
+        def build():
             box = Frame(win)
             box.grid(column=0, row=0, pady=5, padx=5)
-            default_weapon_menu = Combobox(box, textvariable=weapon, width=21,
-                                           values=build_lst(filename, WEAPON_ADDRESSES, name_length),
-                                           postcommand=reset_list, state='readonly')
-            default_weapon_menu.grid(column=0, row=0)
+            self.default_item_menu = Combobox(box, textvariable=self.item, width=21,
+                                              values=self.item_list,
+                                              postcommand=reset_list, state='readonly')
+            self.default_item_menu.grid(column=0, row=0)
 
             new_name_label = LabelFrame(box, text='New Name')
             new_name_label.grid(column=0, row=1)
@@ -239,8 +242,14 @@ class WeaponEdit:
                                           values=list(RESIST_AMOUNTS.keys()), state='readonly')
             resist_amount_menu.grid(column=1, row=0)
 
-        weapon = StringVar()
-        weapon.trace('w', set_defaults)
+        def reset_list():
+            self.item_list[:] = []
+            self.item_addresses[:] = []
+            self.item_list, self.item_addresses = get_major_name_lists(filename, addresses, name_length)
+            self.default_item_menu['values'] = self.item_list
+
+        self.item = StringVar()
+        self.item.trace('w', set_defaults)
         name = StringVar()
         name.trace('w', partial(limit_name_size, name, name_length))
 
@@ -273,5 +282,5 @@ class WeaponEdit:
         resist = StringVar()
         resist_amount = StringVar()
 
-        weapon.set(build_lst(filename, WEAPON_ADDRESSES, name_length)[0])
         build()
+        self.item.set(self.item_list[0])

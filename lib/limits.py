@@ -14,15 +14,15 @@ def limit_name_size(name, name_length, *args):
 def limit(i, x, *args):
     if i.get() == '00':
         i.set('0')
-    val = i.get()
-    if not val.isnumeric():
-        val = ''.join(filter(str.isnumeric, val))
+    #val = i.get()
+    if not i.get().isnumeric():
+        val = ''.join(filter(str.isnumeric, i.get()))
         i.set(val)
-    elif val.isnumeric():
-        if int(val) > x:
+    elif i.get().isnumeric():
+        if int(i.get()) > x:
             i.set(x)
         else:
-            i.set(val)
+            i.set(i.get())
 
 
 # check for neg/pos 127

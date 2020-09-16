@@ -3,7 +3,7 @@ from tkinter import Toplevel, Label, StringVar, LabelFrame, Entry, Frame, Button
 from tkinter.ttk import Combobox
 
 from lib.limits import limit, limit_127, limit_name_size
-from lib.list_functions import build_lst, get_minor_dic
+from lib.list_functions import build_lst, get_minor_dic, get_major_name_lists
 from lib.variables import WAND_ADDRESSES, SCROLL_ADDRESSES, inv_SKILL_ATTRIBUTE, \
     inv_RESIST, inv_RESIST_AMOUNTS, SKILL_ATTRIBUTE, RESIST, RESIST_AMOUNTS, SPELL_DIC
 
@@ -19,12 +19,17 @@ class WandScrollEdit:
         data_read = 20
         name_length = 18
 
+        self.scroll_list, self.scroll_addresses = get_major_name_lists(filename, SCROLL_ADDRESSES, name_length)
+        self.wand_list, self.wand_addresses = get_major_name_lists(filename, WAND_ADDRESSES, name_length)
+        self.sc_menu = Combobox()
+        self.wa_menu = Combobox()
+
         spell_dic = get_minor_dic(filename, SPELL_DIC, 22)
         inv_spell_dic = {v: k for k, v in spell_dic.items()}
 
         def wand_defaults(*args):
             with open(filename, 'rb') as f:
-                address = WAND_ADDRESSES[build_lst(filename, WAND_ADDRESSES, name_length).index(wand.get())]
+                address = self.wand_addresses[self.wa_menu.current()]
                 f.seek(address)
                 wa_name.set(f.read(name_length).decode("utf-8"))
 
@@ -50,7 +55,7 @@ class WandScrollEdit:
 
         def scroll_defaults(*args):
             with open(filename, 'rb') as f:
-                address = SCROLL_ADDRESSES[build_lst(filename, SCROLL_ADDRESSES, name_length).index(scroll.get())]
+                address = self.scroll_addresses[self.sc_menu.current()]
                 f.seek(address)
                 sc_name.set(f.read(name_length).decode("utf-8"))
 
@@ -63,7 +68,7 @@ class WandScrollEdit:
 
         def wand_write():
             with open(filename, 'rb+') as f:
-                address = WAND_ADDRESSES[build_lst(filename, WAND_ADDRESSES, name_length).index(wand.get())]
+                address = self.wand_addresses[self.wa_menu.current()]
 
                 new_name = bytearray(wa_name.get(), 'utf-8')
                 if len(new_name) < name_length:
@@ -85,6 +90,9 @@ class WandScrollEdit:
                 if sk < 0:
                     sk = sk + 256
 
+                print(int(SKILL_ATTRIBUTE[wa_skill.get()], 16))
+                print(int(sk))
+
                 towrite = [
                     int(wa_damage.get()),
                     int(wa_protection.get()),
@@ -92,10 +100,10 @@ class WandScrollEdit:
                     int(wa_int_req.get()),
                     int(v1), int(v2),
                     int(wa_aspect.get()),
-                    int(d[14] + d[15], 16),
-                    int(d[16] + d[17], 16),
                     int(SKILL_ATTRIBUTE[wa_skill.get()], 16),
                     int(sk),
+                    int(d[18] + d[19], 16),
+                    int(d[20] + d[21], 16),
                     int((inv_spell_dic[wa_spell.get()])[:2], 16),
                     int((inv_spell_dic[wa_spell.get()])[2:], 16),
                     int(wa_charges.get()),
@@ -111,9 +119,13 @@ class WandScrollEdit:
                 for i in towrite:
                     f.write(i.to_bytes(1, byteorder='big'))
 
+                wand_reset_list()
+                self.wand.set(self.wand_list[self.wand_list.index(wa_name.get().rstrip('\x00'))])
+            wand_defaults()
+
         def scroll_write():
             with open(filename, 'rb+') as f:
-                address = SCROLL_ADDRESSES[build_lst(filename, SCROLL_ADDRESSES, name_length).index(scroll.get())]
+                address = self.scroll_addresses[self.sc_menu.current()]
 
                 new_name = bytearray(sc_name.get(), 'utf-8')
                 if len(new_name) < name_length:
@@ -154,6 +166,10 @@ class WandScrollEdit:
                 for i in towrite:
                     f.write(i.to_bytes(1, byteorder='big'))
 
+                scroll_reset_list()
+                self.scroll.set(self.scroll_list[self.scroll_list.index(sc_name.get().rstrip('\x00'))])
+            scroll_defaults()
+
         def build():
             box = Frame(win)
             box.grid(padx=5, pady=5)
@@ -161,13 +177,10 @@ class WandScrollEdit:
             sc_box = LabelFrame(box, text='Scrolls:', bd=6)
             sc_box.grid(column=0, row=0, sticky='n')
 
-            def sc_reset_list():
-                sc_menu['values'] = build_lst(filename, SCROLL_ADDRESSES, name_length)
-
-            sc_menu = Combobox(sc_box, textvariable=scroll, width=20,
-                               values=build_lst(filename, SCROLL_ADDRESSES, name_length),
-                               postcommand=sc_reset_list, state='readonly')
-            sc_menu.grid(column=0, row=0, columnspan=2)
+            self.sc_menu = Combobox(sc_box, textvariable=self.scroll, width=20,
+                                    values=self.scroll_list,
+                                    postcommand=scroll_reset_list, state='readonly')
+            self.sc_menu.grid(column=0, row=0, columnspan=2)
             sc_new_name_label = LabelFrame(sc_box, text='New Name')
             sc_new_name_label.grid(column=0, row=1, columnspan=2)
             sc_new_name_entry = Entry(sc_new_name_label, textvariable=sc_name, width=20)
@@ -192,13 +205,10 @@ class WandScrollEdit:
             wa_box = LabelFrame(box, text='Wands', bd=6)
             wa_box.grid(column=1, row=0)
 
-            def wa_reset_list():
-                wa_menu['values'] = build_lst(filename, WAND_ADDRESSES, name_length)
-
-            wa_menu = Combobox(wa_box, textvariable=wand, width=20,
-                               values=build_lst(filename, WAND_ADDRESSES, name_length),
-                               postcommand=wa_reset_list)
-            wa_menu.grid(column=0, row=0, columnspan=2)
+            self.wa_menu = Combobox(wa_box, textvariable=self.wand, width=20,
+                                    values=self.wand_list,
+                                    postcommand=wand_reset_list)
+            self.wa_menu.grid(column=0, row=0, columnspan=2)
             wa_new_name_label = LabelFrame(wa_box, text='New Name')
             wa_new_name_label.grid(column=0, row=1, columnspan=2)
             wa_new_name_entry = Entry(wa_new_name_label, textvariable=wa_name, width=20)
@@ -273,8 +283,20 @@ class WandScrollEdit:
             wa_save = Button(wa_box, text='Save Wand Edits', command=wand_write)
             wa_save.grid(column=0, row=13, columnspan=2)
 
-        wand = StringVar()
-        wand.trace('w', wand_defaults)
+        def scroll_reset_list():
+            self.scroll_list[:] = []
+            self.scroll_addresses[:] = []
+            self.scroll_list, self.scroll_addresses = get_major_name_lists(filename, SCROLL_ADDRESSES, name_length)
+            self.sc_menu['values'] = self.scroll_list
+
+        def wand_reset_list():
+            self.wand_list[:] = []
+            self.wand_addresses[:] = []
+            self.wand_list, self.wand_addresses = get_major_name_lists(filename, WAND_ADDRESSES, name_length)
+            self.wa_menu['values'] = self.wand_list
+
+        self.wand = StringVar()
+        self.wand.trace('w', wand_defaults)
         wa_name = StringVar()
         wa_name.trace('w', partial(limit_name_size, wa_name, name_length))
         wa_damage = StringVar()
@@ -299,8 +321,8 @@ class WandScrollEdit:
         wa_resist = StringVar()
         wa_resist_amount = StringVar()
 
-        scroll = StringVar()
-        scroll.trace('w', scroll_defaults)
+        self.scroll = StringVar()
+        self.scroll.trace('w', scroll_defaults)
         sc_name = StringVar()
         sc_name.trace('w', partial(limit_name_size, sc_name, name_length))
         sc_value = StringVar()
@@ -309,6 +331,6 @@ class WandScrollEdit:
         sc_cast_level = StringVar()
         sc_cast_level.trace('w', partial(limit, sc_cast_level, 15))
 
-        wand.set(build_lst(filename, WAND_ADDRESSES, name_length)[0])
-        scroll.set(build_lst(filename, SCROLL_ADDRESSES, name_length)[0])
         build()
+        self.wand.set(self.wand_list[0])
+        self.scroll.set(self.scroll_list[0])
