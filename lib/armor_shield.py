@@ -12,12 +12,10 @@ class ArmorShield:
     def __init__(self, filename, icon, addresses, title):
         win = Toplevel()
         win.resizable(False, False)
-        if title == 5:
+        if title == 0:
             win.title("Armor Edit")
-        elif title == 6:
+        elif title == 1:
             win.title("Shield Edit")
-        elif title == 7:
-            win.title("Weapon Edit")
         win.iconbitmap(icon)
         filename = filename
         data_seek = 26
