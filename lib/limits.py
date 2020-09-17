@@ -1,7 +1,4 @@
 # limits the same size
-from tkinter import END
-
-
 def limit_name_size(name, name_length, *args):
     n = name.get()
     if len(n) > name_length:
