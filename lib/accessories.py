@@ -14,6 +14,10 @@ class AccessoryEdit(Item):
         for s in stat_var:
             self.stats[stat_var.index(s)].trace('w', partial(limit_127, self.stats[stat_var.index(s)]))
             self.stat_label[stat_var.index(s)]['text'] = s
+            
+        # run
+        self.build()
+        self.item.set(self.item_list[0])
 
     def set_defaults(self, *args):
         with open(self.filename, 'rb') as f:
