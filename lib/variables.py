@@ -573,7 +573,7 @@ WEAPON_TYPE = {
     "Sting": "7",
     "Sword": "8",
     "Thrown": "9",
-    "Tusk": "10"
+    "Tusk": "A"
 }
 
 inv_WEAPON_TYPE = {v: k for k, v in WEAPON_TYPE.items()}

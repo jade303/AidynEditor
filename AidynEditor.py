@@ -4,7 +4,8 @@ from tkinter import Tk, LabelFrame, mainloop, Button, PhotoImage, Label, Checkbu
 from tkinter import filedialog
 
 from lib import armor_shield, characters_enemydrops, spells, wands_scrolls, weapons, trainers_shops, accessories
-from lib.variables import ARMOR_ADDRESSES, SHIELD_ADDRESSES, PARTY_ADDRESSES, ENEMY_ADDRESSES, WEAPON_ADDRESSES
+from lib.variables import ARMOR_ADDRESSES, SHIELD_ADDRESSES, PARTY_ADDRESSES, ENEMY_ADDRESSES, WEAPON_ADDRESSES, \
+    ACCESSORY_ADDRESSES
 
 p = Path()
 background = p / 'images/aidyn.gif'
@@ -54,21 +55,21 @@ def file_dialog():
         trainer_button.grid(column=1, row=2)
 
         accessory_button = Button(root, text='Accessory', width=button_width,
-                                  command=lambda: accessories.AccessoryEdit(filename, icon))
+                                  command=lambda: accessories.AccessoryEdit(filename, icon,
+                                                                            ACCESSORY_ADDRESSES,
+                                                                            24, 20, 20))
         accessory_button.grid(column=1, row=3)
 
         armor_button = Button(root, text='Armor', width=button_width,
-                              command=lambda: armor_shield.ArmorShield(filename,
-                                                                       icon,
+                              command=lambda: armor_shield.ArmorShield(filename, icon,
                                                                        ARMOR_ADDRESSES,
-                                                                       0))
+                                                                       26, 25, 22, 5))
         armor_button.grid(column=1, row=4)
 
         shield_button = Button(root, text='Shield', width=button_width,
-                               command=lambda: armor_shield.ArmorShield(filename,
-                                                                        icon,
+                               command=lambda: armor_shield.ArmorShield(filename, icon,
                                                                         SHIELD_ADDRESSES,
-                                                                        1))
+                                                                        26, 25, 22, 6))
         shield_button.grid(column=1, row=5)
 
         spell_button = Button(root, text='Spell', width=button_width,
@@ -80,7 +81,9 @@ def file_dialog():
         wandsscrolls_button.grid(column=1, row=7)
 
         weapon_button = Button(root, text='Weapon', width=button_width,
-                               command=lambda: weapons.WeaponEdit(filename, icon, WEAPON_ADDRESSES))
+                               command=lambda: weapons.WeaponEdit(filename, icon,
+                                                                  WEAPON_ADDRESSES,
+                                                                  23, 25, 21))
         weapon_button.grid(column=1, row=8)
 
 
