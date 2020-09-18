@@ -1,4 +1,6 @@
 from functools import partial
+
+from lib.fuctions import int_cast
 from lib.item import Item
 from lib.limits import limit_127
 from lib.variables import inv_EQUIPMENT_STAT, inv_SKILL_ATTRIBUTE, inv_RESIST, inv_RESIST_AMOUNTS, \
@@ -102,32 +104,33 @@ class ArmorShield(Item):
                 sk = sk + 256
 
             towrite = [
-                int(self.stats[0].get()),
-                int(self.stats[1].get()),
-                int(dx),
-                int(d[6] + d[7], 16),
-                int(sneak),
-                int(v1), int(v2),
-                int(d[14] + d[15], 16),
+                self.stats[0].get(),
+                self.stats[1].get(),
+                dx,
+                (d[6] + d[7]),
+                sneak,
+                v1, v2,
+                (d[14] + d[15]),
                 self.aspect.get(),
-                int(EQUIPMENT_STAT[self.att.get()], 16),
-                int(st),
-                int(SKILL_ATTRIBUTE[self.skill.get()], 16),
-                int(sk),
-                int((self.inv_spell_dic[self.spell.get()])[:2], 16),
-                int((self.inv_spell_dic[self.spell.get()])[2:], 16),
-                int(self.spell_level.get()),
-                int(d[32] + d[33], 16),
-                int((self.inv_spell_dic[self.magic.get()])[:2], 16),
-                int((self.inv_spell_dic[self.magic.get()])[2:], 16),
-                int(self.magic_level.get()),
-                int(RESIST[self.resist.get()], 16),
-                int(RESIST_AMOUNTS[self.resist_amount.get()], 16)
+                EQUIPMENT_STAT[self.att.get()],
+                st,
+                SKILL_ATTRIBUTE[self.skill.get()],
+                sk,
+                self.inv_spell_dic[self.spell.get()][:2],
+                self.inv_spell_dic[self.spell.get()][2:],
+                self.spell_level.get(),
+                (d[32] + d[33]),
+                self.inv_spell_dic[self.magic.get()][:2],
+                self.inv_spell_dic[self.magic.get()][2:],
+                self.magic_level.get(),
+                RESIST[self.resist.get()],
+                RESIST_AMOUNTS[self.resist_amount.get()]
             ]
 
             f.seek(address + self.data_seek)
-            for i in towrite:
-                f.write(i.to_bytes(1, byteorder='big'))
+            for item in towrite:
+                item = int_cast(item)
+                f.write(item.to_bytes(1, byteorder='big'))
 
             self.reset_list()
             self.item.set(self.item_list[self.item_list.index(self.name.get().rstrip('\x00'))])

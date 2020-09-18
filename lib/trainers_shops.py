@@ -3,7 +3,7 @@ from tkinter import Toplevel, StringVar, Button, LabelFrame, Label, Entry, Frame
 from tkinter.ttk import Combobox
 
 from lib.limits import limit
-from lib.list_functions import get_major_item_dic, get_minor_dic
+from lib.fuctions import get_major_item_dic, get_minor_dic
 from lib.variables import SKILLS, SHOP_SKILLS, SHOPS, SHOP_SHIELD, SHOP_SPELLS, SHOP_ITEM_ADDRESSES, SPELL_DIC
 
 

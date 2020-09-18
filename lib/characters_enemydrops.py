@@ -4,7 +4,7 @@ from tkinter import Toplevel, Frame, LabelFrame, Entry, Button, Radiobutton, Lab
 from tkinter.ttk import Combobox
 
 from lib.limits import limit_name_size, limit, limit_127
-from lib.list_functions import get_major_item_dic, get_minor_dic, get_major_loot_lists, get_major_name_lists
+from lib.fuctions import get_major_item_dic, get_minor_dic, get_major_loot_lists, get_major_name_lists, int_cast
 from lib.variables import ATTRIBUTES, SKILLS, DROP_CAT, SPELL_DIC, RESIST, \
     RESIST_AMOUNTS, inv_RESIST, inv_RESIST_AMOUNTS, SCHOOL, inv_SCHOOL
 
@@ -28,7 +28,7 @@ class CharacterEdit:
             self.drop_box = Combobox()
             self.enemy_drop_cat_box = Combobox()
             self.max_stats = [50, 30, 30, 60, 70, 120]  # Highest max stats found among enemies
-        win.iconbitmap(icon)                            # Need to do more testing with max enemy stats
+        win.iconbitmap(icon)
         data_seek = 44
 
         self.character_list, self.character_addresses = get_major_name_lists(filename, characters, name_length)
@@ -184,33 +184,34 @@ class CharacterEdit:
                     max_v1 = 255
 
                 towrite = [
-                    int(min_v1), int(min_v2),
-                    int(max_v1), int(max_v2),
-                    int(armor_chance.get()),
-                    int(shield_chance.get()),
-                    int(weap1_chance.get()),
-                    int(weap2_chance.get()),
-                    int(weap3_chance.get()),
-                    int(reagent_chance.get()),
-                    int(reagent_min.get()),
-                    int(reagent_max.get())
+                    min_v1, min_v2,
+                    max_v1, max_v2,
+                    armor_chance.get(),
+                    shield_chance.get(),
+                    weap1_chance.get(),
+                    weap2_chance.get(),
+                    weap3_chance.get(),
+                    reagent_chance.get(),
+                    reagent_min.get(),
+                    reagent_max.get()
                 ]
 
                 for i in item:
-                    towrite.append(int((inv_major_dic[i.get()])[:2], 16))
-                    towrite.append(int((inv_major_dic[i.get()])[2:], 16))
-                    towrite.append(int(item_chance[item.index(i)].get()))
-                    towrite.append(int(item_min[item.index(i)].get()))
-                    towrite.append(int(item_max[item.index(i)].get()))
+                    towrite.append(inv_major_dic[i.get()][:2])
+                    towrite.append(inv_major_dic[i.get()][2:])
+                    towrite.append(item_chance[item.index(i)].get())
+                    towrite.append(item_min[item.index(i)].get())
+                    towrite.append(item_max[item.index(i)].get())
 
                 for i, c in zip(other_items, other_items_chance):
-                    towrite.append(int((inv_major_dic[i.get()])[:2], 16))
-                    towrite.append(int((inv_major_dic[i.get()])[2:], 16))
-                    towrite.append(int(c.get()))
+                    towrite.append(inv_major_dic[i.get()][:2])
+                    towrite.append(inv_major_dic[i.get()][2:])
+                    towrite.append(c.get())
 
                 f.seek(address + 22)
-                for i in towrite:
-                    f.write(i.to_bytes(1, byteorder='big'))
+                for t in towrite:
+                    t = int_cast(t)
+                    f.write(t.to_bytes(1, byteorder='big'))
 
                 reset_loot_list()
                 if drop_cat.get() == enemy_drop_cat.get():
@@ -222,7 +223,6 @@ class CharacterEdit:
 
         def write():
             with open(filename, 'rb+') as f:
-                towrite = []
                 address = self.character_addresses[self.default_name_menu.current()]
                 # write new name to file
                 new_name = bytearray(name.get(), 'utf-8')
@@ -235,45 +235,50 @@ class CharacterEdit:
                 f.seek(address + data_seek)
                 d = f.read(data_read).hex()
 
-                towrite = [aspect.get(), int(d[2] + d[3], 16),
-                           int(d[4] + d[5], 16)]
+                towrite = [aspect.get(), (d[2] + d[3]),
+                           (d[4] + d[5])]
+
                 for i in skills:
                     j = i.get()
                     if j == '':
-                        j = 255
-                    towrite.append(int(j))
+                        if char_type == 0:
+                            j = 255
+                        elif char_type == 1:
+                            j = 0
+                    towrite.append(j)
 
                 for i in atts:
                     j = i.get()
-                    towrite.append(int(j))
+                    towrite.append(j)
 
-                towrite.append(int(d[64] + d[65], 16))
-                towrite.append(int(level.get()))
-                towrite.append(int(d[68] + d[69], 16))
+                towrite.append(d[64] + d[65])
+                towrite.append(level.get())
+                towrite.append(d[68] + d[69])
 
                 for i in weapons:
-                    if i.get() == 'NONE':
-                        towrite.append(int((inv_major_dic[i.get()])[:2], 16))
-                        towrite.append(int((inv_major_dic[i.get()])[2:], 16))
-                    else:
-                        w = '(weapon) ' + i.get()
+                    w = i.get()
+                    if w == 'NONE':
                         towrite.append(int((inv_major_dic[w])[:2], 16))
                         towrite.append(int((inv_major_dic[w])[2:], 16))
+                    else:
 
-                towrite.append(int(d[82] + d[83], 16))
-                towrite.append(int(d[84] + d[85], 16))
+                        towrite.append(int((inv_major_dic['(weapon) ' + w])[:2], 16))
+                        towrite.append(int((inv_major_dic['(weapon) ' + w])[2:], 16))
+
+                towrite.append(d[82] + d[83])
+                towrite.append(d[84] + d[85])
 
                 for i in spells:
-                    towrite.append(int((inv_spell_dic[i.get()])[:2], 16))
-                    towrite.append(int((inv_spell_dic[i.get()])[2:], 16))
+                    towrite.append(inv_spell_dic[i.get()][:2])
+                    towrite.append(inv_spell_dic[i.get()][2:])
 
-                towrite.append(int(SCHOOL[school.get()], 16))
+                towrite.append(SCHOOL[school.get()])
 
                 for i in spell_levels:
-                    towrite.append(int(i.get()))
+                    towrite.append(i.get())
 
                 for i in range(118, 136, 2):
-                    towrite.append(int(d[i] + d[i + 1], 16))
+                    towrite.append(d[i] + d[i + 1])
 
                 a = armor.get()
                 if a == 'NONE':
@@ -283,7 +288,7 @@ class CharacterEdit:
                     towrite.append(int((inv_major_dic['(armor) ' + a])[:2], 16))
                     towrite.append(int((inv_major_dic['(armor) ' + a])[2:], 16))
 
-                towrite.append(int(protection.get()))
+                towrite.append(protection.get())
 
                 s = shield.get()
                 if s == 'NONE':
@@ -295,26 +300,27 @@ class CharacterEdit:
 
                 shi = shield_skill.get()
                 if shi == '':
-                    shi = 255
-                towrite.append(int(shi))
+                    if char_type == 0:
+                        shi = 255
+                    elif char_type == 1:
+                        shi = 0
+                towrite.append(shi)
 
-                towrite.append(int(RESIST[resist1.get()], 16))
-                towrite.append(int(RESIST_AMOUNTS[resist1A.get()], 16))
-                towrite.append(int(RESIST[resist2.get()], 16))
-                towrite.append(int(RESIST_AMOUNTS[resist2A.get()], 16))
+                towrite.append(RESIST[resist1.get()])
+                towrite.append(RESIST_AMOUNTS[resist1A.get()])
+                towrite.append(RESIST[resist2.get()])
+                towrite.append(RESIST_AMOUNTS[resist2A.get()])
 
                 if char_type == 1:
                     for i in range(156, 179, 2):
-                        towrite.append(int(d[i] + d[i + 1], 16))
-                    xp = exp.get()
-                    if xp == '':
-                        xp = '0'
-                    towrite.append(int(xp))
-                    towrite.append(int((self.loot_code_list[self.loot_name_list.index(enemy_drop_cat.get())]), 16))
+                        towrite.append(d[i] + d[i + 1])
+                    towrite.append(exp.get())
+                    towrite.append(self.loot_code_list[self.loot_name_list.index(enemy_drop_cat.get())])
 
                 f.seek(address + data_seek)
-                for i in towrite:
-                    f.write(i.to_bytes(1, byteorder='big'))
+                for item in towrite:
+                    item = int_cast(item)
+                    f.write(item.to_bytes(1, byteorder='big'))
 
                 """base_stat_address = 0x0E3BE7
                 modded_stat_address = 0x0E3C03
@@ -594,7 +600,12 @@ class CharacterEdit:
                 if exp.get() == '':
                     self.exp_total.configure(text=' = ')
                 else:
-                    self.exp_total.configure(text=' = ' + str(75 * int(exp.get())))
+                    xp = 75 * int(exp.get())
+                    print(exp.get())
+                    print(xp)
+                    if xp > 19125:
+                        xp = 19125
+                    self.exp_total.configure(text=' = ' + str(xp))
 
             def reset_loot_list():
                 self.loot_name_list[:] = []

@@ -1,4 +1,6 @@
 from functools import partial
+
+from lib.fuctions import int_cast
 from lib.item import Item
 from lib.limits import limit_127
 from lib.variables import inv_EQUIPMENT_STAT, inv_SKILL_ATTRIBUTE, \
@@ -14,7 +16,7 @@ class AccessoryEdit(Item):
         for s in stat_var:
             self.stats[stat_var.index(s)].trace('w', partial(limit_127, self.stats[stat_var.index(s)]))
             self.stat_label[stat_var.index(s)]['text'] = s
-            
+
         # run
         self.build()
         self.item.set(self.item_list[0])
@@ -69,44 +71,51 @@ class AccessoryEdit(Item):
             d = f.read(self.data_read).hex()
 
             new_value = self.value.get()
+            if new_value == '':
+                new_value = '0'
             v2, v1 = divmod(int(new_value), 256)
             if v2 == 256:
                 v2 = 255
                 v1 = 255
 
             st = int(self.att_amount.get())
+            if st == '':
+                st = 00
             if st < 0:
                 st = st + 256
 
             sk = int(self.skill_amount.get())
+            if sk == '':
+                sk = 00
             if sk < 0:
                 sk = sk + 256
 
             towrite = [
-                int(self.stats[0].get()),
-                int(self.stats[1].get()),
-                int(self.stats[2].get()),
-                int(self.stats[3].get()),
-                int(v1), int(v2),
+                self.stats[0].get(),
+                self.stats[1].get(),
+                self.stats[2].get(),
+                self.stats[3].get(),
+                v1, v2,
                 self.aspect.get(),
-                int(EQUIPMENT_STAT[self.att.get()], 16),
-                int(st),
-                int(SKILL_ATTRIBUTE[self.skill.get()], 16),
-                int(sk),
-                int((self.inv_spell_dic[self.spell.get()])[:2], 16),
-                int((self.inv_spell_dic[self.spell.get()])[2:], 16),
-                int(self.spell_level.get()),
-                int(d[28] + d[29], 16),
-                int((self.inv_spell_dic[self.magic.get()])[:2], 16),
-                int((self.inv_spell_dic[self.magic.get()])[2:], 16),
-                int(self.magic_level.get()),
-                int(RESIST[self.resist.get()], 16),
-                int(RESIST_AMOUNTS[self.resist_amount.get()], 16)
+                EQUIPMENT_STAT[self.att.get()],
+                st,
+                SKILL_ATTRIBUTE[self.skill.get()],
+                sk,
+                self.inv_spell_dic[self.spell.get()][:2],
+                self.inv_spell_dic[self.spell.get()][2:],
+                self.spell_level.get(),
+                (d[28] + d[29]),
+                self.inv_spell_dic[self.magic.get()][:2],
+                self.inv_spell_dic[self.magic.get()][2:],
+                self.magic_level.get(),
+                RESIST[self.resist.get()],
+                RESIST_AMOUNTS[self.resist_amount.get()]
             ]
 
             f.seek(address + self.data_seek)
-            for i in towrite:
-                f.write(i.to_bytes(1, byteorder='big'))
+            for item in towrite:
+                item = int_cast(item)
+                f.write(item.to_bytes(1, byteorder='big'))
 
             self.reset_list()
             self.item.set(self.item_list[self.item_list.index(self.name.get().rstrip('\x00'))])

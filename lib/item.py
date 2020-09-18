@@ -2,7 +2,7 @@ from functools import partial
 from tkinter import Toplevel, StringVar, Frame, LabelFrame, Entry, Label, Button, Radiobutton, IntVar
 from tkinter.ttk import Combobox
 from lib.limits import limit_name_size, limit, limit_127
-from lib.list_functions import get_major_name_lists, get_minor_dic
+from lib.fuctions import get_major_name_lists, get_minor_dic
 from lib.variables import SPELL_DIC, EQUIPMENT_STAT, SKILL_ATTRIBUTE, RESIST_AMOUNTS, RESIST
 
 
@@ -96,7 +96,7 @@ class Item:
             self.stat_label.append(Label(self.stat_frame))
             self.stat_entry.append(Entry(self.stat_frame, textvariable=self.stats[x], width=4))
         self.value_label = Label(self.stat_frame, text='Base Value:')
-        self.value_entry = Entry(self.stat_frame, textvariable=self.value, width=5)
+        self.value_entry = Entry(self.stat_frame, textvariable=self.value, width=6)
         self.value_label2 = Label(self.stat_frame, text='Max base value: 65535', font=(None, 8))
 
     def set_defaults(self):

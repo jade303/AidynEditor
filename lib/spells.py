@@ -3,12 +3,12 @@ from tkinter import Toplevel, Frame, LabelFrame, Entry, Radiobutton, Label, Butt
 from tkinter.ttk import Combobox
 
 from lib.limits import limit_name_size, limit
-from lib.list_functions import get_major_name_lists
+from lib.fuctions import get_major_name_lists, int_cast
 from lib.variables import SPELL_ADDRESSES, inv_TARGET_NUM, inv_TARGET_TYPE, inv_SPELL_INGREDIENTS, \
     TARGET_NUM, TARGET_TYPE, SPELL_INGREDIENTS, SCHOOL, inv_SCHOOL
 
 
-class SpellEdit:
+class SpellEdit():
     def __init__(self, filename, icon):
         win = Toplevel()
         win.resizable(False, False)
@@ -64,21 +64,22 @@ class SpellEdit:
                 d = f.read(data_read).hex()
 
                 towrite = [
-                    int(SCHOOL[school.get()], 16),
-                    int(damage.get()),
-                    int(stamina.get()),
-                    int(TARGET_NUM[target_num.get()]),
-                    int(TARGET_TYPE[target_type.get()]),
-                    int(d[10] + d[11], 16),
-                    int(wizard.get()),
+                    SCHOOL[school.get()],
+                    damage.get(),
+                    stamina.get(),
+                    TARGET_NUM[target_num.get()],
+                    TARGET_TYPE[target_type.get()],
+                    (d[10] + d[11]),
+                    wizard.get(),
                     aspect.get(),
-                    int(spell_range.get()),
-                    int(SPELL_INGREDIENTS[ingredient.get()]),
-                    int(exp.get())
+                    spell_range.get(),
+                    SPELL_INGREDIENTS[ingredient.get()],
+                    exp.get()
                 ]
 
                 f.seek(address + data_seek)
                 for item in towrite:
+                    item = int_cast(item)
                     f.write(item.to_bytes(1, byteorder='big'))
 
                 reset_list()
@@ -194,3 +195,7 @@ class SpellEdit:
 
         build()
         self.spell.set(self.spell_list[0])
+
+    """def build(self):
+        super().build()
+        self.resist_frame.destroy()"""

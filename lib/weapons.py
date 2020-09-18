@@ -2,6 +2,7 @@ from functools import partial
 from tkinter import StringVar, LabelFrame
 from tkinter.ttk import Combobox
 
+from lib.fuctions import int_cast
 from lib.item import Item
 from lib.limits import limit
 from lib.variables import inv_WEAPON_TYPE, inv_WEAPON_ANIMATIONS, inv_EQUIPMENT_STAT, \
@@ -95,35 +96,36 @@ class WeaponEdit(Item):
                 sk = sk + 256
 
             towrite = [
-                int(WEAPON_TYPE[self.weapon_type.get()], 16),
-                int(self.stats[0].get()),
-                int(self.stats[1].get()),
-                int(self.stats[2].get()),
-                int(v1), int(v2),
-                int(d[12] + d[13], 16),
-                int(self.stats[3].get()),
-                int(WEAPON_ANIMATIONS[self.animation.get()], 16),
-                int(d[18] + d[19], 16),
-                int(RESIST[self.damage_type.get()], 16),
+                WEAPON_TYPE[self.weapon_type.get()],
+                self.stats[0].get(),
+                self.stats[1].get(),
+                self.stats[2].get(),
+                v1, v2,
+                (d[12] + d[13]),
+                self.stats[3].get(),
+                WEAPON_ANIMATIONS[self.animation.get()],
+                (d[18] + d[19]),
+                RESIST[self.damage_type.get()],
                 self.aspect.get(),
-                int(EQUIPMENT_STAT[self.att.get()], 16),
-                int(st),
-                int(SKILL_ATTRIBUTE[self.skill.get()], 16),
-                int(sk),
-                int((self.inv_spell_dic[self.spell.get()])[:2], 16),
-                int((self.inv_spell_dic[self.spell.get()])[2:], 16),
-                int(self.spell_level.get()),
-                int(d[38] + d[39], 16),
-                int((self.inv_spell_dic[self.magic.get()])[:2], 16),
-                int((self.inv_spell_dic[self.magic.get()])[2:], 16),
-                int(self.magic_level.get()),
-                int(RESIST[self.resist.get()], 16),
-                int(RESIST_AMOUNTS[self.resist_amount.get()], 16)
+                EQUIPMENT_STAT[self.att.get()],
+                st,
+                SKILL_ATTRIBUTE[self.skill.get()],
+                sk,
+                self.inv_spell_dic[self.spell.get()][:2],
+                self.inv_spell_dic[self.spell.get()][2:],
+                self.spell_level.get(),
+                (d[38] + d[39]),
+                self.inv_spell_dic[self.magic.get()][:2],
+                self.inv_spell_dic[self.magic.get()][2:],
+                self.magic_level.get(),
+                RESIST[self.resist.get()],
+                RESIST_AMOUNTS[self.resist_amount.get()]
             ]
 
             f.seek(address + self.data_seek)
-            for i in towrite:
-                f.write(i.to_bytes(1, byteorder='big'))
+            for item in towrite:
+                item = int_cast(item)
+                f.write(item.to_bytes(1, byteorder='big'))
 
             self.reset_list()
             self.item.set(self.item_list[self.item_list.index(self.name.get().rstrip('\x00'))])

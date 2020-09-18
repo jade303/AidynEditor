@@ -3,7 +3,7 @@ from tkinter import Toplevel, Label, StringVar, LabelFrame, Entry, Frame, Button
 from tkinter.ttk import Combobox
 
 from lib.limits import limit, limit_127, limit_name_size
-from lib.list_functions import build_lst, get_minor_dic, get_major_name_lists
+from lib.fuctions import build_lst, get_minor_dic, get_major_name_lists, int_cast
 from lib.variables import WAND_ADDRESSES, SCROLL_ADDRESSES, inv_SKILL_ATTRIBUTE, \
     inv_RESIST, inv_RESIST_AMOUNTS, SKILL_ATTRIBUTE, RESIST, RESIST_AMOUNTS, SPELL_DIC
 
@@ -90,34 +90,32 @@ class WandScrollEdit:
                 if sk < 0:
                     sk = sk + 256
 
-                print(int(SKILL_ATTRIBUTE[wa_skill.get()], 16))
-                print(int(sk))
-
                 towrite = [
-                    int(wa_damage.get()),
-                    int(wa_protection.get()),
-                    int(wa_str_req.get()),
-                    int(wa_int_req.get()),
-                    int(v1), int(v2),
-                    int(wa_aspect.get()),
-                    int(SKILL_ATTRIBUTE[wa_skill.get()], 16),
-                    int(sk),
-                    int(d[18] + d[19], 16),
-                    int(d[20] + d[21], 16),
-                    int((inv_spell_dic[wa_spell.get()])[:2], 16),
-                    int((inv_spell_dic[wa_spell.get()])[2:], 16),
-                    int(wa_charges.get()),
-                    int(wa_spell_level.get()),
-                    int(d[30] + d[31], 16),
-                    int(d[32] + d[33], 16),
-                    int(d[34] + d[35], 16),
-                    int(RESIST[wa_resist.get()], 16),
-                    int(RESIST_AMOUNTS[wa_resist_amount.get()], 16)
+                    wa_damage.get(),
+                    wa_protection.get(),
+                    wa_str_req.get(),
+                    wa_int_req.get(),
+                    v1, v2,
+                    wa_aspect.get(),
+                    SKILL_ATTRIBUTE[wa_skill.get()],
+                    sk,
+                    (d[18] + d[19]),
+                    (d[20] + d[21]),
+                    inv_spell_dic[wa_spell.get()][:2],
+                    inv_spell_dic[wa_spell.get()][2:],
+                    wa_charges.get(),
+                    wa_spell_level.get(),
+                    (d[30] + d[31]),
+                    (d[32] + d[33]),
+                    (d[34] + d[35]),
+                    RESIST[wa_resist.get()],
+                    RESIST_AMOUNTS[wa_resist_amount.get()]
                 ]
 
                 f.seek(address + data_seek)
-                for i in towrite:
-                    f.write(i.to_bytes(1, byteorder='big'))
+                for item in towrite:
+                    item = int_cast(item)
+                    f.write(item.to_bytes(1, byteorder='big'))
 
                 wand_reset_list()
                 self.wand.set(self.wand_list[self.wand_list.index(wa_name.get().rstrip('\x00'))])
@@ -146,25 +144,26 @@ class WandScrollEdit:
                 towrite = []
 
                 for i in range(0, 8, 2):
-                    towrite.append(int(d[i] + d[i + 1], 16))
+                    towrite.append(d[i] + d[i + 1])
 
-                towrite.append(int(v1))
-                towrite.append(int(v2))
+                towrite.append(v1)
+                towrite.append(v2)
 
                 for i in range(12, 22, 2):
-                    towrite.append(int(d[i] + d[i + 1], 16))
+                    towrite.append(d[i] + d[i + 1])
 
-                towrite.append(int((inv_spell_dic[sc_spell.get()])[:2], 16))
-                towrite.append(int((inv_spell_dic[sc_spell.get()])[2:], 16))
-                towrite.append(int(d[26] + d[27], 16))
-                towrite.append(int(sc_cast_level.get()))
+                towrite.append(inv_spell_dic[sc_spell.get()][:2])
+                towrite.append(inv_spell_dic[sc_spell.get()][2:])
+                towrite.append(d[26] + d[27])
+                towrite.append(sc_cast_level.get())
 
                 for i in range(30, 40, 2):
-                    towrite.append(int(d[i] + d[i + 1], 16))
+                    towrite.append(d[i] + d[i + 1])
 
                 f.seek(address + data_seek)
-                for i in towrite:
-                    f.write(i.to_bytes(1, byteorder='big'))
+                for item in towrite:
+                    item = int_cast(item)
+                    f.write(item.to_bytes(1, byteorder='big'))
 
                 scroll_reset_list()
                 self.scroll.set(self.scroll_list[self.scroll_list.index(sc_name.get().rstrip('\x00'))])
@@ -317,7 +316,7 @@ class WandScrollEdit:
         wa_charges = StringVar()
         wa_charges.trace('w', partial(limit, wa_charges, 255))
         wa_spell_level = StringVar()
-        wa_spell_level.trace('w', partial(limit, wa_spell_level, 255))
+        wa_spell_level.trace('w', partial(limit, wa_spell_level, 15))
         wa_resist = StringVar()
         wa_resist_amount = StringVar()
 

@@ -1,5 +1,6 @@
-from pathlib import Path
+import os
 import shutil
+import sys
 from tkinter import Tk, LabelFrame, mainloop, Button, PhotoImage, Label, Checkbutton, BooleanVar
 from tkinter import filedialog
 
@@ -7,9 +8,17 @@ from lib import armor_shield, characters_enemydrops, spells, wands_scrolls, weap
 from lib.variables import ARMOR_ADDRESSES, SHIELD_ADDRESSES, PARTY_ADDRESSES, ENEMY_ADDRESSES, WEAPON_ADDRESSES, \
     ACCESSORY_ADDRESSES
 
-p = Path()
-background = p / 'images/aidyn.gif'
-icon = p / 'images/aidyn.ico'
+
+# todo: fix exp value (maybe value?)
+
+def resource_path(relative_path):
+    if hasattr(sys, '_MEIPASS'):
+        return os.path.join(sys._MEIPASS, relative_path)
+    return os.path.join(os.path.abspath("."), relative_path)
+
+
+background = resource_path('images\\aidyn.gif')
+icon = resource_path('images\\aidyn.ico')
 
 
 def file_dialog():
@@ -40,8 +49,8 @@ def file_dialog():
                                                                                   PARTY_ADDRESSES,
                                                                                   party_name_length,
                                                                                   0))  # this number provides
-        party_button.grid(column=1, row=0, sticky='ew')                                # the type of window
-                                                                                       # i.e. 0 = party, 1 = enemy
+        party_button.grid(column=1, row=0, sticky='ew')  # the type of window
+        # i.e. 0 = party, 1 = enemy
         enemy_button = Button(root, text='Enemy', width=button_width,
                               command=lambda: characters_enemydrops.CharacterEdit(filename,
                                                                                   icon,
