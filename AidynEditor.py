@@ -9,8 +9,6 @@ from lib.variables import ARMOR_ADDRESSES, SHIELD_ADDRESSES, PARTY_ADDRESSES, EN
     ACCESSORY_ADDRESSES
 
 
-# todo: fix exp value (maybe value?)
-
 def resource_path(relative_path):
     if hasattr(sys, '_MEIPASS'):
         return os.path.join(sys._MEIPASS, relative_path)
