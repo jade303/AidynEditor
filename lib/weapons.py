@@ -2,9 +2,8 @@ from functools import partial
 from tkinter import StringVar, LabelFrame
 from tkinter.ttk import Combobox
 
-from lib.fuctions import int_cast
+from lib.fuctions import int_cast, limit
 from lib.item import Item
-from lib.limits import limit
 from lib.variables import inv_WEAPON_TYPE, inv_WEAPON_ANIMATIONS, inv_EQUIPMENT_STAT, \
     inv_SKILL_ATTRIBUTE, inv_RESIST, inv_RESIST_AMOUNTS, WEAPON_TYPE, WEAPON_ANIMATIONS, EQUIPMENT_STAT, \
     SKILL_ATTRIBUTE, RESIST, RESIST_AMOUNTS
