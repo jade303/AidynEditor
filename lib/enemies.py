@@ -137,7 +137,7 @@ class EnemyEdit(Characters):
                 j = i.get()
                 towrite.append(j)
 
-            towrite.append(d[64] + d[65])
+            towrite.append(self.spell_battery.get())
             towrite.append(self.level.get())
             towrite.append(d[68] + d[69])
 
@@ -155,8 +155,8 @@ class EnemyEdit(Characters):
             towrite.append(d[84] + d[85])
 
             for i in self.spells:
-                towrite.append(self.inv_spell_dic[i.get()][:2])
-                towrite.append(self.inv_spell_dic[i.get()][2:])
+                towrite.append(int((self.inv_spell_dic[i.get()])[:2], 16))
+                towrite.append(int((self.inv_spell_dic[i.get()])[2:], 16))
 
             towrite.append(SCHOOL[self.schools.get()])
 

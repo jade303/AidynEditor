@@ -30,7 +30,7 @@ class SpellEdit:
         self.damage = StringVar()
         self.damage.trace('w', partial(limit, self.damage, 255))
         self.stamina = StringVar()
-        self.stamina.trace('w', partial(limit, self.stamina, 120))
+        self.stamina.trace('w', partial(limit, self.stamina, 127))
         self.wizard = StringVar()
         self.wizard.trace('w', partial(limit, self.wizard, 10))
         self.spell_range = StringVar()

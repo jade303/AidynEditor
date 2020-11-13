@@ -14,12 +14,16 @@ def build_lst(filename, addresses, name_length):
 def get_minor_dic(filename, dic, name_length):
     # ID/Name key/value dictionary
     # dictionary keys must be addresses
-    lst = []
+    name = []
+    code = []
     with open(filename, 'rb') as f:
         for a in dic.keys():
             f.seek(a)
-            lst.append(f.read(name_length).decode("utf-8").rstrip('\x00'))
-    return {**{'0000': 'NONE'}, **dict(zip(dic.values(), lst))}
+            name.append(f.read(name_length).decode("utf-8").rstrip('\x00'))
+        for b in dic.values():
+            code.append(b)
+        name, code = (list(t) for t in zip(*sorted(zip(name, code))))
+    return {**{'0000': 'NONE'}, **dict(zip(code, name))}
 
 
 def get_major_item_dic(filename):
