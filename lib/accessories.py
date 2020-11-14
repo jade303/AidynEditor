@@ -96,19 +96,19 @@ class AccessoryEdit(Item):
                 self.stats[3].get(),
                 v1, v2,
                 self.aspect.get(),
-                EQUIPMENT_STAT[self.att.get()],
+                int(EQUIPMENT_STAT[self.att.get()], 16),
                 st,
-                SKILL_ATTRIBUTE[self.skill.get()],
+                int(SKILL_ATTRIBUTE[self.skill.get()], 16),
                 sk,
-                self.inv_spell_dic[self.spell.get()][:2],
-                self.inv_spell_dic[self.spell.get()][2:],
+                int(self.inv_spell_dic[self.spell.get()][:2], 16),
+                int(self.inv_spell_dic[self.spell.get()][2:], 16),
                 self.spell_level.get(),
                 (d[28] + d[29]),
-                self.inv_spell_dic[self.magic.get()][:2],
-                self.inv_spell_dic[self.magic.get()][2:],
+                int(self.inv_spell_dic[self.magic.get()][:2], 16),
+                int(self.inv_spell_dic[self.magic.get()][2:], 16),
                 self.magic_level.get(),
-                RESIST[self.resist.get()],
-                RESIST_AMOUNTS[self.resist_amount.get()]
+                int(RESIST[self.resist.get()], 16),
+                int(RESIST_AMOUNTS[self.resist_amount.get()], 16)
             ]
 
             f.seek(address + self.data_seek)

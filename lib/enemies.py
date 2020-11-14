@@ -137,7 +137,7 @@ class EnemyEdit(Characters):
                 j = i.get()
                 towrite.append(j)
 
-            towrite.append(self.spell_battery.get())
+            towrite.append(d[64] + d[65])
             towrite.append(self.level.get())
             towrite.append(d[68] + d[69])
 
@@ -155,8 +155,8 @@ class EnemyEdit(Characters):
             towrite.append(d[84] + d[85])
 
             for i in self.spells:
-                towrite.append(int((self.inv_spell_dic[i.get()])[:2], 16))
-                towrite.append(int((self.inv_spell_dic[i.get()])[2:], 16))
+                towrite.append(int(self.inv_spell_dic[i.get()][:2], 16))
+                towrite.append(int(self.inv_spell_dic[i.get()][2:], 16))
 
             towrite.append(SCHOOL[self.schools.get()])
 
@@ -192,10 +192,10 @@ class EnemyEdit(Characters):
                     shi = 0
             towrite.append(shi)
 
-            towrite.append(RESIST[self.resist1a.get()])
-            towrite.append(RESIST_AMOUNTS[self.resist1b.get()])
-            towrite.append(RESIST[self.resist2a.get()])
-            towrite.append(RESIST_AMOUNTS[self.resist2b.get()])
+            towrite.append(int(RESIST[self.resist1a.get()], 16))
+            towrite.append(int(RESIST_AMOUNTS[self.resist1b.get()], 16))
+            towrite.append(int(RESIST[self.resist2a.get()], 16))
+            towrite.append(int(RESIST_AMOUNTS[self.resist2b.get()], 16))
 
             for i in range(156, 179, 2):
                 towrite.append(d[i] + d[i + 1])
@@ -233,7 +233,10 @@ class EnemyEdit(Characters):
             self.reagent_max.set(int(d[22] + d[23], 16))
 
             for i, c, mi, mx in zip(self.item, self.item_chance, self.item_min, self.item_max):
-                i.set(self.major_dic[d[(10 * self.item.index(i) + 24):(10 * self.item.index(i) + 28)].upper()])
+                x = d[(10 * self.item.index(i) + 24):(10 * self.item.index(i) + 28)].upper()
+                if x == '0B10':
+                    x = '0000'
+                i.set(self.major_dic[x])
                 c.set(int(d[(10 * self.item.index(i) + 28)] + d[(10 * self.item.index(i) + 29)], 16))
                 mi.set(int(d[(10 * self.item.index(i) + 30)] + d[(10 * self.item.index(i) + 31)], 16))
                 mx.set(int(d[(10 * self.item.index(i) + 32)] + d[(10 * self.item.index(i) + 33)], 16))

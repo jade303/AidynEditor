@@ -224,6 +224,8 @@ ARMOR_ADDRESSES = [
 ]
 
 SCROLL_ADDRESSES = [
+    0x01FCE3A0,
+    0x01FCE374,
     0x01FCE608,
     0x01FCDBB8,
     0x01FCE5DC,
@@ -593,7 +595,7 @@ inv_EQUIPMENT_STAT = {v: k for k, v in EQUIPMENT_STAT.items()}
 SKILL_ATTRIBUTE = {
     "NONE": "FF",
     "Alchemist": "00",
-    "Dipolomat": "01",
+    "Diplomat": "01",
     "Healer": "02",
     "Loremaster": "03",
     "Mechanic": "04",

@@ -100,8 +100,8 @@ class WandScrollEdit:
                     sk,
                     (d[18] + d[19]),
                     (d[20] + d[21]),
-                    inv_spell_dic[wa_spell.get()][:2],
-                    inv_spell_dic[wa_spell.get()][2:],
+                    int(inv_spell_dic[wa_spell.get()][:2], 16),
+                    int(inv_spell_dic[wa_spell.get()][2:], 16),
                     wa_charges.get(),
                     wa_spell_level.get(),
                     (d[30] + d[31]),
@@ -151,8 +151,8 @@ class WandScrollEdit:
                 for i in range(12, 22, 2):
                     towrite.append(d[i] + d[i + 1])
 
-                towrite.append(inv_spell_dic[sc_spell.get()][:2])
-                towrite.append(inv_spell_dic[sc_spell.get()][2:])
+                towrite.append(int(inv_spell_dic[sc_spell.get()][:2], 16))
+                towrite.append(int(inv_spell_dic[sc_spell.get()][2:], 16))
                 towrite.append(d[26] + d[27])
                 towrite.append(sc_cast_level.get())
 

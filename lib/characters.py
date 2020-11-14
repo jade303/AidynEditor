@@ -63,8 +63,6 @@ class Characters:
         self.armor = StringVar()
         self.protection = StringVar()
         self.protection.trace('w', partial(limit_127, self.protection))
-        self.spell_battery = StringVar()
-        self.spell_battery.trace('w', partial(limit, self.spell_battery, 255))
         self.shield = StringVar()
         self.resist1a = StringVar()
         self.resist1b = StringVar()
@@ -95,14 +93,7 @@ class Characters:
                 Combobox(self.spell_frame, textvariable=self.spells[x], values=list(self.inv_spell_dic.keys()),
                          width=16, state='readonly'))
             self.spell_level.append(Entry(self.spell_frame, textvariable=self.spell_levels[x], width=4))
-
-        self.hidden_att_frame = LabelFrame(self.not_loot_frame, text='Hidden Attributes')
-        self.spell_battery_label = Label(self.hidden_att_frame, text='Base Spell Battery')
-        self.spell_battery_entry = Entry(self.hidden_att_frame, textvariable=self.spell_battery, width=4)
-        self.protection_label = Label(self.hidden_att_frame, text='Base Protection')
-        self.protection_entry = Entry(self.hidden_att_frame, textvariable=self.protection, width=4)
-
-        self.resist_frame = LabelFrame(self.hidden_att_frame, text='Resists')
+        self.resist_frame = LabelFrame(self.not_loot_frame, text='Resists')
         self.resist_menu1 = Combobox(self.resist_frame, textvariable=self.resist1a, values=list(RESIST.keys()),
                                      width=16, state='readonly')
         self.resist_amount_menu1 = Combobox(self.resist_frame, textvariable=self.resist1b, width=5,
@@ -117,7 +108,8 @@ class Characters:
         for x in range(6):
             self.att_label.append(Label(self.att_frame, text=ATTRIBUTES[x]))
             self.att_num.append(Entry(self.att_frame, textvariable=self.atts[x], width=4))
-
+        self.protection_label = Label(self.att_frame, text='Base Protection')
+        self.protection_entry = Entry(self.att_frame, textvariable=self.protection, width=4)
         self.equipment_frame = LabelFrame(self.not_loot_frame, text='Equipment')
         self.weapon_frame = LabelFrame(self.equipment_frame, text='Weapons')
         self.weapon_menu = []
@@ -158,8 +150,6 @@ class Characters:
 
             for a in self.atts:
                 a.set(int(d[(self.atts.index(a) * 2) + 52] + d[(self.atts.index(a) * 2) + 53], 16))
-
-            self.spell_battery.set(int(d[64] + d[65], 16))
 
             self.level.set(int(d[66] + d[67], 16))
 
@@ -228,7 +218,7 @@ class Characters:
                 j = i.get()
                 towrite.append(j)
 
-            towrite.append(self.spell_battery.get())
+            towrite.append(d[64] + d[65])
             towrite.append(self.level.get())
             towrite.append(d[68] + d[69])
 
@@ -246,8 +236,8 @@ class Characters:
             towrite.append(d[84] + d[85])
 
             for i in self.spells:
-                towrite.append(int((self.inv_spell_dic[i.get()])[:2], 16))
-                towrite.append(int((self.inv_spell_dic[i.get()])[2:], 16))
+                towrite.append(int(self.inv_spell_dic[i.get()][:2]), 16)
+                towrite.append(int(self.inv_spell_dic[i.get()][2:]), 16)
 
             towrite.append(SCHOOL[self.schools.get()])
 
@@ -283,10 +273,10 @@ class Characters:
                     shi = 0
             towrite.append(shi)
 
-            towrite.append(RESIST[self.resist1a.get()])
-            towrite.append(RESIST_AMOUNTS[self.resist1b.get()])
-            towrite.append(RESIST[self.resist2a.get()])
-            towrite.append(RESIST_AMOUNTS[self.resist2b.get()])
+            towrite.append(int(RESIST[self.resist1a.get()], 16))
+            towrite.append(int(RESIST_AMOUNTS[self.resist1b.get()], 16))
+            towrite.append(int(RESIST[self.resist2a.get()], 16))
+            towrite.append(int(RESIST_AMOUNTS[self.resist2b.get()], 16))
 
             f.seek(address + self.data_seek)
             for item in towrite:
@@ -334,20 +324,16 @@ class Characters:
         for x in range(6):
             self.att_label[x].grid(column=0, row=x, sticky='e')
             self.att_num[x].grid(column=1, row=x, stick='w')
+        self.protection_label.grid(column=0, row=6, stick='e')
+        self.protection_entry.grid(column=1, row=6, stick='w')
 
-        self.hidden_att_frame.grid(column=0, row=4, columnspan=2)
-        self.protection_label.grid(column=0, row=0, stick='e')
-        self.protection_entry.grid(column=1, row=0, stick='w')
-        self.spell_battery_label.grid(column=0, row=1, sticky='e')
-        self.spell_battery_entry.grid(column=1, row=1, sticky='w')
-
-        self.resist_frame.grid(column=0, row=5, columnspan=2)
+        self.resist_frame.grid(column=0, row=4, columnspan=2)
         self.resist_menu1.grid(column=0, row=0)
         self.resist_amount_menu1.grid(column=1, row=0)
         self.resist_menu2.grid(column=0, row=1)
         self.resist_amount_menu2.grid(column=1, row=1)
 
-        self.equipment_frame.grid(column=0, row=6, columnspan=2)
+        self.equipment_frame.grid(column=0, row=5, columnspan=2)
 
         self.weapon_frame.grid(column=0, rowspan=2)
         for x in range(3):

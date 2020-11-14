@@ -213,8 +213,8 @@ class TrainerEdit:
             d = f.read(self.spell_read).hex()
 
             for i in self.spells:
-                towrite.append(self.inv_spell_dic[i.get()][:2])
-                towrite.append(self.inv_spell_dic[i.get()][2:])
+                towrite.append(int(self.inv_spell_dic[i.get()][:2], 16))
+                towrite.append(int(self.inv_spell_dic[i.get()][2:], 16))
 
             towrite.append(d[9] + d[10])
 
