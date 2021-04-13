@@ -1,9 +1,15 @@
+#
+# AidynEditor - an editor for Aidyn Chronicles
+# @author Quinn Vana
+# @email quinnvana@gmail.com
+#
+
 import os
 import shutil
 import sys
 from tkinter import Tk, LabelFrame, mainloop, Button, PhotoImage, Label, Checkbutton, BooleanVar
 from tkinter import filedialog
-from lib import armors_and_shields, spells, wands_and_scrolls, weapons, trainers_and_shops, accessories, \
+from views import armors_and_shields, spells, wands_and_scrolls, weapons, trainers_and_shops, accessories, \
     enemies, party
 from lib.variables import ARMOR_ADDRESSES, SHIELD_ADDRESSES, PARTY_ADDRESSES, ENEMY_ADDRESSES, WEAPON_ADDRESSES, \
     ACCESSORY_ADDRESSES
