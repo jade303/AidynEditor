@@ -236,8 +236,8 @@ class Characters:
             towrite.append(d[84] + d[85])
 
             for i in self.spells:
-                towrite.append(int(self.inv_spell_dic[i.get()][:2]), 16)
-                towrite.append(int(self.inv_spell_dic[i.get()][2:]), 16)
+                towrite.append(int(self.inv_spell_dic[i.get()][:2], 16))
+                towrite.append(int(self.inv_spell_dic[i.get()][2:], 16))
 
             towrite.append(SCHOOL[self.schools.get()])
 
