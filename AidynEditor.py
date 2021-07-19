@@ -1,7 +1,6 @@
 #
 # AidynEditor - an editor for Aidyn Chronicles
-# @author Quinn Vana
-# @email quinnvana@gmail.com
+# @email fishbane0@gmail.com
 #
 
 import os
