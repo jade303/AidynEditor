@@ -112,6 +112,7 @@ browse_frame = LabelFrame(root, text='Aidyn Chronicles ROM')
 browse_frame.pack()
 browse_button = Button(browse_frame, text='Browse', command=file_dialog)
 browse_button.pack()
+browse_button.focus_set()
 back_up = Checkbutton(browse_frame, text='Backup', var=backup)
 back_up.pack()
 
