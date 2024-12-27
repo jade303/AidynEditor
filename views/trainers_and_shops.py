@@ -72,6 +72,7 @@ class TrainerEdit:
 
         self.default_name_menu = Combobox(self.main_win, textvariable=self.trainer, values=self.shops, width=26,
                                           state='readonly')
+        self.default_name_menu.focus_set()
         self.save = Button(self.main_win, text="Save", command=self.write, width=8)
         self.spell_frame = LabelFrame(self.main_win, text='Spells and Spell Level')
 

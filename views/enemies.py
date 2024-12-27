@@ -1,5 +1,5 @@
 from functools import partial
-from tkinter import StringVar, LabelFrame, Label, Button
+from tkinter import StringVar, LabelFrame, Label, Button, Frame
 from tkinter.ttk import Combobox, Entry
 
 from views.characters import Characters
@@ -340,27 +340,32 @@ class EnemyEdit(Characters):
                                  postcommand=self.reset_loot_list)
         self.drop_box.grid(column=1, row=0, sticky='w')
 
-        new_loot_name_frame = LabelFrame(drop_frame, text="Change Loot Name")
-        new_loot_name_frame.grid(column=0, row=1, columnspan=2)
-        new_loot_name_entry = Entry(new_loot_name_frame, textvariable=self.loot_name, width=19)
-        new_loot_name_entry.grid()
-
         save = Button(drop_frame, text="Save Loot Changes", width=18,
                       command=self.write_drop)
-        save.grid(column=0, row=2, columnspan=2, pady=8)
+        save.grid(column=0, row=1, pady=8)
 
-        drop_stats = LabelFrame(drop_frame, text='Loot details\n(editing these affects all enemies\n with the '
+        new_loot_name_frame = LabelFrame(drop_frame, text="Change Loot Name")
+        new_loot_name_frame.grid(column=1, row=1, sticky='w')
+        new_loot_name_entry = Entry(new_loot_name_frame, textvariable=self.loot_name, width=21)
+        new_loot_name_entry.grid()
+
+        drop_stats = LabelFrame(drop_frame, text='Loot details\n(Editing these will affect all enemies with the '
                                                  'same loot type)\n')
         drop_stats.grid(column=0, row=3, columnspan=2)
+        
+        drop_cont1 = Frame(drop_stats)
+        drop_cont1.grid(column=0, row=0, padx=2, pady=16, sticky='n')
+        drop_cont2 = Frame(drop_stats)
+        drop_cont2.grid(column=1, row=0, padx=2, sticky='n')
 
-        gold_min_label = Label(drop_stats, text='Random Gold MIN/MAX')
+        gold_min_label = Label(drop_cont1, text='Random Gold MIN/MAX')
         gold_min_label.grid(column=0, row=0, sticky='e')
-        gold_min_entry = Entry(drop_stats, textvariable=self.gold_min, width=5)
+        gold_min_entry = Entry(drop_cont1, textvariable=self.gold_min, width=5)
         gold_min_entry.grid(column=1, row=0, sticky='e')
-        gold_max_entry = Entry(drop_stats, textvariable=self.gold_max, width=5)
+        gold_max_entry = Entry(drop_cont1, textvariable=self.gold_max, width=5)
         gold_max_entry.grid(column=2, row=0, sticky='w')
 
-        drop_chance_frame = LabelFrame(drop_stats, text='Drop Chance')
+        drop_chance_frame = LabelFrame(drop_cont1, text='Drop Chance')
         drop_chance_frame.grid(column=0, row=2, columnspan=3)
 
         armor_chance_label = Label(drop_chance_frame, text='Armor %', anchor='e')
@@ -393,15 +398,15 @@ class EnemyEdit(Characters):
         reagent_chance_entry = Entry(drop_chance_frame, textvariable=self.reagent_chance, width=5)
         reagent_chance_entry.grid(column=1, row=5, sticky='w')
 
-        reagent_min_label = Label(drop_stats, text='Reagent drop MIN/MAX')
+        reagent_min_label = Label(drop_cont1, text='Reagent drop MIN/MAX')
         reagent_min_label.grid(column=0, row=4, sticky='e')
-        reagent_min_entry = Entry(drop_stats, textvariable=self.reagent_min, width=5)
+        reagent_min_entry = Entry(drop_cont1, textvariable=self.reagent_min, width=5)
         reagent_min_entry.grid(column=1, row=4, sticky='e')
-        reagent_max_entry = Entry(drop_stats, textvariable=self.reagent_max, width=5)
+        reagent_max_entry = Entry(drop_cont1, textvariable=self.reagent_max, width=5)
         reagent_max_entry.grid(column=2, row=4, sticky='w')
 
         for i in self.item:
-            item_frame = LabelFrame(drop_stats, text=('Item ' + str(self.item.index(i) + 1)))
+            item_frame = LabelFrame(drop_cont2, text=('Item ' + str(self.item.index(i) + 1)))
             item_frame.grid(column=0, row=(5 + self.item.index(i)), columnspan=3)
             item_box = Combobox(item_frame, textvariable=i, values=list(self.major_dic.values()),
                                 width=28, state='readonly')
@@ -418,7 +423,7 @@ class EnemyEdit(Characters):
             item_max_entry.grid(column=2, row=2, sticky='w')
 
         for i in self.other_items:
-            other_item_frame = LabelFrame(drop_stats, text=('Item ' + str(self.other_items.index(i) + 3)))
+            other_item_frame = LabelFrame(drop_cont2, text=('Item ' + str(self.other_items.index(i) + 3)))
             other_item_frame.grid(column=0, row=(7 + self.other_items.index(i)), columnspan=3)
             other_item_box = Combobox(other_item_frame, textvariable=i, values=list(self.major_dic.values()),
                                       width=28, state='readonly')
